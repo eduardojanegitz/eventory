@@ -12,7 +12,9 @@ import tagsRoutes from "./routes/tags.js";
 
 // DATA IMPORTS
 import User from "./models/User.js";
-import { dataUser } from "./data/index.js";
+import Product from "./models/Product.js";
+import ProductStat from "./models/ProductStat.js";
+import { dataUser, dataProduct, dataProductStat } from "./data/index.js";
 /* CONFIGURATION */
 dotenv.config();
 const app = express();
@@ -41,6 +43,8 @@ mongoose
     app.listen(PORT, () => console.log(`server port: ${PORT}`));
 
     /*ONLY ADD DATA ONE TIME */
+    // Product.insertMany(dataItem);
+    // ProductStat.insertMany(dataItemStat);
     // User.insertMany(dataUser);
   })
   .catch((error) => console.log(`${error} didn't connect`));
