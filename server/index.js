@@ -5,7 +5,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import helmet from "helmet";
 import morgan from "morgan";
-import usersRoutes from "./routes/users.js";
+import clientRoutes from "./routes/client.js";
 import generalRoutes from "./routes/general.js";
 import itemsRoutes from "./routes/items.js";
 import tagsRoutes from "./routes/tags.js";
@@ -30,7 +30,7 @@ app.use(cors());
 app.use("/general", generalRoutes);
 app.use("/items", itemsRoutes);
 app.use("/tags", tagsRoutes);
-app.use("/users", usersRoutes);
+app.use("/client", clientRoutes);
 
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 9000;
@@ -43,8 +43,8 @@ mongoose
     app.listen(PORT, () => console.log(`server port: ${PORT}`));
 
     /*ONLY ADD DATA ONE TIME */
-    // Product.insertMany(dataItem);
-    // ProductStat.insertMany(dataItemStat);
+    // Product.insertMany(dataProduct);
+    // ProductStat.insertMany(dataProductStat);
     // User.insertMany(dataUser);
   })
   .catch((error) => console.log(`${error} didn't connect`));
