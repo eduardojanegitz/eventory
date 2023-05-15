@@ -39,57 +39,42 @@ const navItems = [
     icon: <HomeOutlined />,
   },
   {
-    text: "Client Facing",
+    text: "Consulta",
     icon: null,
   },
   {
-    text: "Products",
+    text: "Itens",
     icon: <ShoppingCartOutlined />,
   },
   {
-    text: "Customers",
+    text: "Usuários",
     icon: <Groups2Outlined />,
   },
   {
-    text: "Transactions",
+    text: "Inventários",
     icon: <ReceiptLongOutlined />,
   },
   {
-    text: "Geography",
-    icon: <PublicOutlined />,
-  },
-  {
-    text: "Sales",
+    text: "Gráficos",
     icon: null,
   },
   {
-    text: "Overview",
+    text: "Depreciação",
     icon: <PointOfSaleOutlined />,
-  },
-  {
-    text: "Daily",
-    icon: <TodayOutlined />,
-  },
-  {
-    text: "Monthly",
-    icon: <CalendarMonthOutlined />,
   },
   {
     text: "BreakDown",
     icon: <PieChartOutlined />,
   },
   {
-    text: "Managment",
+    text: "Leitura de etiquetas",
     icon: null,
   },
   {
-    text: "Admin",
+    text: "Tags",
     icon: <AdminPanelSettingsOutlined />,
   },
-  {
-    text: "Performance",
-    icon: <TrendingUpOutlined />,
-  },
+
 ];
 const Sidebar = ({
   user,
@@ -149,7 +134,7 @@ const Sidebar = ({
                     </Typography>
                   );
                 }
-                const lcText = text.toLowerCase();
+                const lcText = text.toLowerCase() && text.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
                 return (
                   <ListItem key={text} disablePadding>
                     <ListItemButton

@@ -3,7 +3,7 @@ const { styled } = require("@mui/system");
  
 const FlexBetween = styled(Box)({
     display: "flex",
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "center"
 });
 

@@ -9,6 +9,8 @@ import Dashboard from "scenes/Dashboard";
 import Products from "scenes/Products";
 import Customers from "scenes/Customers";
 import Transactions from "scenes/Transactions";
+import Overview from "scenes/Overview";
+import Breakdown from "scenes/Breakdown";
 
 function App() {
   const mode = useSelector((state) => state.global.mode);
@@ -22,9 +24,11 @@ function App() {
             <Route element={<Layout />}>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/products" element={<Products />} />
-              <Route path="/customers" element={<Customers />} />
-              <Route path="/transactions" element={<Transactions />} />
+              <Route path="/itens" element={<Products />} />
+              <Route path="/usuarios" element={<Customers />} />
+              <Route path="/inventarios" element={<Transactions />} />
+              <Route path="/depreciacao" element={<Overview />} />
+              <Route path="/breakdown" element={<Breakdown />} />
             </Route>
           </Routes>
         </ThemeProvider>

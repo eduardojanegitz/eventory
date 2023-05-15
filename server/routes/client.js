@@ -3,8 +3,8 @@ import { getProducts, getCustomers, getTransactions } from "../controllers/clien
 
 const router = express.Router();
 
-router.get("/products", getProducts);
-router.get("/customers", getCustomers);
-router.get("/transactions", getTransactions);
+router.get("/itens", getProducts);
+router.get("/usuarios", getCustomers);
+router.get("/inventarios", getTransactions);
 
 export default router;
