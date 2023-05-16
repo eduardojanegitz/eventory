@@ -11,7 +11,7 @@ import Customers from "scenes/Customers";
 import Transactions from "scenes/Transactions";
 import Overview from "scenes/Overview";
 import Breakdown from "scenes/Breakdown";
-
+import Tags from "scenes/Tags";
 function App() {
   const mode = useSelector((state) => state.global.mode);
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
@@ -28,7 +28,8 @@ function App() {
               <Route path="/usuarios" element={<Customers />} />
               <Route path="/inventarios" element={<Transactions />} />
               <Route path="/depreciacao" element={<Overview />} />
-              <Route path="/breakdown" element={<Breakdown />} />
+              <Route path="/categorias" element={<Breakdown />} />
+              <Route path="/tags" element={<Tags /> } />
             </Route>
           </Routes>
         </ThemeProvider>

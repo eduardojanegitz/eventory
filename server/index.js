@@ -16,12 +16,14 @@ import Product from "./models/Product.js";
 import ProductStat from "./models/ProductStat.js";
 import Transaction from "./models/Transaction.js";
 import OverallStat from "./models/OverallStat.js";
+import Tag from "./models/Tag.js";
 import {
   dataUser,
   dataProduct,
   dataProductStat,
   dataTransaction,
   dataOverallStat,
+  dataTag
 } from "./data/index.js";
 /* CONFIGURATION */
 dotenv.config();
@@ -56,5 +58,6 @@ mongoose
     // Transaction.insertMany(dataTransaction);
     // OverallStat.insertMany(dataOverallStat);
     // User.insertMany(dataUser);
+    Tag.insertMany(dataTag)
   })
   .catch((error) => console.log(`${error} didn't connect`));

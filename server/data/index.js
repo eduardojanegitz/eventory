@@ -2265,7 +2265,12 @@ export const dataAffiliateStat = [
       __v: 36729,
     },
   ];
-  
+  export const dataTag = [
+    {
+      name: "Notebook",
+      qtd: 1,
+    },
+  ]
   export const dataProduct = [
     {
       _id: "63701d24f03239c72c00018e",

@@ -1,10 +1,28 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter&family=Poppins:wght@300;400;500;600;700;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter&family=Poppins:wght@300;400;500;600;700;800&display=swap");
 
 html,
-body, 
+body,
 #root,
 .app {
-    height: 100%;
-    width: 100%;
-    font-family: "Inter", sans-serif;
+  height: 100%;
+  width: 100%;
+  font-family: "Poppins", sans-serif;
+}
+
+/* CHROME, EDGE, SAFARI */
+body::-webkit-scrollbar {
+  width: 8px; /* width of the entire scrollbar */
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: #b3b0b0; /* color of the scroll thumb */
+  border-radius: 20px; /* roundness of the scroll thumb */
+  border: 3px solid #b3b0b0; /* creates padding around scroll thumb */
+}
+
+/* FIREFOX */
+
+body {
+  scrollbar-width: thin; /* "auto" or "thin" */
+  scrollbar-color: #b3b0b0 #b3b0b0; /* scroll thumb and track */
 }

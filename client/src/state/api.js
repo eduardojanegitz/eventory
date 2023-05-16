@@ -40,6 +40,10 @@ export const api = createApi({
       query: () => "general/dashboard",
       providesTags: ["Dashboard"],
     }),
+    getTag: build.query({
+      query: () => "tags/tags",
+      providesTags: ["Tags"]
+    })
   }),
 });
 

@@ -208,10 +208,10 @@ const Dashboard = () => {
       >
         {/* ROW 1 */}
         <StatBox
-          title="Total Customers"
+          title="Total de Ativos"
           value={data && data.totalCustomers}
           increase="+14%"
-          description="Since last month"
+          description="Desde o mês passado"
           icon={
             <Email
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
@@ -219,10 +219,10 @@ const Dashboard = () => {
           }
         />
         <StatBox
-          title="Sales Today"
+          title="Valor total"
           value={data && data.todayStats.totalSales}
           increase="+21%"
-          description="Since last month"
+          description="Desde o mês passado"
           icon={
             <PointOfSale
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
@@ -239,10 +239,10 @@ const Dashboard = () => {
           <OverviewChart view="sales" isDashboard={true} />
         </Box>
         <StatBox
-          title="Monthly Sales"
+          title="Vida útil média"
           value={data && data.thisMonthStats.totalSales}
           increase="+5%"
-          description="Since last month"
+          description="Desde o mês passado"
           icon={
             <PersonAdd
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
@@ -250,10 +250,11 @@ const Dashboard = () => {
           }
         />
         <StatBox
-          title="Yearly Sales"
-          value={data && data.yearlySalesTotal}
-          increase="+43%"
-          description="Since last month"
+          title="Alertas"
+          // value={data && data.yearlySalesTotal}
+          value="Veículos"
+          increase="Manutenção"
+          // description=""
           icon={
             <Traffic
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
@@ -306,7 +307,7 @@ const Dashboard = () => {
           borderRadius="0.55rem"
         >
           <Typography variant="h6" sx={{ color: theme.palette.secondary[100] }}>
-            Sales By Category
+            Itens por grupos
           </Typography>
           <BreakdownChart isDashboard={true} />
           <Typography

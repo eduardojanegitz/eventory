@@ -63,7 +63,7 @@ const navItems = [
     icon: <PointOfSaleOutlined />,
   },
   {
-    text: "BreakDown",
+    text: "Categorias",
     icon: <PieChartOutlined />,
   },
   {
