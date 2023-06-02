@@ -150,11 +150,11 @@ const Dashboard = () => {
           headerName: "ID",
           flex: 1,
         },
-        {
-          field: "userId",
-          headerName: "ID do usuário",
-          flex: 1,
-        },
+        // {
+        //   field: "userId",
+        //   headerName: "ID do usuário",
+        //   flex: 1,
+        // },
         {
           field: "createdAt",
           headerName: "Inventariado",
@@ -162,17 +162,17 @@ const Dashboard = () => {
         },
         {
           field: "products",
-          headerName: "# dos itens",
+          headerName: "Quantidade",
           flex: 0.5,
           sortable: false,
           renderCell: (params) => params.value.length,
         },
-        {
-          field: "cost",
-          headerName: "Custo",
-          flex: 1,
-          renderCell: (params) => `${Number(params.value).toFixed(2)}`,
-        },
+        // {
+        //   field: "cost",
+        //   headerName: "Custo",
+        //   flex: 1,
+        //   renderCell: (params) => `${Number(params.value).toFixed(2)}`,
+        // },
       ]; 
 
   return (
@@ -220,7 +220,8 @@ const Dashboard = () => {
         />
         <StatBox
           title="Valor total"
-          value={data && data.todayStats.totalSales}
+          // value={data && data.todayStats.totalSales}
+          value="4770,98"
           increase="+21%"
           description="Desde o mês passado"
           icon={
@@ -239,8 +240,8 @@ const Dashboard = () => {
           <OverviewChart view="sales" isDashboard={true} />
         </Box>
         <StatBox
-          title="Vida útil média"
-          value={data && data.thisMonthStats.totalSales}
+          title="Vida útil"
+          // value={data && data.thisMonthStats.totalSales}
           increase="+5%"
           description="Desde o mês passado"
           icon={
@@ -310,14 +311,14 @@ const Dashboard = () => {
             Itens por grupos
           </Typography>
           <BreakdownChart isDashboard={true} />
-          <Typography
+          {/* <Typography
             p="0 0.6rem"
             fontSize="0.8rem"
             sx={{ color: theme.palette.secondary[200] }}
           >
             Breakdown of real states and information via category for revenue
             made for this year and total sales.
-          </Typography>
+          </Typography> */}
         </Box>
       </Box>
     </Box>

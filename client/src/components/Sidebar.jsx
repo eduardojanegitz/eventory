@@ -62,10 +62,10 @@ const navItems = [
     text: "Depreciação",
     icon: <PointOfSaleOutlined />,
   },
-  {
-    text: "Categorias",
-    icon: <PieChartOutlined />,
-  },
+  // {
+  //   text: "Categorias",
+  //   icon: <PieChartOutlined />,
+  // },
   {
     text: "Leitura de etiquetas",
     icon: null,
