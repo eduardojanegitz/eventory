@@ -12,6 +12,12 @@ import Transactions from "scenes/Transactions";
 import Overview from "scenes/Overview";
 import Breakdown from "scenes/Breakdown";
 import Tags from "scenes/Tags";
+import NewItem from "scenes/NewItem";
+import NewUser from "scenes/NewUser";
+import AssetMovement from "scenes/AssetMovement";
+import NewMovement from "scenes/NewMovement";
+import Cost from "scenes/Cost";
+
 function App() {
   const mode = useSelector((state) => state.global.mode);
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
@@ -25,11 +31,16 @@ function App() {
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/itens" element={<Products />} />
+              <Route path="/novo-item" element={<NewItem />} />
+              <Route path="/Movimentacao" element={<AssetMovement />} />
+              <Route path="/new-movement" element={<NewMovement />} />
+              <Route path="/novo-usuario" element={<NewUser />} />
               <Route path="/usuarios" element={<Customers />} />
               <Route path="/inventarios" element={<Transactions />} />
               <Route path="/depreciacao" element={<Overview />} />
               <Route path="/categorias" element={<Breakdown />} />
-              <Route path="/tags" element={<Tags /> } />
+              <Route path="/cc" element={<Cost />} />
+              <Route path="/tags" element={<Tags />} />
             </Route>
           </Routes>
         </ThemeProvider>

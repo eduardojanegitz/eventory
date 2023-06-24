@@ -32,6 +32,9 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import FlexBetween from "./FlexBetween";
 import profileImage from "assets/profile.jpeg";
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
+import TableViewIcon from '@mui/icons-material/TableView';
+import InventoryIcon from '@mui/icons-material/Inventory';
 
 const navItems = [
   {
@@ -44,37 +47,44 @@ const navItems = [
   },
   {
     text: "Itens",
-    icon: <ShoppingCartOutlined />,
+    icon: <ManageSearchIcon />,
   },
   {
     text: "Usuários",
     icon: <Groups2Outlined />,
   },
   {
+    text: "Movimentação",
+    icon: <ShoppingCartOutlined />,
+  },
+  // {
+  //   text: "CC",
+  //   icon: <TableViewIcon />,
+  // },
+  {
     text: "Inventários",
-    icon: <ReceiptLongOutlined />,
+    icon: <InventoryIcon   />,
   },
   {
     text: "Gráficos",
     icon: null,
   },
-  {
-    text: "Depreciação",
-    icon: <PointOfSaleOutlined />,
-  },
   // {
-  //   text: "Categorias",
-  //   icon: <PieChartOutlined />,
+  //   text: "Depreciação",
+  //   icon: <PointOfSaleOutlined />,
   // },
   {
-    text: "Leitura de etiquetas",
-    icon: null,
+    text: "Categorias",
+    icon: <PieChartOutlined />,
   },
-  {
-    text: "Tags",
-    icon: <AdminPanelSettingsOutlined />,
-  },
-
+  // {
+  //   text: "Leitura de etiquetas",
+  //   icon: null,
+  // },
+  // {
+  //   text: "Tags",
+  //   icon: <AdminPanelSettingsOutlined />,
+  // },
 ];
 const Sidebar = ({
   user,
@@ -134,7 +144,9 @@ const Sidebar = ({
                     </Typography>
                   );
                 }
-                const lcText = text.toLowerCase() && text.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+                const lcText =
+                  text.toLowerCase() &&
+                  text.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
                 return (
                   <ListItem key={text} disablePadding>
                     <ListItemButton

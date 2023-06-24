@@ -1,4 +1,9 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import axios from "axios";
+
+export const api2 = axios.create({
+  baseURL: process.env.REACT_APP_BASE_URL,
+});
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: process.env.REACT_APP_BASE_URL }),
@@ -10,11 +15,39 @@ export const api = createApi({
     "Transactions",
     "Items",
     "Dashboard",
+    "Item",
+    "Movement",
+    "Inventory"
   ],
   endpoints: (build) => ({
     getUser: build.query({
-      query: (id) => `general/user/${id}`,
+      query: () => `api/user`,
       providesTags: ["User"],
+    }),
+    // USUÁRIO SETADO PARA APARECER O NOME
+    // getUserById: build.query({
+    //   query: (id) => `api/user/${id}`,
+    //   providesTags: ["User"],
+    // }),
+    getItemByTag: build.query({
+      query: (tag) => `api/item/${tag}`,
+      providesTags: ["Item"],
+    }),
+    getItem: build.query({
+      query: () => `api/item`,
+      providesTags: ["Item"],
+    }),
+    getCountItem: build.query({
+      query: () => `api/item/count`,
+      providesTags: ["Item"],
+    }),
+    getCountItemValue: build.query({
+      query: () => `api/item/count-value`,
+      providesTags: ["Item"],
+    }),
+    getMovement: build.query({
+      query: () => `api/movement`,
+      providesTags: ["Movement"],
     }),
     getProducts: build.query({
       query: () => "client/itens",
@@ -25,33 +58,54 @@ export const api = createApi({
       providesTags: ["Customers"],
     }),
     getTransactions: build.query({
-      query: ({ page, pageSize, sort, search }) => ({
+      query: () => ({
         url: "client/inventarios",
         method: "GET",
-        params: { page, pageSize, sort, search },
+        //{ page, pageSize, sort, search }
+        // params: { page, pageSize, sort, search },
       }),
       providesTags: ["Transactions"],
+    }),
+    getInventory: build.query({
+      query: () => ({
+        url: "api/inventory",
+        method: "GET",
+        //{ page, pageSize, sort, search }
+        // params: { page, pageSize, sort, search },
+      }),
+      providesTags: ["Inventory"],
     }),
     getItems: build.query({
       query: () => "items/items",
       providesTags: ["Items"],
     }),
+    getNewItems: build.query({
+      query: () => "items/newitem",
+      providesTags: ["NewItem"],
+    }),
     getDashboard: build.query({
-      query: () => "general/dashboard",
+      query: () => "api/dashboard",
       providesTags: ["Dashboard"],
     }),
     getTag: build.query({
       query: () => "tags/tags",
-      providesTags: ["Tags"]
-    })
+      providesTags: ["Tags"],
+    }),
   }),
 });
 
 export const {
   useGetUserQuery,
+  useGetItemQuery,
   useGetProductsQuery,
   useGetCustomersQuery,
   useGetTransactionsQuery,
   useGetItemsQuery,
+  useGetNewItemsQuery,
   useGetDashboardQuery,
+  useGetItemByTagQuery,
+  useGetCountItemQuery,
+  useGetCountItemValueQuery,
+  useGetMovementQuery,
+  useGetInventoryQuery
 } = api;

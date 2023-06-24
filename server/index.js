@@ -14,7 +14,7 @@ import tagsRoutes from "./routes/tags.js";
 import User from "./models/User.js";
 import Product from "./models/Product.js";
 import ProductStat from "./models/ProductStat.js";
-import Transaction from "./models/Transaction.js";
+// import Transaction from "./models/Transaction.js";
 import OverallStat from "./models/OverallStat.js";
 import Tag from "./models/Tag.js";
 import {
@@ -25,6 +25,7 @@ import {
   dataOverallStat,
   dataTag
 } from "./data/index.js";
+import router from "./routes/router.js";
 /* CONFIGURATION */
 dotenv.config();
 const app = express();
@@ -42,6 +43,8 @@ app.use("/items", itemsRoutes);
 app.use("/tags", tagsRoutes);
 app.use("/client", clientRoutes);
 
+app.use("/api", router);
+
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 9000;
 mongoose
@@ -58,6 +61,16 @@ mongoose
     // Transaction.insertMany(dataTransaction);
     // OverallStat.insertMany(dataOverallStat);
     // User.insertMany(dataUser);
-    Tag.insertMany(dataTag)
+    // Tag.insertMany(dataTag)
+
+    // Product.insertOne([{
+    //   _id: "63701d24f03239c72c00018f",
+    //   name: "teste",
+    //   price: 311.71,
+    //   description: "Revision of Nonaut Sub in Mouth/Throat, Via Opening",
+    //   category: "clothing",
+    //   rating: 1.15,
+    //   supply: 1320,
+    // }])
   })
   .catch((error) => console.log(`${error} didn't connect`));

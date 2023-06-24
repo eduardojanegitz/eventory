@@ -2,7 +2,6 @@ import React from "react";
 import { ResponsivePie } from "@nivo/pie";
 import { Box, Typography, useTheme } from "@mui/material";
 import { useGetItemsQuery } from "state/api";
-import { ResponsiveBar } from "@nivo/bar";
 
 const BreakdownChart = ({ isDashboard = false }) => {
   const { data, isLoading } = useGetItemsQuery();
@@ -33,7 +32,7 @@ const BreakdownChart = ({ isDashboard = false }) => {
       minWidth={isDashboard ? "325px" : undefined}
       position="relative"
     >
-      <ResponsiveBar
+      <ResponsivePie
         data={formattedData}
         theme={{
           axis: {
@@ -91,33 +90,33 @@ const BreakdownChart = ({ isDashboard = false }) => {
           from: "color",
           modifiers: [["darker", 2]],
         }}
-        legends={[
-          {
-            anchor: "bottom",
-            direction: "row",
-            justify: false,
-            translateX: isDashboard ? 20 : 0,
-            translateY: isDashboard ? 50 : 56,
-            itemsSpacing: 0,
-            itemWidth: 85,
-            itemHeight: 18,
-            itemTextColor: "#999",
-            itemDirection: "left-to-right",
-            itemOpacity: 1,
-            symbolSize: 18,
-            symbolShape: "circle",
-            effects: [
-              {
-                on: "hover",
-                style: {
-                  itemTextColor: theme.palette.primary[500],
-                },
-              },
-            ],
-          },
-        ]}
+        // legends={[
+        //   {
+        //     anchor: "bottom",
+        //     direction: "row",
+        //     justify: false,
+        //     translateX: isDashboard ? 20 : 0,
+        //     translateY: isDashboard ? 50 : 56,
+        //     itemsSpacing: 0,
+        //     itemWidth: 85,
+        //     itemHeight: 18,
+        //     itemTextColor: "#999",
+        //     itemDirection: "left-to-right",
+        //     itemOpacity: 1,
+        //     symbolSize: 18,
+        //     symbolShape: "circle",
+        //     effects: [
+        //       {
+        //         on: "hover",
+        //         style: {
+        //           itemTextColor: theme.palette.primary[500],
+        //         },
+        //       },
+        //     ],
+        //   },
+        // ]}
       />
-       <Box
+       {/* <Box
         position="absolute"
         top="50%"
         left="50%"
@@ -130,10 +129,10 @@ const BreakdownChart = ({ isDashboard = false }) => {
             : "translate(-50%, -100%)",
         }}
       >
-        <Typography variant="h6">
+        <Typography variant="h6"> */}
           {/* {!isDashboard && "Total:"} ${data.yearlySalesTotal} */}
-        </Typography>
-      </Box>
+        {/* </Typography>
+      </Box> */}
     </Box>
   );
 };

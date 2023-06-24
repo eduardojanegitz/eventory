@@ -6,6 +6,9 @@ import {
   Search,
   SettingsOutlined,
   ArrowDropDownCircleOutlined,
+  HelpCenterOutlined,
+  HelpCenterRounded,
+  HelpOutline,
 } from "@mui/icons-material";
 import FlexBetween from "components/FlexBetween";
 import { useDispatch } from "react-redux";
@@ -47,7 +50,7 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
           <IconButton onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
             <MenuIcon />
           </IconButton>
-          <FlexBetween
+          {/* <FlexBetween
             backgroundColor={theme.palette.background.alt}
             borderRadius="9px"
             gap="3rem"
@@ -57,7 +60,7 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
             <IconButton>
               <Search />
             </IconButton>
-          </FlexBetween>
+          </FlexBetween> */}
         </FlexBetween>
         {/* RIGHT SIDE */}
         <FlexBetween gap="1.5rem">
@@ -69,7 +72,7 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
             )}
           </IconButton>
           <IconButton>
-            <SettingsOutlined sx={{ fontSize: "25px" }} />
+            <HelpOutline sx={{ fontSize: "25px" }} />
           </IconButton>
 
           <FlexBetween>

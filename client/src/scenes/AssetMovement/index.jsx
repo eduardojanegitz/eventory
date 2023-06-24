@@ -1,15 +1,36 @@
 import React, { useState } from "react";
-import { DataGrid } from "@mui/x-data-grid";
-import { useGetTransactionsQuery } from "state/api";
+import {
+  Box,
+  Card,
+  CardActions,
+  CardContent,
+  Collapse,
+  Button,
+  Typography,
+  Rating,
+  useTheme,
+  useMediaQuery,
+  ListItemButton,
+} from "@mui/material";
 import Header from "components/Header";
-import { useTheme } from "@emotion/react";
-import { Box, Button } from "@mui/material";
-import DataGridCustomToolbar from "components/DataGridCustomToolbar";
+import { useGetItemQuery, useGetMovementQuery } from "state/api";
 import FlexBetween from "components/FlexBetween";
-import { Link } from "react-router-dom";
-import AddIcon from '@mui/icons-material/Add';
+import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
+import {
+  Link,
+  Navigate,
+  Route,
+  Router,
+  Routes,
+  redirect,
+  useNavigate,
+} from "react-router-dom";
+import NewItem from "scenes/NewItem";
+import { DataGrid } from "@mui/x-data-grid";
+import DataGridCustomToolbar from "components/DataGridCustomToolbar";
 
-const Transactions = () => {
+const AssetMovement = () => {
+  const navigate = useNavigate();
   const theme = useTheme();
 
   //values to be sent to the backend
@@ -19,7 +40,7 @@ const Transactions = () => {
   const [search, setSearch] = useState("");
 
   const [searchInput, setSearchInput] = useState("");
-  const { data, isLoading } = useGetTransactionsQuery({
+  const { data, isLoading } = useGetMovementQuery({
     page,
     pageSize,
     sort: JSON.stringify(sort),
@@ -27,46 +48,39 @@ const Transactions = () => {
   });
 
   const columns = [
-    // {
-    //   field: "_id",
-    //   headerName: "ID",
-    //   flex: 1,
-    // },
-    // {
-    //   field: "userId",
-    //   headerName: "ID do usuário",
-    //   flex: 1,
-    // },
     {
-      field: "item",
-      headerName: "Nome do item",
+      field: "name",
+      headerName: "Nome do ativo",
       flex: 1,
     },
     {
-      field: "createdAt",
-      headerName: "Data do inventário",
+      field: "actualLocation",
+      headerName: "Localização atual",
       flex: 1,
     },
     {
-      field: "responsable",
-      headerName: "Responsável",
-      flex: 0.5,
-      // sortable: false,
-      // renderCell: (params) => params.value.length,
+      field: "newLocation",
+      headerName: "Nova Localização",
+      flex: 1,
     },
-    // {
-    //   field: "cost",
-    //   headerName: "Custo",
-    //   flex: 1,
-    //   renderCell: (params) => `${Number(params.value).toFixed(2)}`,
-    // },
+    {
+      field: "reason",
+      headerName: "Motivo",
+      flex: 1,
+    },
+    {
+      field: "obeservations",
+      headerName: "Obeservações",
+      flex: 1,
+    },
   ];
+
   return (
     <Box m="1.5rem 2.5rem">
       <FlexBetween>
         <Header
-          title="INVENTÁRIOS"
-          subtitle="Veja a lista de inventários realizados"
+          title="MOVIMENTAÇÃO DOS ATIVOS"
+          subtitle="Veja a lista das movimentações dos ativos."
         />
         <Box>
           <Button
@@ -78,9 +92,9 @@ const Transactions = () => {
               padding: "10px 20px",
             }}
           >
-            <Link to="/tags/" className="btn-new">
-              <AddIcon sx={{ mr: "10px" }} />
-              Novo inventário
+            <Link to="/new-movement/" className="btn-new">
+              <AddOutlinedIcon sx={{ mr: "10px" }} />
+              Nova Movimentação
             </Link>
           </Button>
         </Box>
@@ -115,10 +129,10 @@ const Transactions = () => {
         <DataGrid
           loading={isLoading || !data}
           getRowId={(row) => row._id}
-          rows={(data && data.response) || []}
+          rows={data || []}
           rowsPerOptions={[20, 50, 100]}
           columns={columns}
-          rowCount={(data && data.total) || 0}
+          // rowCount={(data && data.total) || 0}
           pagination
           page={page}
           pageSize={pageSize}
@@ -137,4 +151,4 @@ const Transactions = () => {
   );
 };
 
-export default Transactions;
+export default AssetMovement;

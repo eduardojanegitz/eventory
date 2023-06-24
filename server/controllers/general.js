@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import OverallStat from "../models/OverallStat.js";
 import Transaction from "../models/Transaction.js";
+import Product from "../models/Product.js"
 
 export const getUser = async (req, res) => {
   try {
@@ -15,8 +16,8 @@ export const getUser = async (req, res) => {
 export const getDashboardStats = async (req, res) => {
   try {
     // hardcoded values
-    const currentMonth = "November";
-    const currentYear = 2021;
+    const currentMonth = "Janeiro";
+    const currentYear = 2023;
     const currentDay = "2021-11-15";
 
     // Recent transactions
@@ -26,6 +27,9 @@ export const getDashboardStats = async (req, res) => {
 
     // Overall Stats
     const overallStat = await OverallStat.find({ year: currentYear });
+
+    //Products 
+    // const products = await Product.find({ $sum: price })
 
     const {
       totalCustomers,
@@ -51,6 +55,7 @@ export const getDashboardStats = async (req, res) => {
       thisMonthStats,
       todayStats,
       transactions,
+      // products
     });
   } catch (error) {
     res.status(404).json({ message: error.message });

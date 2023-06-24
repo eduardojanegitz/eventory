@@ -26,3 +26,93 @@ body {
   scrollbar-width: thin; /* "auto" or "thin" */
   scrollbar-color: #b3b0b0 #b3b0b0; /* scroll thumb and track */
 }
+
+.btn-new {
+  text-decoration: none;
+  color: #FFF;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
+
+.input {
+  padding: 0.8rem;
+  margin: 0.5rem 0.5rem 0.8rem 0;
+  border-radius: 0.3rem;
+  border: 2px solid #000;
+}
+
+.btn-submit {
+  background-color: #177292;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  border-radius: 0.3rem;
+  padding: 0.8rem;
+  margin: 0.5rem 0.5rem 0.5rem 0;
+  cursor: pointer;
+  transition: all 0.5s ease-in-out;
+  border: transparent;
+}
+
+.btn-submit:hover {
+  background-color: blue;
+}
+
+.ul {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  list-style: none;
+}
+
+.ule {
+  display: flex;
+  justify-content: space-between;
+  list-style: none;
+}
+
+.cont {
+  width: 1000px;
+  
+}
+
+.form-tag {
+  display: flex;
+  margin: 1.5rem 1.5rem 1.5rem 0;
+}
+
+.input-tag {
+  padding: 0.8rem;
+  margin: 0.5rem 1rem 0 0;
+  border-radius: 0.3rem;
+  border: 2px solid #000;
+}
+
+.table-head th {
+  justify-content: space-between;
+  width: 30rem;
+}
+
+.table-line td {
+  justify-content: space-between;
+  width: 30rem;
+}
+
+table, th, td {
+  border: 1px solid black;
+  }
+  
+  table {
+  border-collapse: collapse;
+  margin: auto;
+  }
+  
+  th, td{
+  padding: 10px;
+  text-align: center;
+  width: 120px;
+  }

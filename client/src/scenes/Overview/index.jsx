@@ -7,7 +7,7 @@ const Overview = () => {
   const [view, setView] = useState("units");
   return (
     <Box m="1.5rem 2.5rem">
-      <Header title="DEPRECIAÇÃO" subtitle="Veja a depreciação dos itens" />
+      <Header title="VALOR POR CENTRO DE CUSTO" subtitle="Veja a depreciação dos itens" />
       <Box height="75vh">
         <FormControl sx={{ mt: "1rem" }}>
           <InputLabel>View</InputLabel>

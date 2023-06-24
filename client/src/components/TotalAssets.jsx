@@ -1,12 +1,16 @@
 import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import FlexBetween from "./FlexBetween";
-import { useGetCountItemQuery } from "state/api";
+import { useGetCountItemQuery, useGetCountItemValueQuery } from "state/api";
+import { useEffect } from "react";
 
 const StatBox = ({ title, value, increase, icon, description }) => {
   const theme = useTheme();
-  const {data} = useGetCountItemQuery();
- 
+  const { data } = useGetCountItemValueQuery();
+
+
+
+ console.log(data)
   return (
     <Box
       gridColumn="span 2"
@@ -31,7 +35,9 @@ const StatBox = ({ title, value, increase, icon, description }) => {
         fontWeight="600"
         sx={{ color: theme.palette.secondary[200] }}
       >
-        {data}
+        {/* {data[0].total} */}
+        {value}
+        
       </Typography>
       <FlexBetween gap="1rem">
         <Typography

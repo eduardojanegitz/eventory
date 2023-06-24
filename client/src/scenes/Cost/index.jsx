@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 
 
 
-const Customers = () => {
+const Cost = () => {
   const theme = useTheme();
   const { data, isLoading } = useGetUserQuery();
   // console.log("data", data);
@@ -114,4 +114,4 @@ const Customers = () => {
   );
 };
 
-export default Customers;
+export default Cost;

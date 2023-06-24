@@ -116,7 +116,7 @@
 // };
 
 // export default Dashboard;
-import React from "react";
+import React, { useState } from "react";
 import FlexBetween from "components/FlexBetween";
 import Header from "components/Header";
 import {
@@ -136,51 +136,100 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 import BreakdownChart from "components/BreakdownChart";
 import OverviewChart from "components/OverviewChart";
-import { useGetDashboardQuery } from "state/api";
+import { useGetDashboardQuery, useGetProductsQuery } from "state/api";
 import StatBox from "components/StatBox";
+import TotalAssets from "components/TotalAssets";
+import PieChart from "components/PieChart";
+import SummarizeIcon from '@mui/icons-material/Summarize';
+import ErrorIcon from '@mui/icons-material/Error';
+import DateRangeIcon from '@mui/icons-material/DateRange';
+
+const Product = ({
+  _id,
+  name,
+  description,
+  price,
+  rating,
+  category,
+  supply,
+  stat,
+}) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+};
 
 const Dashboard = () => {
   const theme = useTheme();
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
   const { data, isLoading } = useGetDashboardQuery();
+  // const { data, isLoading } = useGetProductsQuery();
+
+  const itensAnterior = 100;
+  const itensAtuais = 120;
+
+  const crescimento = ((itensAtuais - itensAnterior) / itensAnterior) * 100;
 
   const columns = [
-        {
-          field: "_id",
-          headerName: "ID",
-          flex: 1,
-        },
-        // {
-        //   field: "userId",
-        //   headerName: "ID do usuário",
-        //   flex: 1,
-        // },
-        {
-          field: "createdAt",
-          headerName: "Inventariado",
-          flex: 1,
-        },
-        {
-          field: "products",
-          headerName: "Quantidade",
-          flex: 0.5,
-          sortable: false,
-          renderCell: (params) => params.value.length,
-        },
-        // {
-        //   field: "cost",
-        //   headerName: "Custo",
-        //   flex: 1,
-        //   renderCell: (params) => `${Number(params.value).toFixed(2)}`,
-        // },
-      ]; 
+    {
+      field: "_id",
+      headerName: "ID",
+      flex: 1,
+    },
+    // {
+    //   field: "userId",
+    //   headerName: "ID do usuário",
+    //   flex: 1,
+    // },
+    {
+      field: "createdAt",
+      headerName: "Inventariado",
+      flex: 1,
+    },
+    {
+      field: "products",
+      headerName: "Quantidade",
+      flex: 0.5,
+      sortable: false,
+      renderCell: (params) => params.value.length,
+    },
+    // {
+    //   field: "cost",
+    //   headerName: "Custo",
+    //   flex: 1,
+    //   renderCell: (params) => `${Number(params.value).toFixed(2)}`,
+    // },
+  ];
 
   return (
     <Box m="1.5rem 2.5rem">
+      {/* {data.map(
+            ({
+              _id,
+              name,
+              description,
+              price,
+              rating,
+              category,
+              supply,
+              stat,
+            }) => (
+              <Product
+                key={_id}
+                _id={_id}
+                name={name}
+                description={description}
+                price={price}
+                rating={rating}
+                category={category}
+                supply={supply}
+                stat={stat}
+              />
+            ))
+} */}
+      {/* <button onClick={() => console.log(...data)}>ola</button> */}
       <FlexBetween>
-        <Header title="DASHBOARD" subtitle="Bem vindo ao eventory" />
+        <Header title="DASHBOARD" subtitle="Bem vindo ao EVENTORY." />
 
-        <Box>
+        {/* <Box>
           <Button
             sx={{
               backgroundColor: theme.palette.secondary.light,
@@ -193,7 +242,7 @@ const Dashboard = () => {
             <DownloadOutlined sx={{ mr: "10px" }} />
             Download Reports
           </Button>
-        </Box>
+        </Box> */}
       </FlexBetween>
 
       <Box
@@ -209,19 +258,22 @@ const Dashboard = () => {
         {/* ROW 1 */}
         <StatBox
           title="Total de Ativos"
-          value={data && data.totalCustomers}
-          increase="+14%"
+          // value={data && data.totalCustomers}
+          // value={data && data.}s
+          increase="+20%"
           description="Desde o mês passado"
           icon={
-            <Email
+            <SummarizeIcon
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
             />
           }
         />
-        <StatBox
+        <TotalAssets
           title="Valor total"
           // value={data && data.todayStats.totalSales}
-          value="4770,98"
+          // value={data[0].price + data[1].price}
+          // value="4770,98"
+          value="7000"
           increase="+21%"
           description="Desde o mês passado"
           icon={
@@ -237,15 +289,16 @@ const Dashboard = () => {
           p="1rem"
           borderRadius="0.55rem"
         >
-          <OverviewChart view="sales" isDashboard={true} />
+          {/* <OverviewChart view="sales" isDashboard={true} /> */}
+          <BreakdownChart isDashboard={true} />
         </Box>
         <StatBox
-          title="Vida útil"
-          // value={data && data.thisMonthStats.totalSales}
+          title="Idade média do imobilizado"
+          // value={data }
           increase="+5%"
           description="Desde o mês passado"
           icon={
-            <PersonAdd
+            <DateRangeIcon
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
             />
           }
@@ -257,7 +310,7 @@ const Dashboard = () => {
           increase="Manutenção"
           // description=""
           icon={
-            <Traffic
+            <ErrorIcon
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
             />
           }
@@ -293,12 +346,11 @@ const Dashboard = () => {
           }}
         >
           <DataGrid
-            loading={isLoading || !data}
+            // loading={isLoading || !data}
             getRowId={(row) => row._id}
             rows={(data && data.transactions) || []}
             columns={columns}
           />
-    
         </Box>
         <Box
           gridColumn="span 4"
@@ -310,7 +362,9 @@ const Dashboard = () => {
           <Typography variant="h6" sx={{ color: theme.palette.secondary[100] }}>
             Itens por grupos
           </Typography>
-          <BreakdownChart isDashboard={true} />
+          {/* <BreakdownChart isDashboard={true} /> */}
+          <PieChart isDashboard={true}/>
+
           {/* <Typography
             p="0 0.6rem"
             fontSize="0.8rem"
