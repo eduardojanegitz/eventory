@@ -31,7 +31,7 @@ const StatBox = ({ title, value, increase, icon, description }) => {
         fontWeight="600"
         sx={{ color: theme.palette.secondary[200] }}
       >
-        {data}
+        {value}
       </Typography>
       <FlexBetween gap="1rem">
         <Typography
