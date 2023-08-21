@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import { useGetTransactionsQuery } from "state/api";
+import { useGetInventoryQuery } from "state/api";
 import Header from "components/Header";
 import { useTheme } from "@emotion/react";
 import { Box, Button } from "@mui/material";
@@ -19,7 +19,7 @@ const Transactions = () => {
   const [search, setSearch] = useState("");
 
   const [searchInput, setSearchInput] = useState("");
-  const { data, isLoading } = useGetTransactionsQuery({
+  const { data, isLoading } = useGetInventoryQuery({
     page,
     pageSize,
     sort: JSON.stringify(sort),
@@ -38,8 +38,8 @@ const Transactions = () => {
     //   flex: 1,
     // },
     {
-      field: "item",
-      headerName: "Nome do item",
+      field: "_id",
+      headerName: "Número do inventário",
       flex: 1,
     },
     {
@@ -78,7 +78,7 @@ const Transactions = () => {
               padding: "10px 20px",
             }}
           >
-            <Link to="/tags/" className="btn-new">
+            <Link to="/tags" className="btn-new">
               <AddIcon sx={{ mr: "10px" }} />
               Novo inventário
             </Link>
@@ -115,10 +115,10 @@ const Transactions = () => {
         <DataGrid
           loading={isLoading || !data}
           getRowId={(row) => row._id}
-          rows={(data && data.response) || []}
+          rows={(data) || []}
           rowsPerOptions={[20, 50, 100]}
           columns={columns}
-          rowCount={(data && data.total) || 0}
+          // rowCount={(data && data[80].item) || 0}
           pagination
           page={page}
           pageSize={pageSize}
