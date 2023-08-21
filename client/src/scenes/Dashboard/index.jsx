@@ -257,9 +257,10 @@ const Dashboard = () => {
       >
         {/* ROW 1 */}
         <StatBox
-          title="Total de Ativos"
+          title="Total de ativos"
           // value={data && data.totalCustomers}
           // value={data && data.}s
+          value="2"
           increase="+20%"
           description="Desde o mês passado"
           icon={
@@ -293,8 +294,9 @@ const Dashboard = () => {
           <BreakdownChart isDashboard={true} />
         </Box>
         <StatBox
-          title="Idade média do imobilizado"
+          title="Idade média do ativo"
           // value={data }
+          value="4"
           increase="+5%"
           description="Desde o mês passado"
           icon={

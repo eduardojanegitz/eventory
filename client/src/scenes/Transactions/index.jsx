@@ -78,7 +78,7 @@ const Transactions = () => {
               padding: "10px 20px",
             }}
           >
-            <Link to="/tags/" className="btn-new">
+            <Link to="/tags" className="btn-new">
               <AddIcon sx={{ mr: "10px" }} />
               Novo inventário
             </Link>
