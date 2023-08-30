@@ -17,6 +17,7 @@ import NewUser from "scenes/NewUser";
 import AssetMovement from "scenes/AssetMovement";
 import NewMovement from "scenes/NewMovement";
 import Cost from "scenes/Cost";
+import LoginPage from "scenes/LoginPage"
 
 function App() {
   const mode = useSelector((state) => state.global.mode);
@@ -27,6 +28,7 @@ function App() {
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <Routes>
+              <Route path="/login" element={<LoginPage />} />
             <Route element={<Layout />}>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<Dashboard />} />
