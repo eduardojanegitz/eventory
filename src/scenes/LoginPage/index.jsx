@@ -42,16 +42,16 @@ export default function LoginFinal() {
                 >
                     <div>
                         <Typography level="h4" component="h1">
-                            <b>Welcome!</b>
+                            <b>Bem Vindo!</b>
                         </Typography>
-                        <Typography level="body-sm">Sign in to continue.</Typography>
+                        {/* <Typography level="body-sm">Sign in to continue.</Typography> */}
                     </div>
                     <FormControl>
                         <FormLabel>Usúario</FormLabel>
                         <Input
                             name="email"
                             type="email"
-                            placeholder="johndoe@email.com"
+                            placeholder="email@hotmail.com"
                         />
                     </FormControl>
                     <FormControl>
@@ -59,7 +59,7 @@ export default function LoginFinal() {
                         <Input
                             name="password"
                             type="password"
-                            placeholder="password"
+                            placeholder="Senha"
                         />
                     </FormControl>
 
