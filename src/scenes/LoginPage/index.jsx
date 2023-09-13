@@ -1,4 +1,3 @@
-import * as React from "react";
 import { CssVarsProvider, useColorScheme } from "@mui/joy/styles";
 import Sheet from "@mui/joy/Sheet";
 import Typography from "@mui/joy/Typography";
@@ -9,14 +8,13 @@ import Button from "@mui/joy/Button";
 
 //auth
 import { useRef, useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { setCredentials } from "state/auth/authSlice";
-import { useLoginMutation } from "state/auth/authApiSlice";
+import { useNavigate, useLocation } from "react-router-dom";
+import { api2 } from "state/api";
+import useAuth from "hooks/useAuth";
 
 function ModeToggle() {
   const { mode, setMode } = useColorScheme();
-  const [mounted, setMounted] = React.useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -26,17 +24,19 @@ function ModeToggle() {
   }
 }
 
-const LoginFinal = () => {
+const LoginPage = () => {
+  const { setAuth } = useAuth();
+
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/home";
+
   const userRef = useRef();
   const errRef = useRef();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errMsg, setErrMsg] = useState("");
-
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  const [login, { isLoading }] = useLoginMutation();
 
   useEffect(() => {
     userRef.current.focus();
@@ -50,22 +50,37 @@ const LoginFinal = () => {
     e.preventDefault();
 
     try {
-      const { accessToken } = await login({ username, password }).unwrap();
-      dispatch(setCredentials({ accessToken }));
+      const response = await api2.post(
+        "api/auth/login",
+        JSON.stringify({
+          username,
+          password,
+        }),
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        }
+      );
+
+      const accessToken = response?.data?.accessToken;
+      const roles = response?.data?.roles;
+
+      setAuth({ username, password, roles, accessToken });
+
       setUsername("");
       setPassword("");
-      navigate("/dashboard");
+      navigate(from, { replace: true });
     } catch (error) {
-        if (!error.status) {
-            setErrMsg('No Server Response');
-        } else if (error.status === 400) {
-            setErrMsg('Missing Username or Password');
-        } else if (error.status === 401) {
-            setErrMsg('Unauthorized');
-        } else {
-            setErrMsg(error.data?.message);
-        }
-        errRef.current.focus();
+      if (!error.status) {
+        setErrMsg("No Server Response");
+      } else if (error.status === 400) {
+        setErrMsg("Missing Username or Password");
+      } else if (error.status === 401) {
+        setErrMsg("Unauthorized");
+      } else {
+        setErrMsg(error.data?.message);
+      }
+      errRef.current.focus();
     }
   };
   const handleUserInput = (e) => setUsername(e.target.value);
@@ -73,7 +88,7 @@ const LoginFinal = () => {
 
   const errClass = errMsg ? "errmsg" : "offscreen";
 
-  if (isLoading) return <p>Carregando...</p>;
+
   return (
     <CssVarsProvider>
       <main>
@@ -100,7 +115,6 @@ const LoginFinal = () => {
             <Typography level="h4" component="h1">
               <b>Bem Vindo!</b>
             </Typography>
-            {/* <Typography level="body-sm">Sign in to continue.</Typography> */}
           </div>
           <form onSubmit={handleSubmit}>
             <FormControl>
@@ -140,4 +154,4 @@ const LoginFinal = () => {
   );
 };
 
-export default LoginFinal;
+export default LoginPage;
