@@ -22,6 +22,8 @@ import PersistLogin from "state/auth/persistLogin";
 import RequireAuth from "state/auth/requireAuth";
 import { ToastContainer } from "react-toastify";
 import Missing from "components/Missing";
+import Unauthorized from "components/Unauthorized";
+import Home from "components/Home";
 
 const ROLES = {
   Employee: "Employee",
@@ -32,16 +34,34 @@ const ROLES = {
 const App = () => {
   const mode = useSelector((state) => state.global.mode);
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
- 
+
   return (
     <div className="app">
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Routes>
           <Route path="/" element={<LoginPage />} />
-          <Route element={<PersistLogin />}>
+          <Route element={<Layout />}>
+            <Route path="/unauthorized" element={<Unauthorized />} />
+            <Route element={<PersistLogin />}></Route>
             <Route
               element={<RequireAuth allowedRoles={[...Object.values(ROLES)]} />}
+            >
+              <Route path="/home" element={<Home />} />
+              <Route path="/inventarios" element={<Transactions />} />
+              <Route path="/tags" element={<Tags />} />
+            </Route>
+            <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
+              <Route element={<Layout />}>
+                <Route path="/usuarios" element={<Customers />} />
+                <Route path="/novo-usuario" element={<NewUser />} />
+                <Route path="/cc" element={<Cost />} />
+              </Route>
+            </Route>
+            <Route
+              element={
+                <RequireAuth allowedRoles={[ROLES.Admin, ROLES.Manager]} />
+              }
             >
               <Route element={<Layout />}>
                 <Route path="/dashboard" element={<Dashboard />} />
@@ -49,13 +69,8 @@ const App = () => {
                 <Route path="/novo-item" element={<NewItem />} />
                 <Route path="/Movimentacao" element={<AssetMovement />} />
                 <Route path="/new-movement" element={<NewMovement />} />
-                <Route path="/novo-usuario" element={<NewUser />} />
-                <Route path="/usuarios" element={<Customers />} />
-                <Route path="/inventarios" element={<Transactions />} />
                 <Route path="/depreciacao" element={<Overview />} />
                 <Route path="/categorias" element={<Breakdown />} />
-                <Route path="/cc" element={<Cost />} />
-                <Route path="/tags" element={<Tags />} />
               </Route>
 
               <Route path="*" element={<Missing />} />
@@ -67,6 +82,6 @@ const App = () => {
       <ToastContainer />
     </div>
   );
-}
+};
 
 export default App;
