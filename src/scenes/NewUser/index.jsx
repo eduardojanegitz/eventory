@@ -12,18 +12,20 @@ import { api2 } from "state/api";
 import { PopupExample } from "components/Popup";
 
 const NewUser = () => {
+  const [username, setUsername] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [pass, setPass] = useState("");
+  const [password, setPassword] = useState("");
   const [department, setDeparment] = useState("");
 
   async function handleSubmit(e) {
     e.preventDefault();
 
     const response = await api2.post("api/user", {
+      username,
       name,
       email,
-      pass,
+      password,
       department,
     });
   }
@@ -38,6 +40,13 @@ const NewUser = () => {
       </FlexBetween>
 
       <form onSubmit={handleSubmit} className="form">
+        <input
+          type="text"
+          placeholder="Usuário"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          className="input"
+        />
         <input
           type="text"
           placeholder="Nome"
@@ -55,8 +64,8 @@ const NewUser = () => {
         <input
           type="password"
           placeholder="Senha"
-          value={pass}
-          onChange={(e) => setPass(e.target.value)}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           className="input"
         />
         <input
