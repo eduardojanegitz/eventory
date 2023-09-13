@@ -43,7 +43,7 @@ const App = () => {
           <Route path="/" element={<LoginPage />} />
           <Route element={<Layout />}>
             <Route path="/unauthorized" element={<Unauthorized />} />
-            <Route element={<PersistLogin />}></Route>
+            <Route element={<PersistLogin />}>
             <Route
               element={<RequireAuth allowedRoles={[...Object.values(ROLES)]} />}
             >
@@ -68,7 +68,7 @@ const App = () => {
               <Route path="/new-movement" element={<NewMovement />} />
               <Route path="/depreciacao" element={<Overview />} />
               <Route path="/categorias" element={<Breakdown />} />
-
+</Route>
               <Route path="*" element={<Missing />} />
             </Route>
           </Route>
