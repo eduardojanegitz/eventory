@@ -27,7 +27,6 @@ import {
 } from "@mui/material";
 import profileImage from "assets/profile.jpeg";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useSendLogoutMutation } from "state/auth/authApiSlice";
 import useLogout from "hooks/useLogout";
 
 const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
