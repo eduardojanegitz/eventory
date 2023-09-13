@@ -52,26 +52,22 @@ const App = () => {
               <Route path="/tags" element={<Tags />} />
             </Route>
             <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
-              <Route element={<Layout />}>
-                <Route path="/usuarios" element={<Customers />} />
-                <Route path="/novo-usuario" element={<NewUser />} />
-                <Route path="/cc" element={<Cost />} />
-              </Route>
+              <Route path="/usuarios" element={<Customers />} />
+              <Route path="/novo-usuario" element={<NewUser />} />
+              <Route path="/cc" element={<Cost />} />
             </Route>
             <Route
               element={
                 <RequireAuth allowedRoles={[ROLES.Admin, ROLES.Manager]} />
               }
             >
-              <Route element={<Layout />}>
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/itens" element={<Products />} />
-                <Route path="/novo-item" element={<NewItem />} />
-                <Route path="/Movimentacao" element={<AssetMovement />} />
-                <Route path="/new-movement" element={<NewMovement />} />
-                <Route path="/depreciacao" element={<Overview />} />
-                <Route path="/categorias" element={<Breakdown />} />
-              </Route>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/itens" element={<Products />} />
+              <Route path="/novo-item" element={<NewItem />} />
+              <Route path="/Movimentacao" element={<AssetMovement />} />
+              <Route path="/new-movement" element={<NewMovement />} />
+              <Route path="/depreciacao" element={<Overview />} />
+              <Route path="/categorias" element={<Breakdown />} />
 
               <Route path="*" element={<Missing />} />
             </Route>
