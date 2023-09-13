@@ -158,6 +158,10 @@ const Product = ({
 };
 
 const Dashboard = () => {
+
+  const date = new Date();
+  const today = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium', timeStyle: 'short' }).format(date);
+
   const theme = useTheme();
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
   const { data, isLoading } = useGetDashboardQuery();
@@ -225,9 +229,8 @@ const Dashboard = () => {
               />
             ))
 } */}
-      {/* <button onClick={() => console.log(...data)}>ola</button> */}
       <FlexBetween>
-        <Header title="DASHBOARD" subtitle="Bem vindo ao EVENTORY." />
+        <Header title="DASHBOARD" subtitle="Bem vindo ao EVENTORY." date={today}/>
 
         {/* <Box>
           <Button

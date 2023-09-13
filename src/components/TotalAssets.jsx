@@ -7,10 +7,7 @@ import { useEffect } from "react";
 const StatBox = ({ title, value, increase, icon, description }) => {
   const theme = useTheme();
   const { data } = useGetCountItemValueQuery();
-
-
-
- console.log(data)
+  
   return (
     <Box
       gridColumn="span 2"

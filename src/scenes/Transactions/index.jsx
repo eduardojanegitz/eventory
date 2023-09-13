@@ -7,7 +7,10 @@ import { Box, Button } from "@mui/material";
 import DataGridCustomToolbar from "components/DataGridCustomToolbar";
 import FlexBetween from "components/FlexBetween";
 import { Link } from "react-router-dom";
-import AddIcon from '@mui/icons-material/Add';
+import AddIcon from "@mui/icons-material/Add";
+
+import Typography from '@mui/material/Typography';
+import Modal from '@mui/material/Modal';
 
 const Transactions = () => {
   const theme = useTheme();
@@ -25,6 +28,22 @@ const Transactions = () => {
     sort: JSON.stringify(sort),
     search,
   });
+
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+  };
 
   const columns = [
     // {
@@ -48,7 +67,7 @@ const Transactions = () => {
       flex: 1,
     },
     {
-      field: "responsable",
+      field: "user",
       headerName: "Responsável",
       flex: 0.5,
       // sortable: false,
@@ -83,6 +102,35 @@ const Transactions = () => {
               Novo inventário
             </Link>
           </Button>
+
+          <Button
+            onClick={handleOpen}
+            sx={{
+              backgroundColor: theme.palette.secondary.dark,
+              color: theme.palette.background.alt,
+              fontSize: "14px",
+              fontWeight: "bold",
+              padding: "10px 20px",
+            }}
+          >
+            NOVO INVENTÁRIO
+          </Button>
+          <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+            <Box sx={style}>
+              <Typography id="modal-modal-title" variant="h6" component="h2">
+                Sala que está realizando o inventário
+              </Typography>
+              <Typography
+                id="modal-modal-description"
+                sx={{ mt: 2 }}
+              ></Typography>
+            </Box>
+          </Modal>
         </Box>
       </FlexBetween>
       <Box
@@ -115,7 +163,7 @@ const Transactions = () => {
         <DataGrid
           loading={isLoading || !data}
           getRowId={(row) => row._id}
-          rows={(data) || []}
+          rows={data || []}
           rowsPerOptions={[20, 50, 100]}
           columns={columns}
           // rowCount={(data && data[80].item) || 0}

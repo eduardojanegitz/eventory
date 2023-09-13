@@ -12,6 +12,10 @@ import { useState } from "react";
 import FlexBetween from "components/FlexBetween";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 const NewMovement = () => {
   const [name, setName] = useState("");
   const [actualLocation, setActualLocation] = useState("");
@@ -30,6 +34,12 @@ const NewMovement = () => {
       observations,
     });
   }
+
+  const showToastMessage = () => {
+    toast.success('Movimentação realizada com sucesso!', {
+        position: toast.POSITION.TOP_CENTER
+    });
+};
 
   return (
     <Box m="1.5rem 2.5rem">
@@ -76,12 +86,14 @@ const NewMovement = () => {
           onChange={(e) => setObservations(e.target.value)}
           className="input"
         />
-        <button className="btn-submit">
+        <button onClick={showToastMessage} className="btn-submit">
           <ThumbUpAltIcon />
           CONFIRMAR MOVIMENTAÇÃO
         </button>
       </form>
     </Box>
+
+    
   );
 };
 

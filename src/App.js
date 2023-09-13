@@ -2,7 +2,7 @@ import { CssBaseline, ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { themeSettings } from "theme";
 import Layout from "scenes/Layout";
 import Dashboard from "scenes/Dashboard";
@@ -17,37 +17,67 @@ import NewUser from "scenes/NewUser";
 import AssetMovement from "scenes/AssetMovement";
 import NewMovement from "scenes/NewMovement";
 import Cost from "scenes/Cost";
-import LoginPage from "scenes/LoginPage"
+import LoginPage from "scenes/LoginPage";
+import PersistLogin from "state/auth/persistLogin";
+import RequireAuth from "state/auth/requireAuth";
+import { ToastContainer } from "react-toastify";
+import Missing from "components/Missing";
+import Unauthorized from "components/Unauthorized";
+import Home from "components/Home";
 
-function App() {
+const ROLES = {
+  Employee: "Employee",
+  Manager: "Manager",
+  Admin: "Admin",
+};
+
+const App = () => {
   const mode = useSelector((state) => state.global.mode);
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
+
   return (
     <div className="app">
-      <BrowserRouter>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <Routes>
-              <Route path="/" element={<LoginPage />} />
-            <Route element={<Layout />}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Routes>
+          <Route path="/" element={<LoginPage />} />
+          <Route element={<Layout />}>
+            <Route path="/unauthorized" element={<Unauthorized />} />
+            <Route element={<PersistLogin />}>
+            <Route
+              element={<RequireAuth allowedRoles={[...Object.values(ROLES)]} />}
+            >
+              <Route path="/home" element={<Home />} />
+              <Route path="/inventarios" element={<Transactions />} />
+              <Route path="/tags" element={<Tags />} />
+            </Route>
+            <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
+              <Route path="/usuarios" element={<Customers />} />
+              <Route path="/novo-usuario" element={<NewUser />} />
+              <Route path="/cc" element={<Cost />} />
+            </Route>
+            <Route
+              element={
+                <RequireAuth allowedRoles={[ROLES.Admin, ROLES.Manager]} />
+              }
+            >
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/itens" element={<Products />} />
               <Route path="/novo-item" element={<NewItem />} />
               <Route path="/Movimentacao" element={<AssetMovement />} />
               <Route path="/new-movement" element={<NewMovement />} />
-              <Route path="/novo-usuario" element={<NewUser />} />
-              <Route path="/usuarios" element={<Customers />} />
-              <Route path="/inventarios" element={<Transactions />} />
               <Route path="/depreciacao" element={<Overview />} />
               <Route path="/categorias" element={<Breakdown />} />
-              <Route path="/cc" element={<Cost />} />
-              <Route path="/tags" element={<Tags />} />
+</Route>
+              <Route path="*" element={<Missing />} />
             </Route>
-          </Routes>
-        </ThemeProvider>
-      </BrowserRouter>
+          </Route>
+        </Routes>
+      </ThemeProvider>
+
+      <ToastContainer />
     </div>
   );
-}
+};
 
 export default App;

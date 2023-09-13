@@ -1,8 +1,16 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import axios from "axios";
 
+axios.defaults.withCredentials = true;
+
 export const api2 = axios.create({
   baseURL: process.env.REACT_APP_BASE_URL,
+});
+
+export const axiosPrivate = axios.create({
+  baseURL: process.env.REACT_APP_BASE_URL,
+  headers: { 'Content-Type': 'application/json' },
+  withCredentials: true
 });
 
 export const api = createApi({
