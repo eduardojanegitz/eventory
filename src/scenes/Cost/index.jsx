@@ -12,7 +12,6 @@ import { Link } from "react-router-dom";
 const Cost = () => {
   const theme = useTheme();
   const { data, isLoading } = useGetUserQuery();
-  // console.log("data", data);
 
   const columns = [
     {

@@ -116,10 +116,6 @@ const Tags = () => {
     }
 
     // setItem(columns)
-
-    // console.log(data && data.description);
-    // console.log([lista]);
-    // console.log(setItem(data))
   };
   return (
     <Box m="1.5rem 2.5rem">
