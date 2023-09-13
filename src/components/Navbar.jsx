@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   LightModeOutlined,
   DarkModeOutlined,
@@ -25,16 +25,40 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
-import profileImage from "assets/profile.jpeg"
+import profileImage from "assets/profile.jpeg";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useSendLogoutMutation } from "state/auth/authApiSlice";
+import useLogout from "hooks/useLogout";
 
 const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
   const dispatch = useDispatch();
   const theme = useTheme();
 
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  const logout = useLogout();
+
+  const signOut = async () => {
+    await logout()
+    navigate('/')
+  }
+
+  // Redux toolkit
+  // const [sendLogout, { isLoading, isSuccess, isError, error }] =
+  //   useSendLogoutMutation();
+
+  // useEffect(() => {
+  //   if(isSuccess) navigate('/')
+  // }, [isSuccess, navigate])
+
+
   const [anchorEl, setAnchorEl] = useState(null);
   const isOpen = Boolean(anchorEl);
   const handleClick = (event) => setAnchorEl(event.currentTarget);
-  const handleClose = () => setAnchorEl(null);
+  const handleClose = () => (setAnchorEl(null), signOut());
+  // if(isLoading) return <p>logging out</p>
+  // if(isError) return <p>Erro: {error.data?.message}</p>
 
   return (
     <AppBar
