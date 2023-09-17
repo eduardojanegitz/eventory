@@ -237,7 +237,6 @@ const Tags = () => {
               <TableCell>Nome</TableCell>
               <TableCell align="right">Descrição</TableCell>
               <TableCell align="right">Número de serial</TableCell>
-              <TableCell align="right">Localização</TableCell>
               <TableCell align="right">Ação</TableCell>
             </TableRow>
           </TableHead>
@@ -252,7 +251,6 @@ const Tags = () => {
                 </TableCell>
                 <TableCell align="right">{list.descricao}</TableCell>
                 <TableCell align="right">{list.serial}</TableCell>
-                <TableCell align="right">{list.localizacao}</TableCell>
                 <TableCell align="right">
                   <IconButton edge="end" aria-label="delete">
                     <DeleteIcon />
