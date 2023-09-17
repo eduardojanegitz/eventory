@@ -23,6 +23,7 @@ import useAxiosPrivate from "hooks/useAxiosPrivate";
 import { api2, useGetMovementQuery } from "state/api";
 // import { Input } from "@mui/base";
 import Input from "components/Input";
+import ModalStyle from "components/ModalStyle";
 
 const AssetMovement = () => {
   const theme = useTheme();
@@ -87,18 +88,6 @@ const AssetMovement = () => {
     setReason("");
     setObservations("");
     showToastMessage();
-  };
-
-  const style = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: "37.5rem",
-    bgcolor: theme.palette.background.default,
-    borderRadius: "35px",
-    boxShadow: 24,
-    padding: "2rem",
   };
 
   const columns = [
@@ -183,7 +172,7 @@ const AssetMovement = () => {
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
           >
-            <Box sx={style}>
+            <ModalStyle>
               <Typography id="modal-modal-title" variant="h5" component="h1">
                 Nova movimentação do ativo
               </Typography>
@@ -252,7 +241,7 @@ const AssetMovement = () => {
                   </Button>
                 </form>
               </Typography>
-            </Box>
+            </ModalStyle>
           </Modal>
         </Box>
       </FlexBetween>
