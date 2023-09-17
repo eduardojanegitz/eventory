@@ -13,11 +13,12 @@ import AddIcon from "@mui/icons-material/Add";
 
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
+import Input from "components/Input";
+import ModalStyle from "components/ModalStyle";
 
 const Transactions = () => {
   const theme = useTheme();
 
-  //values to be sent to the backend
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(20);
   const [sort, setSort] = useState({});
@@ -33,33 +34,12 @@ const Transactions = () => {
     search,
   });
 
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const style = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: 400,
-    bgcolor: "background.paper",
-    border: "2px solid #000",
-    boxShadow: 24,
-    p: 4,
-  };
 
   const columns = [
-    // {
-    //   field: "_id",
-    //   headerName: "ID",
-    //   flex: 1,
-    // },
-    // {
-    //   field: "userId",
-    //   headerName: "ID do usuário",
-    //   flex: 1,
-    // },
     {
       field: "_id",
       headerName: "Número do inventário",
@@ -69,6 +49,11 @@ const Transactions = () => {
       field: "createdAt",
       headerName: "Data do inventário",
       flex: 1,
+      valueGetter: (params) => {
+        // Formate a data para o formato brasileiro (dd/mm/yyyy)
+        const date = new Date(params.row.createdAt);
+        return date.toLocaleDateString('pt-BR');
+      },
     },
     {
       field: "user",
@@ -83,7 +68,10 @@ const Transactions = () => {
     //   flex: 1,
     //   renderCell: (params) => `${Number(params.value).toFixed(2)}`,
     // },
+   
   ];
+  const handleLocation = (e) => setLocation(e.target.value);
+
   return (
     <Box m="1.5rem 2.5rem">
       <FlexBetween>
@@ -93,28 +81,18 @@ const Transactions = () => {
         />
         <Box>
           <Button
-            sx={{
-              backgroundColor: theme.palette.secondary.light,
-              color: theme.palette.background.alt,
-              fontSize: "14px",
-              fontWeight: "bold",
-              padding: "10px 20px",
-            }}
-          >
-            <Link to="/tags" className="btn-new">
-              <AddIcon sx={{ mr: "10px" }} />
-              Novo inventário
-            </Link>
-          </Button>
-
-          <Button
             onClick={handleOpen}
             sx={{
               backgroundColor: theme.palette.secondary.dark,
-              color: theme.palette.background.alt,
+              color: theme.palette.background.default,
               fontSize: "14px",
               fontWeight: "bold",
               padding: "10px 20px",
+              transition: "background-color 0.3s ease, color 0.3s ease", // Adiciona uma transição suave
+              "&:hover": {
+                backgroundColor: theme.palette.secondary.main, // Define a cor quando o mouse passa por cima
+                color: theme.palette.primary.main,
+              },
             }}
           >
             NOVO INVENTÁRIO
@@ -125,26 +103,27 @@ const Transactions = () => {
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
           >
-            <Box sx={style}>
+            <ModalStyle>
               <Typography id="modal-modal-title" variant="h6" component="h2">
                 Sala que está realizando o inventário
               </Typography>
-              <input
+              <Input
                 type="text"
                 value={location}
-                onChange={(e) => setLocation(e.target.value)}
+                onChange={handleLocation}
+                readOnly={false}
               />
               <Button variant="contained" color="secondary">
-              <Link to="/tags">
-              <AddIcon sx={{ mr: "10px" }} />
-              Novo inventário
-            </Link>
+                <Link to={`/tags?location=${location}`}>
+                  <AddIcon sx={{ mr: "10px" }} />
+                  Novo inventário
+                </Link>
               </Button>
               <Typography
                 id="modal-modal-description"
                 sx={{ mt: 2 }}
               ></Typography>
-            </Box>
+            </ModalStyle>
           </Modal>
         </Box>
       </FlexBetween>
