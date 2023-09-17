@@ -1,3 +1,5 @@
+// Transactions
+
 import React, { useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { useGetInventoryQuery } from "state/api";
@@ -9,8 +11,8 @@ import FlexBetween from "components/FlexBetween";
 import { Link } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 
-import Typography from '@mui/material/Typography';
-import Modal from '@mui/material/Modal';
+import Typography from "@mui/material/Typography";
+import Modal from "@mui/material/Modal";
 
 const Transactions = () => {
   const theme = useTheme();
@@ -20,6 +22,8 @@ const Transactions = () => {
   const [pageSize, setPageSize] = useState(20);
   const [sort, setSort] = useState({});
   const [search, setSearch] = useState("");
+
+  const [location, setLocation] = useState("");
 
   const [searchInput, setSearchInput] = useState("");
   const { data, isLoading } = useGetInventoryQuery({
@@ -34,13 +38,13 @@ const Transactions = () => {
   const handleClose = () => setOpen(false);
 
   const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
     width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
+    bgcolor: "background.paper",
+    border: "2px solid #000",
     boxShadow: 24,
     p: 4,
   };
@@ -125,6 +129,17 @@ const Transactions = () => {
               <Typography id="modal-modal-title" variant="h6" component="h2">
                 Sala que está realizando o inventário
               </Typography>
+              <input
+                type="text"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+              />
+              <Button variant="contained" color="secondary">
+              <Link to="/tags">
+              <AddIcon sx={{ mr: "10px" }} />
+              Novo inventário
+            </Link>
+              </Button>
               <Typography
                 id="modal-modal-description"
                 sx={{ mt: 2 }}

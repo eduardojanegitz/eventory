@@ -1,3 +1,6 @@
+// Tags
+
+
 import { Box, Button, InputBase, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import FlexBetween from "components/FlexBetween";
@@ -28,6 +31,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import useAxiosPrivate from "hooks/useAxiosPrivate";
+import { toast } from "react-toastify";
 
 const Tags = () => {
   const theme = useTheme();
@@ -37,6 +41,8 @@ const Tags = () => {
   // const [localizacao, setLocalizacao] = useState("")
   // const [serial, setSerial] = useState("")
   const [list, setList] = useState([]);
+  const [backEnd, setBackEnd] = useState([]);
+  const [showError, setShowError] = useState(false);
 
   let itemName = useRef();
 
@@ -47,6 +53,9 @@ const Tags = () => {
     itemName.current.focus();
   }, []);
 
+  useEffect(() => {
+   api2.get("api/tag/L-1").then(response => setBackEnd(response.data))}, [])
+  
   // const userId = useSelector((state) => state.global.userId);
   // const itemQ = 12345
   const { data } = useGetItemByTagQuery(item);
@@ -56,11 +65,39 @@ const Tags = () => {
   // const { responsable, setResponsable } = useState("");
   // const teste = (lista[0])
 
+  const showToastMessage = () => {
+    toast.success("Inventário realizado com sucesso!", {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  };
+  const showToastError = () => {
+    toast.error("Inventário divergente!", {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  };
+
   async function handleSubmit(e) {
     e.preventDefault();
+    const isMatch = list.every((listItem) =>
+    backEnd.some(
+      (backendItem) =>
+        backendItem.name === listItem.nome &&
+        backendItem.description === listItem.descricao &&
+        backendItem.location === listItem.localizacao &&
+        backendItem.serialNumber === listItem.serial
+    )
+  );
+
+  if (isMatch) {
     await axiosPrivate.post("api/inventory", {
       list,
     });
+    showToastMessage();
+  } else {
+    // Exiba a mensagem de erro caso a comparação falhe
+    // setShowError(true);
+    showToastError();
+  }
   }
   //   const response = await api2.post("api/invetory", {
   //     location,
@@ -189,6 +226,9 @@ const Tags = () => {
       <button onClick={adicionarItem} className="btn-submit">
         ADICIONAR
       </button>
+      {/* {showError && (
+        showToastError()
+      )} */}
 
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
