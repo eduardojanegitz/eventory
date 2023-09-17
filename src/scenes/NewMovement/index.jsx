@@ -12,17 +12,30 @@ import { useState } from "react";
 import FlexBetween from "components/FlexBetween";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import useAxiosPrivate from "hooks/useAxiosPrivate";
+
 const NewMovement = () => {
   const [name, setName] = useState("");
+  const [item, setItem] = useState("");
+  // const [list, setList] = useState("");
+  const [list2, setList2] = useState("");
   const [actualLocation, setActualLocation] = useState("");
   const [newLocation, setNewLocation] = useState("");
   const [reason, setReason] = useState("");
   const [observations, setObservations] = useState("");
+  const [id, setId] = useState("");
+
+
+  const axiosPrivate = useAxiosPrivate();
 
   async function handleSubmit(e) {
     e.preventDefault();
 
-    const response = await api2.post("api/movement", {
+      await axiosPrivate.post("api/movement/", {
+      id,
       name,
       actualLocation,
       newLocation,
@@ -30,6 +43,26 @@ const NewMovement = () => {
       observations,
     });
   }
+
+  const adicionar = async () => {
+    const response = await api2.get(`api/item/${item}`)
+    setId(response.data._id)
+    setActualLocation(
+      
+        response.data.location
+      
+    )
+    setName(
+      response.data.name
+    )
+
+  }
+  
+  const showToastMessage = () => {
+    toast.success('Movimentação realizada com sucesso!', {
+        position: toast.POSITION.TOP_CENTER
+    });
+};
 
   return (
     <Box m="1.5rem 2.5rem">
@@ -44,17 +77,33 @@ const NewMovement = () => {
         <input
           type="text"
           placeholder="Nome"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={item}
+          onChange={(e) => setItem(e.target.value)}
           className="input"
+          onBlur={adicionar}
         />
         <input
+          type="text"
+          placeholder="Nome"
+          value={actualLocation}
+          className="input"
+          disabled
+        />
+        <input
+          type="text"
+          placeholder="Nome"
+          value={name}
+          className="input"
+          disabled
+        />
+        {/* <button onClick={adicionar}>ola</button> */}
+        {/* <input
           type="text"
           placeholder="Localização atual"
           value={actualLocation}
           onChange={(e) => setActualLocation(e.target.value)}
           className="input"
-        />
+        /> */}
         <input
           type="text"
           placeholder="Nova localização"
@@ -76,12 +125,14 @@ const NewMovement = () => {
           onChange={(e) => setObservations(e.target.value)}
           className="input"
         />
-        <button className="btn-submit">
+        <button onClick={showToastMessage} className="btn-submit">
           <ThumbUpAltIcon />
           CONFIRMAR MOVIMENTAÇÃO
         </button>
       </form>
     </Box>
+
+    
   );
 };
 

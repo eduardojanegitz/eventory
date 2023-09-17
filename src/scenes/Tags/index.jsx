@@ -20,13 +20,14 @@ import IconButton from "@mui/material/IconButton";
 import Grid from "@mui/material/Grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import useAxiosPrivate from "hooks/useAxiosPrivate";
 
 const Tags = () => {
   const theme = useTheme();
@@ -35,9 +36,12 @@ const Tags = () => {
   // const [nome, setNome] = useState("")
   // const [localizacao, setLocalizacao] = useState("")
   // const [serial, setSerial] = useState("")
-  const [lista, setLista] = useState([]);
+  const [list, setList] = useState([]);
 
   let itemName = useRef();
+
+  // permission
+  const axiosPrivate = useAxiosPrivate();
 
   useEffect(() => {
     itemName.current.focus();
@@ -52,13 +56,10 @@ const Tags = () => {
   // const { responsable, setResponsable } = useState("");
   // const teste = (lista[0])
 
- 
-
   async function handleSubmit(e) {
     e.preventDefault();
-    console.log(lista);
-    const response = await api2.post("api/inventory", {
-       lista
+    await axiosPrivate.post("api/inventory", {
+      list,
     });
   }
   //   const response = await api2.post("api/invetory", {
@@ -101,8 +102,8 @@ const Tags = () => {
     if (itemName.current.value === "") {
       window.alert("Preencha o item");
     } else {
-      setLista([
-        ...lista,
+      setList([
+        ...list,
 
         {
           descricao: data.description,
@@ -116,10 +117,6 @@ const Tags = () => {
     }
 
     // setItem(columns)
-
-    // console.log(data && data.description);
-    // console.log([lista]);
-    // console.log(setItem(data))
   };
   return (
     <Box m="1.5rem 2.5rem">
@@ -189,46 +186,44 @@ const Tags = () => {
         />
         <button className="btn-submit">FINALIZAR</button>
       </form>
-        <button onClick={adicionarItem} className="btn-submit">
-          ADICIONAR
-        </button>
-
+      <button onClick={adicionarItem} className="btn-submit">
+        ADICIONAR
+      </button>
 
       <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell>Nome</TableCell>
-            <TableCell align="right">Descrição</TableCell>
-            <TableCell align="right">Número de serial</TableCell>
-            <TableCell align="right">Localização</TableCell>
-            <TableCell align="right">Ação</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {lista.map((list) => (
-            <TableRow
-              key={list.serialNumber}
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
-              <TableCell component="th" scope="row">
-                {list.nome}
-              </TableCell>
-              <TableCell align="right">{list.descricao}</TableCell>
-              <TableCell align="right">{list.serial}</TableCell>
-              <TableCell align="right">{list.localizacao}</TableCell>
-              <TableCell align="right">
-              <IconButton edge="end" aria-label="delete">
-                      <DeleteIcon />
-                    </IconButton>
-              </TableCell>
+        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell>Nome</TableCell>
+              <TableCell align="right">Descrição</TableCell>
+              <TableCell align="right">Número de serial</TableCell>
+              <TableCell align="right">Localização</TableCell>
+              <TableCell align="right">Ação</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-                     
-                     
+          </TableHead>
+          <TableBody>
+            {list.map((list) => (
+              <TableRow
+                key={list.serialNumber}
+                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+              >
+                <TableCell component="th" scope="row">
+                  {list.nome}
+                </TableCell>
+                <TableCell align="right">{list.descricao}</TableCell>
+                <TableCell align="right">{list.serial}</TableCell>
+                <TableCell align="right">{list.localizacao}</TableCell>
+                <TableCell align="right">
+                  <IconButton edge="end" aria-label="delete">
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
       {/* <table >
           <tr className="table-head">
           <th>Nome</th>

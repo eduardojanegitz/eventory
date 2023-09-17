@@ -28,6 +28,8 @@ import {
 import NewItem from "scenes/NewItem";
 import { DataGrid } from "@mui/x-data-grid";
 import DataGridCustomToolbar from "components/DataGridCustomToolbar";
+import DeleteIcon from '@mui/icons-material/Delete';
+
 // import * as api from "state/api";
 
 // const Product = ({
@@ -156,6 +158,37 @@ const Products = () => {
       headerName: "Tag",
       flex: 1,
     },
+    {
+      field: "Ação",
+      flex: 1,
+      renderCell: (cellValues) => {
+        return (
+          <>
+          
+          <Button
+          variant="contained"
+          color="secondary" 
+          // onClick={(event) => {
+          //   handleClick(event, cellValues)
+          // }}
+          sx={{ marginRight: '5px'}}
+          >
+            Editar
+          </Button>
+          <Button
+          variant="contained"
+          color="error" 
+          startIcon={<DeleteIcon />}
+          // onClick={(event) => {
+          //   handleClick(event, cellValues)
+          // }}
+          >
+            Apagar
+          </Button>
+          </>
+        )
+      }
+    }
    
   ];
 

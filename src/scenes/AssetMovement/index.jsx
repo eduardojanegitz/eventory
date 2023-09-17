@@ -1,51 +1,105 @@
 import React, { useState } from "react";
 import {
   Box,
+  Button,
   Card,
   CardActions,
   CardContent,
   Collapse,
-  Button,
   Typography,
-  Rating,
   useTheme,
-  useMediaQuery,
-  ListItemButton,
+  InputBase,
+  TextField,
 } from "@mui/material";
-import Header from "components/Header";
-import { useGetItemQuery, useGetMovementQuery } from "state/api";
-import FlexBetween from "components/FlexBetween";
-import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-import {
-  Link,
-  Navigate,
-  Route,
-  Router,
-  Routes,
-  redirect,
-  useNavigate,
-} from "react-router-dom";
-import NewItem from "scenes/NewItem";
 import { DataGrid } from "@mui/x-data-grid";
+import DeleteIcon from "@mui/icons-material/Delete";
+import SendIcon from "@mui/icons-material/Send";
+import Modal from "@mui/material/Modal";
+import { toast } from "react-toastify";
+import Header from "components/Header";
+import FlexBetween from "components/FlexBetween";
 import DataGridCustomToolbar from "components/DataGridCustomToolbar";
+import useAxiosPrivate from "hooks/useAxiosPrivate";
+import { api2, useGetMovementQuery } from "state/api";
+// import { Input } from "@mui/base";
+import Input from "components/Input";
 
 const AssetMovement = () => {
-  const navigate = useNavigate();
   const theme = useTheme();
-
-  //values to be sent to the backend
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(20);
   const [sort, setSort] = useState({});
   const [search, setSearch] = useState("");
-
+  const [open, setOpen] = useState(false);
   const [searchInput, setSearchInput] = useState("");
+  const [name, setName] = useState("");
+  const [item, setItem] = useState("");
+  const [list2, setList2] = useState("");
+  const [actualLocation, setActualLocation] = useState("");
+  const [newLocation, setNewLocation] = useState("");
+  const [reason, setReason] = useState("");
+  const [observations, setObservations] = useState("");
+  const [id, setId] = useState("");
+  const axiosPrivate = useAxiosPrivate();
+
   const { data, isLoading } = useGetMovementQuery({
     page,
     pageSize,
     sort: JSON.stringify(sort),
     search,
   });
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  const handleItem = (e) => setItem(e.target.value);
+  const handleLocation = (e) => setNewLocation(e.target.value);
+  const handleReason = (e) => setReason(e.target.value);
+  const handleObservations = (e) => setObservations(e.target.value);
+
+  const adicionar = async () => {
+    const response = await api2.get(`api/item/${item}`);
+    setId(response.data._id);
+    setActualLocation(response.data.location);
+    setName(response.data.name);
+  };
+
+  const showToastMessage = () => {
+    toast.success("Movimentação realizada com sucesso!", {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    await axiosPrivate.post("api/movement/", {
+      id,
+      name,
+      actualLocation,
+      newLocation,
+      reason,
+      observations,
+    });
+    setId("");
+    setName("");
+    setActualLocation("");
+    setNewLocation("");
+    setReason("");
+    setObservations("");
+    showToastMessage();
+  };
+
+  const style = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "37.5rem",
+    bgcolor: theme.palette.background.default,
+    borderRadius: "35px",
+    boxShadow: 24,
+    padding: "2rem",
+  };
 
   const columns = [
     {
@@ -55,7 +109,7 @@ const AssetMovement = () => {
     },
     {
       field: "actualLocation",
-      headerName: "Localização atual",
+      headerName: "Localização antiga",
       flex: 1,
     },
     {
@@ -69,9 +123,37 @@ const AssetMovement = () => {
       flex: 1,
     },
     {
-      field: "obeservations",
-      headerName: "Obeservações",
+      field: "observations",
+      headerName: "Observações",
       flex: 1,
+    },
+    {
+      field: "user",
+      headerName: "Responsável",
+      flex: 1,
+    },
+    {
+      field: "createdAt",
+      headerName: "Data",
+      flex: 1,
+    },
+    {
+      field: "Ação",
+      flex: 1,
+      renderCell: (cellValues) => (
+        <>
+          <Button
+            variant="contained"
+            color="secondary"
+            sx={{ marginRight: "5px" }}
+          >
+            Editar
+          </Button>
+          <Button variant="contained" color="error" startIcon={<DeleteIcon />}>
+            Apagar
+          </Button>
+        </>
+      ),
     },
   ];
 
@@ -84,19 +166,94 @@ const AssetMovement = () => {
         />
         <Box>
           <Button
+            onClick={handleOpen}
             sx={{
-              backgroundColor: theme.palette.secondary.light,
+              backgroundColor: theme.palette.secondary.dark,
               color: theme.palette.background.alt,
               fontSize: "14px",
               fontWeight: "bold",
               padding: "10px 20px",
             }}
           >
-            <Link to="/new-movement/" className="btn-new">
-              <AddOutlinedIcon sx={{ mr: "10px" }} />
-              Nova Movimentação
-            </Link>
+            Nova Movimentação
           </Button>
+          <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+            <Box sx={style}>
+              <Typography id="modal-modal-title" variant="h5" component="h1">
+                Nova movimentação do ativo
+              </Typography>
+              <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                <form onSubmit={handleSubmit} className="form">
+                  <Input
+                    type="text"
+                    placeholder="Código do item"
+                    value={item}
+                    onChange={handleItem}
+                    onBlur={adicionar}
+                  />
+                  {/* <Input 
+                     type="text"
+                     placeholder="Nome"
+                     value={item}
+                     onChange={(e) => setItem(e.target.value)}
+                     // className="input"
+                     onBlur={adicionar}
+                  /> */}
+                  {/* <TextField
+          required
+          id="filled-basic"
+          label="Nome"
+        /> */}
+                  <Input
+                    type="text"
+                    placeholder="Nome do item *"
+                    value={name}
+                    readOnly={true}
+                  />
+                  <Input
+                    type="text"
+                    placeholder="Localização Atual *"
+                    value={actualLocation}
+                    readOnly={true}
+                  />
+                  <Input
+                    type="text"
+                    placeholder="Nova localização"
+                    value={newLocation}
+                    onChange={handleLocation}
+                  />
+                  <Input
+                    type="text"
+                    placeholder="Motivo"
+                    value={reason}
+                    onChange={handleReason}
+                  />
+                  <Input
+                    type="text"
+                    placeholder="Observações"
+                    value={observations}
+                    onChange={handleObservations}
+                  />
+                  <p>
+                    Registros marcados com * são preenchidos automaticamente
+                  </p>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="secondary"
+                    endIcon={<SendIcon />}
+                  >
+                    Confirmar movimentação
+                  </Button>
+                </form>
+              </Typography>
+            </Box>
+          </Modal>
         </Box>
       </FlexBetween>
       <Box
@@ -130,9 +287,8 @@ const AssetMovement = () => {
           loading={isLoading || !data}
           getRowId={(row) => row._id}
           rows={data || []}
-          rowsPerOptions={[20, 50, 100]}
+          rowsPerPageOptions={[20, 50, 100]}
           columns={columns}
-          // rowCount={(data && data.total) || 0}
           pagination
           page={page}
           pageSize={pageSize}
