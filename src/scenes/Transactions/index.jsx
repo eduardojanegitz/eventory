@@ -1,8 +1,8 @@
 // Transactions
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import { useGetInventoryQuery } from "state/api";
+import { api2, useGetInventoryQuery } from "state/api";
 import Header from "components/Header";
 import { useTheme } from "@emotion/react";
 import { Box, Button } from "@mui/material";
@@ -23,20 +23,26 @@ const Transactions = () => {
   const [pageSize, setPageSize] = useState(20);
   const [sort, setSort] = useState({});
   const [search, setSearch] = useState("");
+  
+  const [data, setData] = useState([])
 
   const [location, setLocation] = useState("");
 
   const [searchInput, setSearchInput] = useState("");
-  const { data, isLoading } = useGetInventoryQuery({
-    page,
-    pageSize,
-    sort: JSON.stringify(sort),
-    search,
-  });
+  // const { data, isLoading } = useGetInventoryQuery({
+  //   page,
+  //   pageSize,
+  //   sort: JSON.stringify(sort),
+  //   search,
+  // });
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  useEffect(() => {
+    api2.get("/api/inventory").then((response) => setData(response.data))
+  }, [])
 
 
   const columns = [
@@ -155,24 +161,24 @@ const Transactions = () => {
         }}
       >
         <DataGrid
-          loading={isLoading || !data}
+          // loading={isLoading || !data}
           getRowId={(row) => row._id}
           rows={data || []}
           rowsPerOptions={[20, 50, 100]}
           columns={columns}
           // rowCount={(data && data[80].item) || 0}
           pagination
-          page={page}
-          pageSize={pageSize}
+          // page={page}
+          // pageSize={pageSize}
           paginationMode="server"
           sortingMode="server"
           onPageChange={(newPage) => setPage(newPage)}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
           onSortModelChange={(newSortModel) => setSort(...newSortModel)}
           components={{ Toolbar: DataGridCustomToolbar }}
-          componentsProps={{
-            toolbar: { searchInput, setSearchInput, setSearch },
-          }}
+          // componentsProps={{
+          //   toolbar: { searchInput, setSearchInput, setSearch },
+          // }}
         />
       </Box>
     </Box>
