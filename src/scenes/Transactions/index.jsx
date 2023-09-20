@@ -47,7 +47,7 @@ const Transactions = () => {
 
   const columns = [
     {
-      field: "_id",
+      field: "inventoryCode",
       headerName: "Número do inventário",
       flex: 1,
     },
@@ -58,7 +58,7 @@ const Transactions = () => {
       valueGetter: (params) => {
         // Formate a data para o formato brasileiro (dd/mm/yyyy)
         const date = new Date(params.row.createdAt);
-        return date.toLocaleDateString('pt-BR');
+        return date.toLocaleString('pt-BR');
       },
     },
     {
