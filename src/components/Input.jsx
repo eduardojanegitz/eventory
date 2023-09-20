@@ -11,6 +11,7 @@ const Input = ({ type, placeholder, value, onChange, onBlur, readOnly }) => {
       onChange={onChange}
       onBlur={onBlur}
       disabled={readOnly}
+      required
       sx={{
         border: ` 2px solid ${theme.palette.primary[100]}`,
         borderRadius: "20px",

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -23,6 +23,7 @@ import useAxiosPrivate from "hooks/useAxiosPrivate";
 import { api2, useGetMovementQuery } from "state/api";
 // import { Input } from "@mui/base";
 import Input from "components/Input";
+import ModalStyle from "components/ModalStyle";
 
 const AssetMovement = () => {
   const theme = useTheme();
@@ -40,14 +41,15 @@ const AssetMovement = () => {
   const [reason, setReason] = useState("");
   const [observations, setObservations] = useState("");
   const [id, setId] = useState("");
+  const [data, setData] = useState([])
   const axiosPrivate = useAxiosPrivate();
 
-  const { data, isLoading } = useGetMovementQuery({
-    page,
-    pageSize,
-    sort: JSON.stringify(sort),
-    search,
-  });
+  // const { data, isLoading } = useGetMovementQuery({
+  //   page,
+  //   pageSize,
+  //   sort: JSON.stringify(sort),
+  //   search,
+  // });
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -55,6 +57,11 @@ const AssetMovement = () => {
   const handleLocation = (e) => setNewLocation(e.target.value);
   const handleReason = (e) => setReason(e.target.value);
   const handleObservations = (e) => setObservations(e.target.value);
+
+  useEffect(() => {
+    api2.get("/api/movement").then((response) => setData(response.data))
+  }, [])
+
 
   const adicionar = async () => {
     const response = await api2.get(`api/item/${item}`);
@@ -87,18 +94,6 @@ const AssetMovement = () => {
     setReason("");
     setObservations("");
     showToastMessage();
-  };
-
-  const style = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: "37.5rem",
-    bgcolor: theme.palette.background.default,
-    borderRadius: "35px",
-    boxShadow: 24,
-    padding: "2rem",
   };
 
   const columns = [
@@ -183,7 +178,7 @@ const AssetMovement = () => {
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
           >
-            <Box sx={style}>
+            <ModalStyle>
               <Typography id="modal-modal-title" variant="h5" component="h1">
                 Nova movimentação do ativo
               </Typography>
@@ -252,7 +247,7 @@ const AssetMovement = () => {
                   </Button>
                 </form>
               </Typography>
-            </Box>
+            </ModalStyle>
           </Modal>
         </Box>
       </FlexBetween>
@@ -284,23 +279,23 @@ const AssetMovement = () => {
         }}
       >
         <DataGrid
-          loading={isLoading || !data}
+          // loading={isLoading || !data}
           getRowId={(row) => row._id}
           rows={data || []}
           rowsPerPageOptions={[20, 50, 100]}
           columns={columns}
           pagination
-          page={page}
-          pageSize={pageSize}
+          // page={page}
+          // pageSize={pageSize}
           paginationMode="server"
           sortingMode="server"
-          onPageChange={(newPage) => setPage(newPage)}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          // onPageChange={(newPage) => setPage(newPage)}
+          // onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
           onSortModelChange={(newSortModel) => setSort(...newSortModel)}
           components={{ Toolbar: DataGridCustomToolbar }}
-          componentsProps={{
-            toolbar: { searchInput, setSearchInput, setSearch },
-          }}
+          // componentsProps={{
+          //   toolbar: { searchInput, setSearchInput, setSearch },
+          // }}
         />
       </Box>
     </Box>

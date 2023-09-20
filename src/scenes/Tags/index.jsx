@@ -28,15 +28,19 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import useAxiosPrivate from "hooks/useAxiosPrivate";
+import { toast } from "react-toastify";
+import { useLocation } from "react-router-dom";
 
 const Tags = () => {
   const theme = useTheme();
   const [item, setItem] = useState();
-  // const [descricao, setDescricao] = useState("")
-  // const [nome, setNome] = useState("")
-  // const [localizacao, setLocalizacao] = useState("")
-  // const [serial, setSerial] = useState("")
   const [list, setList] = useState([]);
+  const [backEnd, setBackEnd] = useState([]);
+  const [showError, setShowError] = useState(false);
+
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const locationValue = searchParams.get("location");
 
   let itemName = useRef();
 
@@ -47,56 +51,68 @@ const Tags = () => {
     itemName.current.focus();
   }, []);
 
-  // const userId = useSelector((state) => state.global.userId);
-  // const itemQ = 12345
-  const { data } = useGetItemByTagQuery(item);
-  // const { teste, setTeste } = useState(lista[0]);
+  useEffect(() => {
+    api2
+      .get(`api/tag/${locationValue}`)
+      .then((response) => setBackEnd(response.data));
+  }, []);
 
-  // const { location, setLocation } = useState("");
-  // const { responsable, setResponsable } = useState("");
-  // const teste = (lista[0])
+  const { data } = useGetItemByTagQuery(item);
+
+  const showToastMessage = () => {
+    toast.success("Inventário realizado com sucesso!", {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  };
+  const showToastError = () => {
+    toast.error("Inventário divergente!", {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  };
+  const showToastError2 = () => {
+    toast.error("Os itens não podem inventariado duas vezes!", {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  };
 
   async function handleSubmit(e) {
     e.preventDefault();
-    await axiosPrivate.post("api/inventory", {
-      list,
-    });
-  }
-  //   const response = await api2.post("api/invetory", {
-  //     location,
-  //     responsable,
-  //     // teste,
-  //     item
-  //   });
-  // }
 
-  // const columns = [
-  //   {
-  //     field: "name",
-  //     headerName: "Nome do ativo",
-  //     flex: 1,
-  //   },
-  //   {
-  //     field: "description",
-  //     headerName: "Descrição do item",
-  //     flex: 1,
-  //   },
-  //   {
-  //     field: "value",
-  //     headerName: "Valor",
-  //     flex: 1,
-  //   },
-  //   {
-  //     field: "serialNumber",
-  //     headerName: "Número de série",
-  //     flex: 1,
-  //   },
-  //   {
-  //     field: "tag",
-  //     headerName: "Número de série",
-  //     flex: 1,
-  //   },
-  // ];
+    const hasDuplicates = list.some(
+      (item, index) =>
+        list.findIndex(
+          (otherItem, otherIndex) =>
+            index !== otherIndex &&
+            item.nome === otherItem.nome &&
+            item.descricao === otherItem.descricao &&
+            item.localizacao === otherItem.localizacao &&
+            item.serial === otherItem.serial
+        ) !== -1
+    );
+
+    if (hasDuplicates) {
+      showToastError2();
+    } else {
+      const isMatch = list.every((listItem) =>
+        backEnd.some(
+          (backendItem) =>
+            backendItem.name === listItem.nome &&
+            backendItem.description === listItem.descricao &&
+            backendItem.location === listItem.localizacao &&
+            backendItem.serialNumber === listItem.serial
+        )
+      );
+
+      if (isMatch && list.length === backEnd.length) {
+        await axiosPrivate.post("api/inventory", {
+          list,
+        });
+        showToastMessage();
+      } else {
+        showToastError();
+      }
+    }
+  }
 
   const adicionarItem = () => {
     if (itemName.current.value === "") {
@@ -115,67 +131,15 @@ const Tags = () => {
       setItem("");
       itemName.current.focus();
     }
-
-    // setItem(columns)
   };
   return (
     <Box m="1.5rem 2.5rem">
       <Header
         title="LEITURA DE ETIQUETAS"
-        subtitle="Faça aqui a sua leitura."
+        subtitle={`Faça aqui a sua leitura. Localização: ${locationValue}`}
       />
-      {/* <FlexBetween
-        backgroundColor={theme.palette.background.alt}
-        borderRadius="9px"
-        gap="3rem"
-        p="0.1rem 1.5rem"
-        width="40%"
-        mt="2.5rem"
-      >
-        <InputBase placeholder="Local" />
-      </FlexBetween> */}
-      {/* 
-      <InputBase
-        // backgroundColor={theme.palette.background.alt}
-        // borderRadius="9px"
-        // gap="3rem"
-        // p="0.1rem 1.5 rem"
-        // width="40%"
-        // mt="2.5rem"
-        type="text"
-        value={item}
-        onChange={(e) => setItem(e.target.value)}
-        placeholder="Digite o item"
-      /> */}
-      {/* <Input type="text" user={data || {}} placeholder="Digite" disabled /> */}
-      {/* <Button
-        sx={{
-          backgroundColor: theme.palette.secondary.light,
-          color: theme.palette.background.alt,
-          fontSize: "12px",
-          fontWeight: "bold",
-          padding: "5px 10px",
-          mt: "0.8rem",
-        }}
-        onClick={adicionarItem}
-      >
-        Adicionar
-      </Button> */}
+
       <form onSubmit={handleSubmit} className="form-tag">
-        {/* <input
-          type="text"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          placeholder="Localização"
-          className="input-tag"
-        />
-        <input
-          type="text"
-          value={responsable}
-          onChange={(e) => setResponsable(e.target.value)}
-          placeholder="Responsável"
-          className="input-tag"
-        /> */}
         <input
           type="text"
           value={item}
@@ -184,11 +148,18 @@ const Tags = () => {
           className="input-tag"
           placeholder="Digite o item"
         />
-        <button className="btn-submit">FINALIZAR</button>
+        <Button
+          sx={{ mr: "5px" }}
+          variant="contained"
+          color="secondary"
+          onClick={adicionarItem}
+        >
+          ADICIONAR
+        </Button>
+        <Button type="submit" color="error" variant="contained">
+          FINALIZAR
+        </Button>
       </form>
-      <button onClick={adicionarItem} className="btn-submit">
-        ADICIONAR
-      </button>
 
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -197,7 +168,6 @@ const Tags = () => {
               <TableCell>Nome</TableCell>
               <TableCell align="right">Descrição</TableCell>
               <TableCell align="right">Número de serial</TableCell>
-              <TableCell align="right">Localização</TableCell>
               <TableCell align="right">Ação</TableCell>
             </TableRow>
           </TableHead>
@@ -212,7 +182,6 @@ const Tags = () => {
                 </TableCell>
                 <TableCell align="right">{list.descricao}</TableCell>
                 <TableCell align="right">{list.serial}</TableCell>
-                <TableCell align="right">{list.localizacao}</TableCell>
                 <TableCell align="right">
                   <IconButton edge="end" aria-label="delete">
                     <DeleteIcon />
@@ -223,78 +192,6 @@ const Tags = () => {
           </TableBody>
         </Table>
       </TableContainer>
-
-      {/* <table >
-          <tr className="table-head">
-          <th>Nome</th>
-          <th>Descrição</th>
-          <th>Localização</th>
-          <th>Número de série</th>
-          </tr> */}
-      {/* <tr className="table-line"> */}
-      {/* <td>{lista[0]}</td>
-            <td>{lista[1]}</td>
-            <td>{lista[2]}</td>
-            <td>{lista[3]}</td> */}
-      {/* </tr> */}
-
-      {/* {lista.map((index, lista) => 
-          
-          {console.log([lista[0]])}
-          
-        )} */}
-      {/* </table> */}
-      {/* </div> */}
-      <div>{/* {data && data.description} */}</div>
-      {/* <Box
-        height="80vh"
-        sx={{
-          "& .MuiDataGrid-root": {
-            border: "none",
-          },
-          "& .MuiDataGrid-cell": {
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: theme.palette.background.alt,
-            color: theme.palette.secondary[100],
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-virtualScroller": {
-            backgroundColor: theme.palette.primary.light,
-          },
-          "& .MuiDataGrid-FooterContainer": {
-            backgroundColor: theme.palette.background.alt,
-            color: theme.palette.secondary[100],
-            borderTop: "none",
-          },
-          "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-            color: `${theme.palette.secondary[200]} !important`,
-          },
-        }}
-      >
-        <DataGrid
-          // loading={isLoading || !data}
-          getRowId={(row) => row._id}
-          rows={dataQ || []}
-          rowsPerOptions={[20, 50, 100]}
-          columns={columns}
-          // rowCount={(data && data.total) || 0}
-          pagination
-          // page={page}
-          // pageSize={pageSize}
-          paginationMode="server"
-          sortingMode="server"
-          // onPageChange={(newPage) => setPage(newPage)}
-          // onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          // onSortModelChange={(newSortModel) => setSort(...newSortModel)}
-          // components={{ Toolbar: DataGridCustomToolbar }}
-          // componentsProps={{
-          //   toolbar: { searchInput, setSearchInput, setSearch },
-          // }}
-        />
-      </Box>
-       */}
     </Box>
   );
 };
