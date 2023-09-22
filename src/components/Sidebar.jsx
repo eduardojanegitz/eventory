@@ -35,6 +35,7 @@ import profileImage from "assets/profile.jpeg";
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import TableViewIcon from '@mui/icons-material/TableView';
 import InventoryIcon from '@mui/icons-material/Inventory';
+import RuleIcon from '@mui/icons-material/Rule';
 
 const navItems = [
   {
@@ -64,6 +65,10 @@ const navItems = [
   {
     text: "Inventários",
     icon: <InventoryIcon   />,
+  },
+  {
+    text: "Divergências",
+    icon: <RuleIcon   />,
   },
   {
     text: "Gráficos",
