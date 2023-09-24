@@ -116,6 +116,7 @@ const Tags = () => {
       } else {
         await axiosPrivate.post("api/divergences", {
           divergences,
+          location: locationValue
         });
 
         showToastError();
