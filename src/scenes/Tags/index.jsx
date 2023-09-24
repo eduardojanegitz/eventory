@@ -32,7 +32,6 @@ import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
 
 const Tags = () => {
-  const theme = useTheme();
   const [item, setItem] = useState();
   const [list, setList] = useState([]);
   const [backEnd, setBackEnd] = useState([]);
@@ -93,22 +92,33 @@ const Tags = () => {
     if (hasDuplicates) {
       showToastError2();
     } else {
-      const isMatch = list.every((listItem) =>
-        backEnd.some(
+      const divergences = [];
+
+      list.forEach((listItem) => {
+        const isMatch = backEnd.some(
           (backendItem) =>
             backendItem.name === listItem.nome &&
             backendItem.description === listItem.descricao &&
             backendItem.location === listItem.localizacao &&
             backendItem.serialNumber === listItem.serial
-        )
-      );
+        );
 
-      if (isMatch && list.length === backEnd.length) {
+        if (!isMatch) {
+          divergences.push(listItem);
+        }
+      });
+
+      if (divergences.length == 0 && list.length === backEnd.length) {
         await axiosPrivate.post("api/inventory", {
           list,
         });
         showToastMessage();
       } else {
+        await axiosPrivate.post("api/divergences", {
+          divergences,
+          location: locationValue
+        });
+
         showToastError();
       }
     }
@@ -175,7 +185,7 @@ const Tags = () => {
             {list.map((list) => (
               <TableRow
                 key={list.serialNumber}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                // sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
                 <TableCell component="th" scope="row">
                   {list.nome}
