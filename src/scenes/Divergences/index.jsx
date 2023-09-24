@@ -5,20 +5,75 @@ import { DataGrid } from "@mui/x-data-grid";
 import Header from "components/Header";
 import FlexBetween from "components/FlexBetween";
 import DataGridCustomToolbar from "components/DataGridCustomToolbar";
+import IconButton from "@mui/material/IconButton";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { toast } from "react-toastify";
 
 const Divergences = () => {
     const theme = useTheme();
     const [sort, setSort] = useState({});
   const [divergences, setDivergences] = useState([]);
 
-  useEffect(() => {
-     api2.get("api/divergences").then((response) => setDivergences(response.data))
-    
+  const showToastMessage = () => {
+    toast.success("Divergência aprovada", {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  };
 
-    
-  }, []);
+  const loadData = async () => {
+    try {
+      const response = await api2.get("api/divergences");
+      setDivergences(response.data);
+    } catch (error) {
+      console.error("Erro ao carregar dados da tabela:", error);
+    }
+  };
+
+  useEffect(() => {
+ 
+    // Carregue os dados da tabela quando o componente for montado
+    loadData();
+  }, [])
+
+  async function handleDeleteClick(id) {
+    try {
+      const response = await api2.delete(`api/divergences/${id}`);
+      if (response.status === 200) {
+        // Atualize a lista de divergências após a exclusão bem-sucedida
+        // setDivergences((prevDivergences) =>
+        //   prevDivergences.filter((divergence) => divergence._id !== id)
+        // );
+        loadData();
+        showToastMessage();
+        // Exiba uma mensagem de sucesso ou faça qualquer outra ação necessária
+      } else {
+        // Exiba uma mensagem de erro ou trate qualquer erro que ocorra
+        console.error("Erro ao excluir o item.");
+      }
+    } catch (error) {
+      console.error("Erro ao excluir o item:", error);
+    }
+  }
 
   const columns = [
+    {
+      field: "location",
+      headerName: "Localização",
+      flex: 1
+    },
+    {
+      field: "localizacao",
+      headerName: "Localização correta",
+      flex: 1,
+      valueGetter: (params) => {
+        if (params.row.item && params.row.item.length > 0) {
+          const localizacao = params.row.item.map((obj) => obj.localizacao);
+          return localizacao.join(', ');
+        } else {
+          return '';
+        }
+      },
+    },
     {
       field: "descricao",
       headerName: "Descrição",
@@ -72,7 +127,22 @@ const Divergences = () => {
         const date = new Date(params.row.createdAt);
         return date.toLocaleString('pt-BR');
       },
-    }
+    },
+    {
+      field: "actions",
+      headerName: "Ações",
+      sortable: false,
+      flex: 1,
+      renderCell: (params) => (
+        <IconButton
+          edge="end"
+          aria-label="delete"
+          onClick={() => handleDeleteClick(params.row._id)}
+        >
+          <DeleteIcon />
+        </IconButton>
+      ),
+    },
   ];
   
 
