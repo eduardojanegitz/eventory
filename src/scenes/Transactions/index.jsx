@@ -5,28 +5,36 @@ import { DataGrid } from "@mui/x-data-grid";
 import { api2, useGetInventoryQuery } from "state/api";
 import Header from "components/Header";
 import { useTheme } from "@emotion/react";
-import { Box, Button } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+} from "@mui/material";
 import DataGridCustomToolbar from "components/DataGridCustomToolbar";
 import FlexBetween from "components/FlexBetween";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
-import Input from "components/Input";
 import ModalStyle from "components/ModalStyle";
 
 const Transactions = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
 
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(20);
   const [sort, setSort] = useState({});
   const [search, setSearch] = useState("");
-  
-  const [data, setData] = useState([])
+
+  const [data, setData] = useState([]);
 
   const [location, setLocation] = useState("");
+  const [locationSelect, setLocationSelect] = useState([]);
 
   const [searchInput, setSearchInput] = useState("");
   // const { data, isLoading } = useGetInventoryQuery({
@@ -39,11 +47,17 @@ const Transactions = () => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const [selectedLocation, setSelectedLocation] = useState("");
 
   useEffect(() => {
-    api2.get("/api/inventory").then((response) => setData(response.data))
-  }, [])
+    api2.get("/api/inventory").then((response) => setData(response.data));
+  }, []);
 
+  useEffect(() => {
+    api2
+      .get("api/location")
+      .then((response) => setLocationSelect(response.data));
+  });
 
   const columns = [
     {
@@ -58,7 +72,7 @@ const Transactions = () => {
       valueGetter: (params) => {
         // Formate a data para o formato brasileiro (dd/mm/yyyy)
         const date = new Date(params.row.createdAt);
-        return date.toLocaleString('pt-BR');
+        return date.toLocaleString("pt-BR");
       },
     },
     {
@@ -74,9 +88,15 @@ const Transactions = () => {
     //   flex: 1,
     //   renderCell: (params) => `${Number(params.value).toFixed(2)}`,
     // },
-   
   ];
-  const handleLocation = (e) => setLocation(e.target.value);
+
+  const handleNewInventory = (location) => {
+    if (location) {
+      navigate(`/tags?location=${location}`);
+    } else {
+      alert("Selecione uma localização antes de continuar.");
+    }
+  };
 
   return (
     <Box m="1.5rem 2.5rem">
@@ -110,20 +130,37 @@ const Transactions = () => {
             aria-describedby="modal-modal-description"
           >
             <ModalStyle>
-              <Typography id="modal-modal-title" variant="h6" component="h2">
+            <Typography id="modal-modal-title" variant="h6" component="h2">
                 Sala que está realizando o inventário
               </Typography>
-              <Input
-                type="text"
-                value={location}
-                onChange={handleLocation}
-                readOnly={false}
-              />
-              <Button variant="contained" color="secondary">
-                <Link to={`/tags?location=${location}`}>
-                  <AddIcon sx={{ mr: "10px" }} />
-                  Novo inventário
-                </Link>
+              <FormControl  sx={{ minWidth: 200 }}>
+                <InputLabel htmlFor="location-select">
+                  Selecione a localização
+                </InputLabel>
+                <Select
+                // variant="solid"
+                sx={{ width: '25rem', mb:'1rem', borderRadius: '8px', padding: '8px',
+               }}
+                  value={selectedLocation}
+                  onChange={(e) => setSelectedLocation(e.target.value)}
+                  label="Selecione a localização"
+                  id="location-select"
+                >
+                  {locationSelect.map((location) => (
+                    <MenuItem key={location._id} value={location.name}>
+                      {location.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => handleNewInventory(selectedLocation)}
+              >
+                <AddIcon sx={{ mr: "10px" }} />
+                Novo inventário
               </Button>
               <Typography
                 id="modal-modal-description"
