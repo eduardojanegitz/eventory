@@ -21,6 +21,7 @@ import AddIcon from "@mui/icons-material/Add";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import ModalStyle from "components/ModalStyle";
+import { toast } from "react-toastify";
 
 const Transactions = () => {
   const theme = useTheme();
@@ -48,6 +49,12 @@ const Transactions = () => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const [selectedLocation, setSelectedLocation] = useState("");
+
+  const showToastWarning = () => {
+    toast.warning("Primeiro selecione uma localização!", {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  };
 
   useEffect(() => {
     api2.get("/api/inventory").then((response) => setData(response.data));
@@ -94,7 +101,7 @@ const Transactions = () => {
     if (location) {
       navigate(`/tags?location=${location}`);
     } else {
-      alert("Selecione uma localização antes de continuar.");
+      showToastWarning();
     }
   };
 
@@ -130,17 +137,26 @@ const Transactions = () => {
             aria-describedby="modal-modal-description"
           >
             <ModalStyle>
-            <Typography id="modal-modal-title" variant="h6" component="h2">
+              <Typography
+                id="modal-modal-title"
+                variant="h6"
+                component="h2"
+                sx={{ mb: "1rem" }}
+              >
                 Sala que está realizando o inventário
               </Typography>
-              <FormControl  sx={{ minWidth: 200 }}>
+              <FormControl sx={{ minWidth: 200 }}>
                 <InputLabel htmlFor="location-select">
                   Selecione a localização
                 </InputLabel>
                 <Select
-                // variant="solid"
-                sx={{ width: '25rem', mb:'1rem', borderRadius: '8px', padding: '8px',
-               }}
+                  // variant="solid"
+                  sx={{
+                    width: "25rem",
+                    mb: "1rem",
+                    borderRadius: "8px",
+                    padding: "8px",
+                  }}
                   value={selectedLocation}
                   onChange={(e) => setSelectedLocation(e.target.value)}
                   label="Selecione a localização"
