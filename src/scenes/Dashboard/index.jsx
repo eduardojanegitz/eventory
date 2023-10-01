@@ -46,10 +46,10 @@ const Dashboard = () => {
 
   const theme = useTheme();
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
-  const { data, isLoading } = useGetDashboardQuery();
-  // const { data, isLoading } = useGetProductsQuery();
   const [inventory, setInventory] = useState([])
   const [item, setItem] = useState([])
+  const [data, setData] = useState([])
+  const [total, setTotal] = useState([])
 
   const itensAnterior = 100;
   const itensAtuais = 120;
@@ -64,6 +64,23 @@ const Dashboard = () => {
     api2.get("/api/item").then((response) => setItem(response.data))
   }, [])
 
+  useEffect(() => {
+    api2.get("/api/dashboard/item/lastmonth").then((response) => setData(response.data))
+  }, [])
+
+  useEffect(() => {
+    api2.get("/api/dashboard/item/total").then((response) => {
+      if (response.data && response.data[0] && response.data[0].total) {
+        setTotal(response.data[0].total);
+      } else {
+        setTotal(0); 
+      }
+    });
+  }, [])
+
+  const growth = `${((item.length - data.length) / data.length) * 100}%`; 
+  // const formattedGrowth = `${growth.toFixed(2)}%`;
+  
   const columns = [
     {
       field: "inventoryCode",
@@ -153,7 +170,7 @@ const Dashboard = () => {
         <StatBox
           title="Total de ativos"
           value={item.length}
-          increase="+20%"
+          increase={growth}
           description="Desde o mês passado"
           icon={
             <SummarizeIcon
@@ -163,10 +180,7 @@ const Dashboard = () => {
         />
         <TotalAssets
           title="Valor total"
-          // value={data && data.todayStats.totalSales}
-          // value={data[0].price + data[1].price}
-          // value="4770,98"
-          value="7000"
+          value={total}
           increase="+21%"
           description="Desde o mês passado"
           icon={

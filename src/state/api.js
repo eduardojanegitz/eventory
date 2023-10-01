@@ -38,7 +38,7 @@ export const api = createApi({
     //   providesTags: ["User"],
     // }),
     getItemByTag: build.query({
-      query: (tag) => `api/item/${tag}`,
+      query: (tag) => `api/tag/${tag}`,
       providesTags: ["Item"],
     }),
     getItem: build.query({
