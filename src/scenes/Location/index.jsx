@@ -2,14 +2,8 @@ import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
-  Card,
-  CardActions,
-  CardContent,
-  Collapse,
   Typography,
   useTheme,
-  InputBase,
-  TextField,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -20,8 +14,7 @@ import Header from "components/Header";
 import FlexBetween from "components/FlexBetween";
 import DataGridCustomToolbar from "components/DataGridCustomToolbar";
 import useAxiosPrivate from "hooks/useAxiosPrivate";
-import { api2, useGetMovementQuery } from "state/api";
-// import { Input } from "@mui/base";
+import { api2 } from "state/api";
 import Input from "components/Input";
 import ModalStyle from "components/ModalStyle";
 
@@ -36,67 +29,48 @@ const Location = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState([]);
+  const [editLocation, setEditLocation] = useState(null);
 
-  // const { data, isLoading } = useGetMovementQuery({
-  //   page,
-  //   pageSize,
-  //   sort: JSON.stringify(sort),
-  //   search,
-  // });
-
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-  const handleName = (e) => setName(e.target.value);
-  const handleDescription = (e) => setDescription(e.target.value);
-
-  const loadData = async () => {
-    try {
-      const response = await api2.get("api/location");
-      setLocation(response.data);
-    } catch (error) {
-      console.error("Erro ao carregar dados da tabela:", error);
-    }
+  const handleOpen = (location = null) => {
+    setEditLocation(location);
+    setName(location ? location.name : "");
+    setDescription(location ? location.description : "");
+    setOpen(true);
   };
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const showToastMessage = () => {
-    toast.success("Localização cadastrada com sucesso!", {
-      position: toast.POSITION.TOP_CENTER,
-    });
-  };
-  const showToastDelete = () => {
-    toast.success("Localização deletada com sucesso!", {
-      position: toast.POSITION.TOP_CENTER,
-    });
+  const handleClose = () => {
+    setOpen(false);
   };
 
-  async function handleDeleteClick(id) {
-    try {
-      const response = await api2.delete(`api/location/${id}`);
-      if (response.status === 200) {
-        loadData();
-        showToastDelete();
-      } else {
-        console.error("Erro ao excluir o item.");
-      }
-    } catch (error) {
-      console.error("Erro ao excluir o item:", error);
-    }
-  }
+  const handleName = (e) => {
+    setName(e.target.value);
+  };
+
+  const handleDescription = (e) => {
+    setDescription(e.target.value);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    await api2.post("api/location/", {
-      name,
-      description,
-    });
+    if (editLocation && editLocation._id) {
+      await api2.put(`api/location/${editLocation._id}`, {
+        name,
+        description,
+      });
+      showToastSuccess("Localização atualizada com sucesso!");
+    } else {
+      await api2.post("api/location/", {
+        name,
+        description,
+      });
+      showToastSuccess("Localização cadastrada com sucesso!");
+    }
+
     setName("");
     setDescription("");
-    showToastMessage();
+    setEditLocation(null);
+    setOpen(false);
     loadData();
   };
 
@@ -120,6 +94,7 @@ const Location = () => {
             variant="contained"
             color="secondary"
             sx={{ marginRight: "5px" }}
+            onClick={() => handleOpen(cellValues.row)}
           >
             Editar
           </Button>
@@ -135,6 +110,45 @@ const Location = () => {
       ),
     },
   ];
+
+  const loadData = async () => {
+    try {
+      const response = await api2.get("api/location");
+      setLocation(response.data);
+    } catch (error) {
+      console.error("Erro ao carregar dados da tabela:", error);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const showToastSuccess = (message) => {
+    toast.success(message , {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  };
+
+  const showToastDelete = () => {
+    toast.success("Localização deletada com sucesso!", {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  };
+
+  async function handleDeleteClick(id) {
+    try {
+      const response = await api2.delete(`api/location/${id}`);
+      if (response.status === 200) {
+        loadData();
+        showToastDelete();
+      } else {
+        console.error("Erro ao excluir o item.");
+      }
+    } catch (error) {
+      console.error("Erro ao excluir o item:", error);
+    }
+  }
 
   return (
     <Box m="1.5rem 2.5rem">
@@ -164,7 +178,7 @@ const Location = () => {
           >
             <ModalStyle>
               <Typography id="modal-modal-title" variant="h5" component="h1">
-                Nova localização
+                {editLocation && editLocation._id ? "Editar localização" : "Nova localização"}
               </Typography>
               <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                 <form onSubmit={handleSubmit} className="form">
@@ -186,7 +200,7 @@ const Location = () => {
                     color="secondary"
                     endIcon={<SendIcon />}
                   >
-                    Cadastrar
+                    {editLocation && editLocation._id ? "Atualizar" : "Cadastrar"}
                   </Button>
                 </form>
               </Typography>
@@ -222,23 +236,20 @@ const Location = () => {
         }}
       >
         <DataGrid
-          // loading={isLoading || !data}
           getRowId={(row) => row._id}
           rows={location || []}
           rowsPerPageOptions={[20, 50, 100]}
           columns={columns}
           pagination
-          // page={page}
-          // pageSize={pageSize}
           paginationMode="server"
           sortingMode="server"
-          // onPageChange={(newPage) => setPage(newPage)}
-          // onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          onPageChange={(newPage) => setPage(newPage)}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
           onSortModelChange={(newSortModel) => setSort(...newSortModel)}
           components={{ Toolbar: DataGridCustomToolbar }}
-          // componentsProps={{
-          //   toolbar: { searchInput, setSearchInput, setSearch },
-          // }}
+          componentsProps={{
+            toolbar: { searchInput, setSearchInput, setSearch },
+          }}
         />
       </Box>
     </Box>
