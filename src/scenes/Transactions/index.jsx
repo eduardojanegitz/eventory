@@ -64,7 +64,7 @@ const Transactions = () => {
     api2
       .get("api/location")
       .then((response) => setLocationSelect(response.data));
-  });
+  }, []);
 
   const columns = [
     {

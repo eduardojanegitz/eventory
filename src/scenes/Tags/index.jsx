@@ -52,7 +52,7 @@ const Tags = () => {
 
   useEffect(() => {
     api2
-      .get(`api/tag/${locationValue}`)
+      .get(`api/inventory/location/${locationValue}`)
       .then((response) => setBackEnd(response.data));
   }, []);
 
