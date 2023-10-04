@@ -78,8 +78,12 @@ const Dashboard = () => {
     });
   }, [])
 
-  const growth = `${((item.length - data.length) / data.length) * 100}%`; 
-  // const formattedGrowth = `${growth.toFixed(2)}%`;
+  const growth = ((item.length - data.length) / data.length) * 100; 
+  const formattedGrowth = `${growth.toFixed(1)}%`;
+
+  const formatNumber = (value) => {
+    return value.toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+  };
   
   const columns = [
     {
@@ -170,7 +174,7 @@ const Dashboard = () => {
         <StatBox
           title="Total de ativos"
           value={item.length}
-          increase={growth}
+          increase={formattedGrowth}
           description="Desde o mês passado"
           icon={
             <SummarizeIcon
@@ -180,7 +184,7 @@ const Dashboard = () => {
         />
         <TotalAssets
           title="Valor total"
-          value={total}
+          value={`R$ ${formatNumber(total)}`}
           increase="+21%"
           description="Desde o mês passado"
           icon={

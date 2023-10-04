@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Card,
@@ -13,7 +13,7 @@ import {
   ListItemButton,
 } from "@mui/material";
 import Header from "components/Header";
-import { useGetItemQuery } from "state/api";
+import { api2, useGetItemQuery } from "state/api";
 import FlexBetween from "components/FlexBetween";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import {
@@ -29,78 +29,8 @@ import NewItem from "scenes/NewItem";
 import { DataGrid } from "@mui/x-data-grid";
 import DataGridCustomToolbar from "components/DataGridCustomToolbar";
 import DeleteIcon from '@mui/icons-material/Delete';
-
-// import * as api from "state/api";
-
-// const Product = ({
-//   _id,
-//   name,
-//   description,
-//   price,
-//   rating,
-//   category,
-//   supply,
-//   stat,
-// }) => {
-//   const [isExpanded, setIsExpanded] = useState(false);
-
-//   return (
-//     <Card
-//       sx={{
-//         backgroundImage: "none",
-//         backgroundColor: theme.palette.background.alt,
-//         borderRadius: "0.55rem",
-//       }}
-//     >
-//       <CardContent>
-//         <Typography
-//           sx={{ fontSize: 14 }}
-//           color={theme.palette.secondary[700]}
-//           gutterBottom
-//         >
-//           {category}
-//         </Typography>
-//         <Typography variant="h5" component="div">
-//           {name}
-//         </Typography>
-//         <Typography sx={{ mb: "1.5rem" }} color={theme.palette.secondary[400]}>
-//           ${Number(price).toFixed(2)}
-//         </Typography>
-//         {/* <Rating value={rating} readOnly /> */}
-
-//         <Typography variant="body2">{description}</Typography>
-//       </CardContent>
-//       <CardActions>
-//         <Button
-//           variant="primary"
-//           size="small"
-//           onClick={() => setIsExpanded(!isExpanded)}
-//         >
-//           Veja mais
-//         </Button>
-//       </CardActions>
-//       <Collapse
-//         in={isExpanded}
-//         timeout="auto"
-//         unmountOnExit
-//         sx={{
-//           color: theme.palette.neutral[300],
-//         }}
-//       >
-//         <CardContent>
-//           <Typography>id: {_id}</Typography>
-//           <Typography>Supply Left: {supply}</Typography>
-//           <Typography>
-//             Yearly Sales This Year: {stat.yearlySalesTotal}
-//           </Typography>
-//           <Typography>
-//             Yearly Units Sold This Year: {stat.yearlyTotalSoldUnits}
-//           </Typography>
-//         </CardContent>
-//       </Collapse>
-//     </Card>
-//   );
-// };
+import { SettingsRemote } from "@mui/icons-material";
+import { toast } from "react-toastify";
 
 const Products = () => {
   // const { data, isLoading } = useGetProductsQuery();
@@ -114,13 +44,48 @@ const Products = () => {
   const [sort, setSort] = useState({});
   const [search, setSearch] = useState("");
 
+  const [item, setItem] = useState([]);
+
   const [searchInput, setSearchInput] = useState("");
-  const { data, isLoading } = useGetItemQuery({
-    page,
-    pageSize,
-    sort: JSON.stringify(sort),
-    search,
-  });
+  // const { data, isLoading } = useGetItemQuery({
+  //   page,
+  //   pageSize,
+  //   sort: JSON.stringify(sort),
+  //   search,
+  // });
+
+  const showToastMessage = () => {
+    toast.success("Item excluído com sucesso!", {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  };
+
+  const loadData = async () => {
+    try {
+      const response = await api2.get("api/item");
+      setItem(response.data);
+    } catch (error) {
+      console.error("Erro ao carregar dados da tabela:", error);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, [])
+
+  async function handleDeleteClick(id) {
+    try {
+      const response = await api2.delete(`api/item/${id}`);
+      if (response.status === 200) {
+        loadData();
+        showToastMessage();
+      } else {
+        console.error("Erro ao excluir o item.");
+      }
+    } catch (error) {
+      console.error("Erro ao excluir o item:", error);
+    }
+  }
 
   const columns = [
     {
@@ -168,9 +133,6 @@ const Products = () => {
           <Button
           variant="contained"
           color="secondary" 
-          // onClick={(event) => {
-          //   handleClick(event, cellValues)
-          // }}
           sx={{ marginRight: '5px'}}
           >
             Editar
@@ -179,9 +141,7 @@ const Products = () => {
           variant="contained"
           color="error" 
           startIcon={<DeleteIcon />}
-          // onClick={(event) => {
-          //   handleClick(event, cellValues)
-          // }}
+          onClick={() => handleDeleteClick(cellValues.row._id)}
           >
             Apagar
           </Button>
@@ -245,24 +205,24 @@ const Products = () => {
         }}
       >
         <DataGrid
-          loading={isLoading || !data}
+          // loading={isLoading || !data}
           getRowId={(row) => row._id}
-          rows={data || []}
+          rows={item || []}
           rowsPerOptions={[20, 50, 100]}
           columns={columns}
           // rowCount={(data && data.total) || 0}
           pagination
-          page={page}
-          pageSize={pageSize}
+          // page={page}
+          // pageSize={pageSize}
           paginationMode="server"
           sortingMode="server"
-          onPageChange={(newPage) => setPage(newPage)}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          // onPageChange={(newPage) => setPage(newPage)}
+          // onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
           onSortModelChange={(newSortModel) => setSort(...newSortModel)}
           components={{ Toolbar: DataGridCustomToolbar }}
-          componentsProps={{
-            toolbar: { searchInput, setSearchInput, setSearch },
-          }}
+          // componentsProps={{
+          //   toolbar: { searchInput, setSearchInput, setSearch },
+          // }}
         />
       </Box>
       {/* {data || !isLoading ? (
