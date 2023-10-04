@@ -25,6 +25,7 @@ import Missing from "components/Missing";
 import Unauthorized from "components/Unauthorized";
 import Home from "components/Home";
 import Divergences from "scenes/Divergences";
+import Location from "scenes/Location";
 
 const ROLES = {
   Employee: "Employee",
@@ -66,6 +67,7 @@ const App = () => {
               >
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/itens" element={<Products />} />
+                <Route path="/localizacao" element={<Location />} />
                 <Route path="/novo-item" element={<NewItem />} />
                 <Route path="/Movimentacao" element={<AssetMovement />} />
                 <Route path="/new-movement" element={<NewMovement />} />
