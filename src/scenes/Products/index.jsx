@@ -11,9 +11,14 @@ import {
   useTheme,
   useMediaQuery,
   ListItemButton,
+  Modal,
+  InputLabel,
+  Select,
+  MenuItem,
+  Grid,
 } from "@mui/material";
 import Header from "components/Header";
-import { api2, useGetItemQuery } from "state/api";
+import { api, api2, useGetItemQuery } from "state/api";
 import FlexBetween from "components/FlexBetween";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import {
@@ -28,9 +33,12 @@ import {
 import NewItem from "scenes/NewItem";
 import { DataGrid } from "@mui/x-data-grid";
 import DataGridCustomToolbar from "components/DataGridCustomToolbar";
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteIcon from "@mui/icons-material/Delete";
 import { SettingsRemote } from "@mui/icons-material";
 import { toast } from "react-toastify";
+import ModalStyle from "components/ModalStyle";
+import Input from "components/Input";
+import InputGrid from "components/InputGrid";
 
 const Products = () => {
   // const { data, isLoading } = useGetProductsQuery();
@@ -38,11 +46,56 @@ const Products = () => {
   const navigate = useNavigate();
   const theme = useTheme();
 
-  //values to be sent to the backend
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(20);
   const [sort, setSort] = useState({});
   const [search, setSearch] = useState("");
+
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [value, setValue] = useState("");
+  const [location, setLocation] = useState("");
+  const [supplier, setSupplier] = useState("");
+  const [serialNumber, setSerialNumber] = useState("");
+  const [tag, setTag] = useState("");
+  const [locationSelect, setLocationSelect] = useState([]);
+  const [editItem, setEditItem] = useState(null);
+
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = (item = null) => {
+    setEditItem(item);
+    setName(item ? item.name : "");
+    setDescription(item ? item.description : "");
+    setValue(item ? item.value : "");
+    setSupplier(item ? item.supplier : "");
+    setSerialNumber(item ? item.serialNumber : "");
+    setTag(item ? item.setTag : "");
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleName = (e) => {
+    setName(e.target.value);
+  };
+  const handleDescription = (e) => {
+    setDescription(e.target.value);
+  };
+  const handleValue = (e) => {
+    setValue(e.target.value);
+  };
+  const handleSupplier = (e) => {
+    setSupplier(e.target.value);
+  };
+  const handleSerialNumber = (e) => {
+    setSerialNumber(e.target.value);
+  };
+  const handleTag = (e) => {
+    setTag(e.target.value);
+  };
 
   const [item, setItem] = useState([]);
 
@@ -54,8 +107,14 @@ const Products = () => {
   //   search,
   // });
 
-  const showToastMessage = () => {
-    toast.success("Item excluído com sucesso!", {
+  const showToastSuccess = (message) => {
+    toast.success(message, {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  };
+
+  const showToastDelete = (message) => {
+    toast.success(message, {
       position: toast.POSITION.TOP_CENTER,
     });
   };
@@ -70,15 +129,52 @@ const Products = () => {
   };
 
   useEffect(() => {
+    api2
+      .get("api/location")
+      .then((response) => setLocationSelect(response.data));
+  }, []);
+
+  useEffect(() => {
     loadData();
-  }, [])
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (editItem && editItem._id) {
+      await api2.put(`api/item/${editItem._id}`, {
+        name,
+        description,
+        value,
+        supplier,
+        serialNumber,
+        tag,
+      });
+      showToastSuccess("Item atualizado com sucesso!");
+    } else {
+      await api2.post("api/item/", {
+        name,
+        description,
+        value,
+        location,
+        supplier,
+        serialNumber,
+        tag,
+      });
+      showToastSuccess("Item cadastrado com sucesso!");
+    }
+
+    setEditItem(null);
+    setOpen(false);
+    loadData();
+  };
 
   async function handleDeleteClick(id) {
     try {
       const response = await api2.delete(`api/item/${id}`);
       if (response.status === 200) {
         loadData();
-        showToastMessage();
+        showToastDelete("Item deletado com sucesso");
       } else {
         console.error("Erro ao excluir o item.");
       }
@@ -125,31 +221,30 @@ const Products = () => {
     },
     {
       field: "Ação",
-      flex: 1,
+      flex: 1.2,
       renderCell: (cellValues) => {
         return (
           <>
-          
-          <Button
-          variant="contained"
-          color="secondary" 
-          sx={{ marginRight: '5px'}}
-          >
-            Editar
-          </Button>
-          <Button
-          variant="contained"
-          color="error" 
-          startIcon={<DeleteIcon />}
-          onClick={() => handleDeleteClick(cellValues.row._id)}
-          >
-            Apagar
-          </Button>
+            <Button
+              variant="contained"
+              color="secondary"
+              sx={{ marginRight: "5px" }}
+              onClick={() => handleOpen(cellValues.row)}
+            >
+              Editar
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              startIcon={<DeleteIcon />}
+              onClick={() => handleDeleteClick(cellValues.row._id)}
+            >
+              Apagar
+            </Button>
           </>
-        )
-      }
-    }
-   
+        );
+      },
+    },
   ];
 
   return (
@@ -161,20 +256,101 @@ const Products = () => {
         />
         <Box>
           <Button
+            onClick={handleOpen}
             sx={{
-              backgroundColor: theme.palette.secondary.light,
+              backgroundColor: theme.palette.secondary.dark,
               color: theme.palette.background.alt,
               fontSize: "14px",
               fontWeight: "bold",
               padding: "10px 20px",
             }}
-        
           >
-            <Link to="/novo-item/" className="btn-new">
-              <AddOutlinedIcon sx={{ mr: "10px" }} />
-              Novo Item
-            </Link>
+            Novo item
           </Button>
+          <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+            <ModalStyle>
+              <Typography id="modal-modal-title" variant="h5" component="h1">
+                {editItem && editItem._id
+                  ? "Editar localização"
+                  : "Nova localização"}
+              </Typography>
+              <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                <form onSubmit={handleSubmit} className="form">
+                  <Input
+                    type="text"
+                    placeholder="Nome do ativo"
+                    value={name}
+                    onChange={handleName}
+                  />
+                  <Input
+                    type="text"
+                    placeholder="Descrição"
+                    value={description}
+                    onChange={handleDescription}
+                  />
+                  <Input
+                    type="text"
+                    placeholder="Valor do ativo"
+                    value={value}
+                    onChange={handleValue}
+                  />
+                  <Input
+                    type="text"
+                    placeholder="Fornecedor"
+                    value={supplier}
+                    onChange={handleSupplier}
+                  />
+                  <Input
+                    type="text"
+                    placeholder="Número de série"
+                    value={serialNumber}
+                    onChange={handleSerialNumber}
+                  />
+                  <Input
+                    type="text"
+                    placeholder="Número da tag"
+                    value={tag}
+                    onChange={handleTag}
+                  />
+                  <InputLabel htmlFor="location-select">
+                    Selecione a localização
+                  </InputLabel>
+                  <Select
+                    // variant="solid"
+                    sx={{
+                      width: "30rem",
+                      mb: "1rem",
+                      borderRadius: "35px",
+                      padding: "4px",
+                    }}
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    label="Selecione a localização"
+                    id="location-select"
+                  >
+                    {locationSelect.map((location) => (
+                      <MenuItem key={location._id} value={location.name}>
+                        {location.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="secondary"
+                    // endIcon={<SendIcon />}
+                  >
+                    {editItem && editItem._id ? "Atualizar" : "Cadastrar"}
+                  </Button>
+                </form>
+              </Typography>
+            </ModalStyle>
+          </Modal>
         </Box>
       </FlexBetween>
       <Box
@@ -216,55 +392,15 @@ const Products = () => {
           // pageSize={pageSize}
           paginationMode="server"
           sortingMode="server"
-          // onPageChange={(newPage) => setPage(newPage)}
-          // onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          onPageChange={(newPage) => setPage(newPage)}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
           onSortModelChange={(newSortModel) => setSort(...newSortModel)}
           components={{ Toolbar: DataGridCustomToolbar }}
-          // componentsProps={{
-          //   toolbar: { searchInput, setSearchInput, setSearch },
-          // }}
+          componentsProps={{
+            toolbar: { searchInput, setSearchInput, setSearch },
+          }}
         />
       </Box>
-      {/* {data || !isLoading ? (
-        <Box
-          mt="20px"
-          display="grid"
-          gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-          justifyContent="space-between"
-          rowGap="20px"
-          columnGap="1.33%"
-          sx={{
-            "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
-          }}
-        >
-          {data.map(
-            ({
-              _id,
-              name,
-              description,
-              price,
-              rating,
-              category,
-              supply,
-              stat,
-            }) => (
-              <Product
-                key={_id}
-                _id={_id}
-                name={name}
-                description={description}
-                price={price}
-                rating={rating}
-                category={category}
-                supply={supply}
-                stat={stat}
-              />
-            )
-          )}
-        </Box>
-      ) : (
-        <>Carregando...</>
-      )} */}
     </Box>
   );
 };
