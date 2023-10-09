@@ -17,7 +17,8 @@ const Input = ({ type, placeholder, value, onChange, onBlur, readOnly }) => {
         borderRadius: "20px",
         padding: "7px",
         boxShadow: `4.5px 2.5px ${theme.palette.primary[100]}`,
-        width: "30rem",
+        width: "auto",
+        maxWidth: "100%",
         marginBottom: "15px"
       }}
     />
