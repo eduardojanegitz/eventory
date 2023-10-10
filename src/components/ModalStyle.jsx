@@ -2,7 +2,7 @@ import { Box, IconButton, Modal, Typography, useTheme } from "@mui/material";
 import React from "react";
 import CancelIcon from "@mui/icons-material/Cancel";
 
-const ModalStyle = ({ children, maxHeight, open, onClose }) => {
+const ModalStyle = ({ children, maxHeight, open, onClose, width }) => {
   const theme = useTheme();
 
   const style = {
@@ -11,7 +11,7 @@ const ModalStyle = ({ children, maxHeight, open, onClose }) => {
     left: "50%",
     transform: "translate(-50%, -50%)",
     maxWidth: "100%",
-    width: "auto",
+    width: width || "auto",
     maxHeight: maxHeight || "none",
     overflowY: maxHeight ? "auto" : "visible",
     bgcolor: theme.palette.background.default,
