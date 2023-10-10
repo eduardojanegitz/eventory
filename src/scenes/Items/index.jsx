@@ -20,7 +20,6 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import SendIcon from "@mui/icons-material/Send";
 import EditIcon from "@mui/icons-material/Edit";
 import Dropdown from "components/Dropdown";
-import { styled } from "@mui/material/styles";
 
 const Items = () => {
   const theme = useTheme();
@@ -44,7 +43,9 @@ const Items = () => {
   const [costCenter, setCostCenter] = useState("");
   const [locationSelect, setLocationSelect] = useState([]);
   const [editItem, setEditItem] = useState(null);
+  const [deleteItem, setDeleteItem] = useState(null);
   const [open, setOpen] = useState(false);
+  const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
 
   const handleOpen = (item = null) => {
     setEditItem(item);
@@ -174,9 +175,9 @@ const Items = () => {
     loadData();
   };
 
-  async function handleDeleteClick(id) {
+  async function handleDeleteClick() {
     try {
-      const response = await api2.delete(`api/item/${id}`);
+      const response = await api2.delete(`api/item/${deleteItem._id}`);
       if (response.status === 200) {
         loadData();
         showToastDelete("Item deletado com sucesso");
@@ -233,7 +234,6 @@ const Items = () => {
             <Button
               variant="text"
               color="secondary"
-              sx={{ marginRight: "5px" }}
               onClick={() => handleOpen(cellValues.row)}
             >
               <EditIcon />
@@ -241,7 +241,11 @@ const Items = () => {
             <Button
               variant="text"
               color="error"
-              onClick={() => handleDeleteClick(cellValues.row._id)}
+              // onClick={() => handleDeleteClick(cellValues.row._id)}
+              onClick={() => {
+                setConfirmationModalOpen(true);
+                setDeleteItem(cellValues.row);
+              }}
             >
               <DeleteIcon />
             </Button>
@@ -258,6 +262,33 @@ const Items = () => {
           title="ITENS ATIVOS"
           subtitle="Veja a lista dos itens ativos."
         />
+        <ModalStyle
+          open={isConfirmationModalOpen}
+          onClose={() => setConfirmationModalOpen(false)}
+        >
+          <Typography sx={{ mb: "30px" }}>
+            Tem certeza de que deseja excluir este item?
+          </Typography>
+          <FlexBetween>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => {
+                handleDeleteClick();
+                setConfirmationModalOpen(false);
+              }}
+            >
+              Confirmar
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={() => setConfirmationModalOpen(false)}
+            >
+              Cancelar
+            </Button>
+          </FlexBetween>
+        </ModalStyle>
         <Box>
           <Button
             onClick={handleOpen}
@@ -395,7 +426,12 @@ const Items = () => {
                       />
                     </Grid> */}
                 </Grid>
-                <Button type="submit" variant="contained" color="secondary">
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="secondary"
+                  endIcon={<SendIcon />}
+                >
                   {editItem && editItem._id ? "Atualizar" : "Cadastrar"}
                 </Button>
               </form>
