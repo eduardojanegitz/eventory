@@ -170,13 +170,10 @@ const Location = () => {
           >
             Nova Localização
           </Button>
-          <Modal
+            <ModalStyle
             open={open}
             onClose={handleClose}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-          >
-            <ModalStyle>
+            >
               <Typography id="modal-modal-title" variant="h5" component="h1">
                 {editLocation && editLocation._id ? "Editar localização" : "Nova localização"}
               </Typography>
@@ -205,7 +202,6 @@ const Location = () => {
                 </form>
               </Typography>
             </ModalStyle>
-          </Modal>
         </Box>
       </FlexBetween>
       <Box
