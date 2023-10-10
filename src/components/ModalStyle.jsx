@@ -1,5 +1,6 @@
-import { Box, Modal, Typography, useTheme } from "@mui/material";
+import { Box, IconButton, Modal, Typography, useTheme } from "@mui/material";
 import React from "react";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 const ModalStyle = ({ children, maxHeight, open, onClose }) => {
   const theme = useTheme();
@@ -25,7 +26,23 @@ const ModalStyle = ({ children, maxHeight, open, onClose }) => {
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
-      <Box sx={style}>{children}</Box>
+      <Box sx={style}>
+        <IconButton
+          edge="end"
+          color="inherit"
+          onClick={onClose}
+          aria-label="close"
+          sx={{
+            position: "absolute",
+            top: 5,
+            right: 20,
+            color: theme.palette.secondary.main,
+          }}
+        >
+          <CancelIcon />
+        </IconButton>
+        {children}
+      </Box>
     </Modal>
   );
 };
