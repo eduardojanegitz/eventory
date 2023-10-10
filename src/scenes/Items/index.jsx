@@ -1,49 +1,28 @@
 import React, { useEffect, useState } from "react";
 import {
   Box,
-  Card,
-  CardActions,
-  CardContent,
-  Collapse,
   Button,
   Typography,
-  Rating,
   useTheme,
-  useMediaQuery,
-  ListItemButton,
-  Modal,
-  InputLabel,
-  Select,
   MenuItem,
   Grid,
 } from "@mui/material";
 import Header from "components/Header";
-import { api, api2, useGetItemQuery } from "state/api";
+import { api2 } from "state/api";
 import FlexBetween from "components/FlexBetween";
-import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-import {
-  Link,
-  Navigate,
-  Route,
-  Router,
-  Routes,
-  redirect,
-  useNavigate,
-} from "react-router-dom";
-import NewItem from "scenes/NewItem";
 import { DataGrid } from "@mui/x-data-grid";
 import DataGridCustomToolbar from "components/DataGridCustomToolbar";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { SettingsRemote } from "@mui/icons-material";
 import { toast } from "react-toastify";
 import ModalStyle from "components/ModalStyle";
 import Input from "components/Input";
-import InputGrid from "components/InputGrid";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import SendIcon from "@mui/icons-material/Send";
+import EditIcon from "@mui/icons-material/Edit";
+import Dropdown from "components/Dropdown";
+import { styled } from "@mui/material/styles";
 
-const Products = () => {
-  // const { data, isLoading } = useGetProductsQuery();
-  // const isNonMobile = useMediaQuery("(min-width: 1000px)");
-  const navigate = useNavigate();
+const Items = () => {
   const theme = useTheme();
 
   const [page, setPage] = useState(0);
@@ -51,16 +30,20 @@ const Products = () => {
   const [sort, setSort] = useState({});
   const [search, setSearch] = useState("");
 
+  const [branch, setBranch] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [acquisitionDate, setAcquisitionDate] = useState("");
+  const [writeOffDate, setWriteOffDate] = useState("");
   const [value, setValue] = useState("");
   const [location, setLocation] = useState("");
   const [supplier, setSupplier] = useState("");
   const [serialNumber, setSerialNumber] = useState("");
   const [tag, setTag] = useState("");
+  const [depreciation, setDepreciation] = useState("");
+  const [costCenter, setCostCenter] = useState("");
   const [locationSelect, setLocationSelect] = useState([]);
   const [editItem, setEditItem] = useState(null);
-
   const [open, setOpen] = useState(false);
 
   const handleOpen = (item = null) => {
@@ -78,6 +61,9 @@ const Products = () => {
     setOpen(false);
   };
 
+  const handleBranch = (e) => {
+    setBranch(e.target.value);
+  };
   const handleName = (e) => {
     setName(e.target.value);
   };
@@ -87,6 +73,12 @@ const Products = () => {
   const handleValue = (e) => {
     setValue(e.target.value);
   };
+  const handleAcquisitionDate = (e) => {
+    setAcquisitionDate(e.target.value);
+  };
+  const handleWriteOffDate = (e) => {
+    setWriteOffDate(e.target.value);
+  };
   const handleSupplier = (e) => {
     setSupplier(e.target.value);
   };
@@ -95,6 +87,15 @@ const Products = () => {
   };
   const handleTag = (e) => {
     setTag(e.target.value);
+  };
+  const handleDepreciation = (e) => {
+    setDepreciation(e.target.value);
+  };
+  const handleLocation = (e) => {
+    setLocation(e.target.value);
+  };
+  const handleCostCenter = (e) => {
+    setCostCenter(e.target.value);
   };
 
   const [item, setItem] = useState([]);
@@ -153,6 +154,7 @@ const Products = () => {
       showToastSuccess("Item atualizado com sucesso!");
     } else {
       await api2.post("api/item/", {
+        branch,
         name,
         description,
         value,
@@ -160,6 +162,9 @@ const Products = () => {
         supplier,
         serialNumber,
         tag,
+        acquisitionDate,
+        writeOffDate,
+        depreciation,
       });
       showToastSuccess("Item cadastrado com sucesso!");
     }
@@ -226,20 +231,19 @@ const Products = () => {
         return (
           <>
             <Button
-              variant="contained"
+              variant="text"
               color="secondary"
               sx={{ marginRight: "5px" }}
               onClick={() => handleOpen(cellValues.row)}
             >
-              Editar
+              <EditIcon />
             </Button>
             <Button
-              variant="contained"
+              variant="text"
               color="error"
-              startIcon={<DeleteIcon />}
               onClick={() => handleDeleteClick(cellValues.row._id)}
             >
-              Apagar
+              <DeleteIcon />
             </Button>
           </>
         );
@@ -257,100 +261,146 @@ const Products = () => {
         <Box>
           <Button
             onClick={handleOpen}
+            startIcon={<AddCircleOutlineIcon />}
             sx={{
               backgroundColor: theme.palette.secondary.dark,
               color: theme.palette.background.alt,
               fontSize: "14px",
               fontWeight: "bold",
               padding: "10px 20px",
+              transition: "background-color 0.3s ease, color 0.3s ease",
+              "&:hover": {
+                backgroundColor: theme.palette.secondary.main,
+                color: theme.palette.primary.main,
+              },
             }}
           >
             Novo item
           </Button>
-          <Modal
+          <ModalStyle
+            maxHeight="90%"
+            width="90%"
             open={open}
             onClose={handleClose}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
           >
-            <ModalStyle>
-              <Typography id="modal-modal-title" variant="h5" component="h1">
-                {editItem && editItem._id
-                  ? "Editar localização"
-                  : "Nova localização"}
-              </Typography>
-              <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                <form onSubmit={handleSubmit} className="form">
-                  <Input
-                    type="text"
-                    placeholder="Nome do ativo"
-                    value={name}
-                    onChange={handleName}
-                  />
-                  <Input
-                    type="text"
-                    placeholder="Descrição"
-                    value={description}
-                    onChange={handleDescription}
-                  />
-                  <Input
-                    type="text"
-                    placeholder="Valor do ativo"
-                    value={value}
-                    onChange={handleValue}
-                  />
-                  <Input
-                    type="text"
-                    placeholder="Fornecedor"
-                    value={supplier}
-                    onChange={handleSupplier}
-                  />
-                  <Input
-                    type="text"
-                    placeholder="Número de série"
-                    value={serialNumber}
-                    onChange={handleSerialNumber}
-                  />
-                  <Input
-                    type="text"
-                    placeholder="Número da tag"
-                    value={tag}
-                    onChange={handleTag}
-                  />
-                  <InputLabel htmlFor="location-select">
-                    Selecione a localização
-                  </InputLabel>
-                  <Select
-                    // variant="solid"
-                    sx={{
-                      width: "30rem",
-                      mb: "1rem",
-                      borderRadius: "35px",
-                      padding: "4px",
-                    }}
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    label="Selecione a localização"
-                    id="location-select"
-                  >
-                    {locationSelect.map((location) => (
-                      <MenuItem key={location._id} value={location.name}>
-                        {location.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    color="secondary"
-                    // endIcon={<SendIcon />}
-                  >
-                    {editItem && editItem._id ? "Atualizar" : "Cadastrar"}
-                  </Button>
-                </form>
-              </Typography>
-            </ModalStyle>
-          </Modal>
+            <Typography id="modal-modal-title" variant="h5" component="h1">
+              {editItem && editItem._id ? "Edição de item" : "Cadastro de item"}
+            </Typography>
+            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+              <form component="form" onSubmit={handleSubmit}>
+                <Grid
+                  container
+                  rowSpacing={{ md: 5 }}
+                  columnSpacing={{ md: 2 }}
+                  columns={{ xs: 4, sm: 8, md: 12 }}
+                >
+                  <Grid item xs={4}>
+                    <Input
+                      type="text"
+                      label="Nome do ativo"
+                      value={name}
+                      onChange={handleName}
+                    />
+                  </Grid>
+                  <Grid item xs={8}>
+                    <Input
+                      type="text"
+                      label="Descrição do ativo"
+                      value={description}
+                      onChange={handleDescription}
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Input
+                      type="number"
+                      label="Valor do ativo"
+                      value={value}
+                      onChange={handleValue}
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Input
+                      type="date"
+                      value={acquisitionDate}
+                      onChange={handleAcquisitionDate}
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Input
+                      type="date"
+                      value={writeOffDate}
+                      onChange={handleWriteOffDate}
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Input
+                      type="text"
+                      label="Fornecedor"
+                      value={supplier}
+                      onChange={handleSupplier}
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Dropdown
+                      value={location}
+                      onChange={handleLocation}
+                      label="Localização"
+                      id="location-select"
+                    >
+                      {locationSelect.map((location) => (
+                        <MenuItem key={location._id} value={location.name}>
+                          {location.name}
+                        </MenuItem>
+                      ))}
+                    </Dropdown>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Input
+                      type="text"
+                      label="Número de série"
+                      value={serialNumber}
+                      onChange={handleSerialNumber}
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Input
+                      type="text"
+                      label="Número da tag"
+                      value={tag}
+                      onChange={handleTag}
+                    />
+                  </Grid>
+                  <Grid item xs={8}>
+                    <Input
+                      type="text"
+                      label="Filial"
+                      value={branch}
+                      onChange={handleBranch}
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Input
+                      type="number"
+                      label="Taxa de depreciação"
+                      value={depreciation}
+                      onChange={handleDepreciation}
+                    />
+                  </Grid>
+                  {/* <Grid item xs={8}>
+                      <Input
+                        type="text"
+                        label="Centro de custo"
+                        value={costCenter}
+                        onChange={handleCostCenter}
+                      />
+                    </Grid> */}
+                </Grid>
+                <Button type="submit" variant="contained" color="secondary">
+                  {editItem && editItem._id ? "Atualizar" : "Cadastrar"}
+                </Button>
+              </form>
+            </Typography>
+          </ModalStyle>
         </Box>
       </FlexBetween>
       <Box
@@ -405,4 +455,4 @@ const Products = () => {
   );
 };
 
-export default Products;
+export default Items;
