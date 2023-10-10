@@ -32,12 +32,6 @@ body {
   color: #FFF;
 }
 
-.form {
-  display: flex;
-  flex-direction: column;
-  width: 50%;
-}
-
 .input {
   padding: 0.8rem;
   margin: 0.5rem 0.5rem 0.8rem 0;
