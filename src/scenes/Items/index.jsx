@@ -54,7 +54,9 @@ const Items = () => {
     setValue(item ? item.value : "");
     setSupplier(item ? item.supplier : "");
     setSerialNumber(item ? item.serialNumber : "");
-    setTag(item ? item.setTag : "");
+    setTag(item ? item.tag : "");
+    setBranch(item ? item.branch : "");
+    setDepreciation(item ? item.depreciation : "");
     setOpen(true);
   };
 
@@ -145,12 +147,16 @@ const Items = () => {
 
     if (editItem && editItem._id) {
       await api2.put(`api/item/${editItem._id}`, {
+        branch,
         name,
         description,
         value,
         supplier,
         serialNumber,
         tag,
+        acquisitionDate,
+        writeOffDate,
+        depreciation,
       });
       showToastSuccess("Item atualizado com sucesso!");
     } else {
@@ -349,20 +355,24 @@ const Items = () => {
                       onChange={handleValue}
                     />
                   </Grid>
-                  <Grid item xs={4}>
-                    <Input
-                      type="date"
-                      value={acquisitionDate}
-                      onChange={handleAcquisitionDate}
-                    />
-                  </Grid>
-                  <Grid item xs={4}>
-                    <Input
-                      type="date"
-                      value={writeOffDate}
-                      onChange={handleWriteOffDate}
-                    />
-                  </Grid>
+                  {(!editItem || (editItem && !editItem.acquisitionDate)) && (
+                    <Grid item xs={4}>
+                      <Input
+                        type="date"
+                        value={acquisitionDate}
+                        onChange={handleAcquisitionDate}
+                      />
+                    </Grid>
+                  )}
+                  {(!editItem || (editItem && !editItem.writeOffDate)) && (
+                    <Grid item xs={4}>
+                      <Input
+                        type="date"
+                        value={writeOffDate}
+                        onChange={handleWriteOffDate}
+                      />
+                    </Grid>
+                  )}
                   <Grid item xs={4}>
                     <Input
                       type="text"
@@ -371,20 +381,22 @@ const Items = () => {
                       onChange={handleSupplier}
                     />
                   </Grid>
-                  <Grid item xs={4}>
-                    <Dropdown
-                      value={location}
-                      onChange={handleLocation}
-                      label="Localização"
-                      id="location-select"
-                    >
-                      {locationSelect.map((location) => (
-                        <MenuItem key={location._id} value={location.name}>
-                          {location.name}
-                        </MenuItem>
-                      ))}
-                    </Dropdown>
-                  </Grid>
+                  {(!editItem || (editItem && !editItem.location)) && (
+                    <Grid item xs={4}>
+                      <Dropdown
+                        value={location}
+                        onChange={handleLocation}
+                        label="Localização"
+                        id="location-select"
+                      >
+                        {locationSelect.map((location) => (
+                          <MenuItem key={location._id} value={location.name}>
+                            {location.name}
+                          </MenuItem>
+                        ))}
+                      </Dropdown>
+                    </Grid>
+                  )}
                   <Grid item xs={4}>
                     <Input
                       type="text"
