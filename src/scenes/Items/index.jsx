@@ -20,6 +20,7 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import SendIcon from "@mui/icons-material/Send";
 import EditIcon from "@mui/icons-material/Edit";
 import Dropdown from "components/Dropdown";
+import GridToolbar from "components/GridToolbar";
 
 const Items = () => {
   const theme = useTheme();
@@ -100,16 +101,13 @@ const Items = () => {
   const handleCostCenter = (e) => {
     setCostCenter(e.target.value);
   };
+  const handleSearch = (searchInput) => {
+    setSearch(searchInput);
+  };
 
   const [item, setItem] = useState([]);
 
   const [searchInput, setSearchInput] = useState("");
-  // const { data, isLoading } = useGetItemQuery({
-  //   page,
-  //   pageSize,
-  //   sort: JSON.stringify(sort),
-  //   search,
-  // });
 
   const showToastSuccess = (message) => {
     toast.success(message, {
@@ -424,7 +422,7 @@ const Items = () => {
                   <Grid item xs={4}>
                     <Input
                       type="number"
-                      label="Taxa de depreciação"
+                      label="Taxa de depreciação %"
                       value={depreciation}
                       onChange={handleDepreciation}
                     />
@@ -451,6 +449,11 @@ const Items = () => {
           </ModalStyle>
         </Box>
       </FlexBetween>
+      <DataGridCustomToolbar
+        value={searchInput}
+        onChange={setSearchInput}
+        onSearch={handleSearch}
+      />
       <Box
         height="80vh"
         sx={{
@@ -481,19 +484,29 @@ const Items = () => {
         <DataGrid
           // loading={isLoading || !data}
           getRowId={(row) => row._id}
-          rows={item || []}
+          // rows={item || []}
           rowsPerOptions={[20, 50, 100]}
           columns={columns}
           // rowCount={(data && data.total) || 0}
           pagination
-          // page={page}
-          // pageSize={pageSize}
+          page={page}
+          pageSize={pageSize}
           paginationMode="server"
           sortingMode="server"
           onPageChange={(newPage) => setPage(newPage)}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
           onSortModelChange={(newSortModel) => setSort(...newSortModel)}
-          components={{ Toolbar: DataGridCustomToolbar }}
+          rows={item.filter((row) =>
+            Object.values(row).some(
+              (value) =>
+                value &&
+                value
+                  .toString()
+                  .toLowerCase()
+                  .includes(searchInput.toLowerCase())
+            )
+          )}
+          components={{ Toolbar: GridToolbar }}
           componentsProps={{
             toolbar: { searchInput, setSearchInput, setSearch },
           }}
