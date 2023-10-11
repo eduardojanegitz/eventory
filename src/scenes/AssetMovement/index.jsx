@@ -24,6 +24,7 @@ import { api2, useGetMovementQuery } from "state/api";
 // import { Input } from "@mui/base";
 import Input from "components/Input";
 import ModalStyle from "components/ModalStyle";
+import GridToolbar from "components/GridToolbar";
 
 const AssetMovement = () => {
   const theme = useTheme();
@@ -57,6 +58,9 @@ const AssetMovement = () => {
   const handleLocation = (e) => setNewLocation(e.target.value);
   const handleReason = (e) => setReason(e.target.value);
   const handleObservations = (e) => setObservations(e.target.value);
+  const handleSearch = (searchInput) => {
+    setSearch(searchInput);
+  };
 
   useEffect(() => {
     api2.get("/api/movement").then((response) => setData(response.data))
@@ -251,6 +255,11 @@ const AssetMovement = () => {
           </Modal>
         </Box>
       </FlexBetween>
+      <DataGridCustomToolbar
+        value={searchInput}
+        onChange={setSearchInput}
+        onSearch={handleSearch}
+      />
       <Box
         height="80vh"
         sx={{
@@ -281,7 +290,16 @@ const AssetMovement = () => {
         <DataGrid
           // loading={isLoading || !data}
           getRowId={(row) => row._id}
-          rows={data || []}
+          rows={data.filter((row) =>
+            Object.values(row).some(
+              (value) =>
+                value &&
+                value
+                  .toString()
+                  .toLowerCase()
+                  .includes(searchInput.toLowerCase())
+            )
+          )}
           rowsPerPageOptions={[20, 50, 100]}
           columns={columns}
           pagination
@@ -292,10 +310,10 @@ const AssetMovement = () => {
           // onPageChange={(newPage) => setPage(newPage)}
           // onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
           onSortModelChange={(newSortModel) => setSort(...newSortModel)}
-          components={{ Toolbar: DataGridCustomToolbar }}
-          // componentsProps={{
-          //   toolbar: { searchInput, setSearchInput, setSearch },
-          // }}
+          components={{ Toolbar: GridToolbar }}
+          componentsProps={{
+            toolbar: { searchInput, setSearchInput, setSearch },
+          }}
         />
       </Box>
     </Box>
