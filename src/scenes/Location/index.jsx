@@ -17,6 +17,7 @@ import useAxiosPrivate from "hooks/useAxiosPrivate";
 import { api2 } from "state/api";
 import Input from "components/Input";
 import ModalStyle from "components/ModalStyle";
+import GridToolbar from "components/GridToolbar";
 
 const Location = () => {
   const theme = useTheme();
@@ -48,6 +49,9 @@ const Location = () => {
 
   const handleDescription = (e) => {
     setDescription(e.target.value);
+  };
+  const handleSearch = (searchInput) => {
+    setSearch(searchInput);
   };
 
   const handleSubmit = async (e) => {
@@ -204,6 +208,11 @@ const Location = () => {
             </ModalStyle>
         </Box>
       </FlexBetween>
+      <DataGridCustomToolbar
+        value={searchInput}
+        onChange={setSearchInput}
+        onSearch={handleSearch}
+      />
       <Box
         height="80vh"
         sx={{
@@ -233,7 +242,16 @@ const Location = () => {
       >
         <DataGrid
           getRowId={(row) => row._id}
-          rows={location || []}
+          rows={location.filter((row) =>
+            Object.values(row).some(
+              (value) =>
+                value &&
+                value
+                  .toString()
+                  .toLowerCase()
+                  .includes(searchInput.toLowerCase())
+            )
+          )}
           rowsPerPageOptions={[20, 50, 100]}
           columns={columns}
           pagination
@@ -242,7 +260,7 @@ const Location = () => {
           onPageChange={(newPage) => setPage(newPage)}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
           onSortModelChange={(newSortModel) => setSort(...newSortModel)}
-          components={{ Toolbar: DataGridCustomToolbar }}
+          components={{ Toolbar: GridToolbar }}
           componentsProps={{
             toolbar: { searchInput, setSearchInput, setSearch },
           }}
