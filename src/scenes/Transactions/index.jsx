@@ -22,6 +22,7 @@ import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import ModalStyle from "components/ModalStyle";
 import { toast } from "react-toastify";
+import GridToolbar from "components/GridToolbar";
 
 const Transactions = () => {
   const theme = useTheme();
@@ -48,6 +49,9 @@ const Transactions = () => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const handleSearch = (searchInput) => {
+    setSearch(searchInput);
+  };
   const [selectedLocation, setSelectedLocation] = useState("");
 
   const showToastWarning = () => {
@@ -181,6 +185,11 @@ const Transactions = () => {
             </ModalStyle>
         </Box>
       </FlexBetween>
+      <DataGridCustomToolbar
+        value={searchInput}
+        onChange={setSearchInput}
+        onSearch={handleSearch}
+      />
       <Box
         height="80vh"
         sx={{
@@ -211,7 +220,16 @@ const Transactions = () => {
         <DataGrid
           // loading={isLoading || !data}
           getRowId={(row) => row._id}
-          rows={data || []}
+          rows={data.filter((row) =>
+            Object.values(row).some(
+              (value) =>
+                value &&
+                value
+                  .toString()
+                  .toLowerCase()
+                  .includes(searchInput.toLowerCase())
+            )
+          )}
           rowsPerOptions={[20, 50, 100]}
           columns={columns}
           // rowCount={(data && data[80].item) || 0}
@@ -223,7 +241,7 @@ const Transactions = () => {
           onPageChange={(newPage) => setPage(newPage)}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
           onSortModelChange={(newSortModel) => setSort(...newSortModel)}
-          components={{ Toolbar: DataGridCustomToolbar }}
+          components={{ Toolbar: GridToolbar }}
           // componentsProps={{
           //   toolbar: { searchInput, setSearchInput, setSearch },
           // }}
