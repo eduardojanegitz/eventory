@@ -14,11 +14,22 @@ const ModalStyle = ({ children, maxHeight, open, onClose, width }) => {
     width: width || "auto",
     maxHeight: maxHeight || "none",
     overflowY: maxHeight ? "auto" : "visible",
+      '&::-webkit-scrollbar': {
+      width: '7px',
+    },
+    '&::-webkit-scrollbar-thumb': {
+      backgroundColor: '#b3b0b0',
+      borderRadius: '20px',
+    },
+    // '&::-webkit-scrollbar-track': {
+    //   backgroundColor: theme.palette.background.default,
+    // },
     bgcolor: theme.palette.background.default,
     borderRadius: "35px",
     boxShadow: 24,
     padding: "2rem",
   };
+
   return (
     <Modal
       open={open}
