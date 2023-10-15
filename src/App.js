@@ -6,7 +6,7 @@ import { Routes, Route } from "react-router-dom";
 import { themeSettings } from "theme";
 import Layout from "scenes/Layout";
 import Dashboard from "scenes/Dashboard";
-import Products from "scenes/Products";
+import Products from "scenes/Items";
 import Customers from "scenes/Customers";
 import Transactions from "scenes/Transactions";
 import Overview from "scenes/Overview";
