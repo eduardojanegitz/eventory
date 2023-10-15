@@ -207,7 +207,6 @@ const Depreciation = () => {
                 layout="horizontal"
                 indexBy="month"
                 margin={{ top: 20, right: 40, bottom: 20, left: 60 }}
-                // padding={0.2}
                 padding={selectedTimePeriod === 3 ? 0.5 : 0.15}
                 colors={{ scheme: "category10" }}
                 axisLeft={{
@@ -230,8 +229,6 @@ const Depreciation = () => {
                     ? d.value
                     : ""
                 }
-                // responsive={true}
-                // aspectRatio={0.8}
               />
             </Box>
           )}
@@ -259,7 +256,7 @@ const Depreciation = () => {
           "& .MuiDataGrid-virtualScroller": {
             backgroundColor: theme.palette.primary.light,
             overflowY: "auto",
-            scrollbarWidth: "thin", // Para navegadores que suportam o padrão
+            scrollbarWidth: "thin",
             "&::-webkit-scrollbar": {
               width: "3px",
             },
@@ -296,14 +293,13 @@ const Depreciation = () => {
           rowsPerPageOptions={[20, 50, 100]}
           columns={columns}
           pagination
-          paginationMode="server"
-          sortingMode="server"
+          paginationMode="client"
           onPageChange={(newPage) => setPage(newPage)}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
           onSortModelChange={(newSortModel) => setSort(...newSortModel)}
           components={{ Toolbar: GridToolbar }}
           componentsProps={{
-            toolbar: { searchInput, setSearchInput, setSearch },
+            toolbar: { searchInput, setSearchInput, search },
           }}
         />
       </Box>
