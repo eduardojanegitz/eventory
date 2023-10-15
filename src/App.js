@@ -26,6 +26,7 @@ import Unauthorized from "components/Unauthorized";
 import Home from "components/Home";
 import Divergences from "scenes/Divergences";
 import Location from "scenes/Location";
+import Depreciation from "scenes/Depreciation";
 
 const ROLES = {
   Employee: "Employee",
@@ -71,7 +72,7 @@ const App = () => {
                 <Route path="/novo-item" element={<NewItem />} />
                 <Route path="/Movimentacao" element={<AssetMovement />} />
                 <Route path="/new-movement" element={<NewMovement />} />
-                <Route path="/depreciacao" element={<Overview />} />
+                <Route path="/depreciacao" element={<Depreciation />} />
                 <Route path="/categorias" element={<Breakdown />} />
                 <Route path="/divergencias" element={<Divergences />} />
               </Route>

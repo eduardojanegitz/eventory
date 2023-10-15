@@ -37,16 +37,17 @@ import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import TableViewIcon from '@mui/icons-material/TableView';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import RuleIcon from '@mui/icons-material/Rule';
+import BarChartIcon from '@mui/icons-material/BarChart';
 
 const navItems = [
   {
     text: "Dashboard",
     icon: <HomeOutlined />,
   },
-  {
-    text: "Consulta",
-    icon: null,
-  },
+  // {
+  //   text: "Consulta",
+  //   icon: null,
+  // },
   {
     text: "Itens",
     icon: <ManageSearchIcon />,
@@ -79,10 +80,10 @@ const navItems = [
     text: "Gráficos",
     icon: null,
   },
-  // {
-  //   text: "Depreciação",
-  //   icon: <PointOfSaleOutlined />,
-  // },
+  {
+    text: "Depreciação",
+    icon: <BarChartIcon />,
+  },
   {
     text: "Categorias",
     icon: <PieChartOutlined />,
