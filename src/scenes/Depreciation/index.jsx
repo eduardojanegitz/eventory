@@ -37,7 +37,7 @@ const Depreciation = () => {
       "Set",
       "Out",
       "Nov",
-      "Dez ",
+      "Dez",
     ];
 
     const month = months[date.getMonth()];
@@ -162,22 +162,14 @@ const Depreciation = () => {
           title="DEPRECIAÇÃO"
           subtitle="Veja a lista das depreciação dos ativos."
         />
-        <ModalStyle open={open} onClose={handleClose}>
-          {selectedTimePeriod === 1 && (
-            <Typography id="modal-modal-title" variant="h5" component="h1">
-              Valor depreciado por mês durante 1 ano
-            </Typography>
-          )}
-          {selectedTimePeriod === 2 && (
-            <Typography id="modal-modal-title" variant="h5" component="h1">
-              Valor depreciado por mês durante 2 anos
-            </Typography>
-          )}
-          {selectedTimePeriod === 3 && (
-            <Typography id="modal-modal-title" variant="h5" component="h1">
-              Valor depreciado por mês durante 3 anos
-            </Typography>
-          )}
+        <ModalStyle open={open} onClose={handleClose} width="95%">
+          <Typography id="modal-modal-title" variant="h5" component="h1">
+            {selectedTimePeriod === 1
+              ? "Valor depreciado por mês durante 1 ano"
+              : selectedTimePeriod === 2
+              ? "Valor depreciado por mês durante 2 anos"
+              : "Valor depreciado por mês durante 3 anos"}
+          </Typography>
 
           <Typography variant="h6" sx={{ textAlign: "center" }}>
             Período de tempo:
@@ -208,13 +200,13 @@ const Depreciation = () => {
             </ButtonGroup>
           </Box>
           {selectedItem && (
-            <Box sx={{ height: "28rem", width: "56.25rem" }}>
+            <Box  sx={{ height: "29rem", width: "auto", maxWidth: "100%" }}>
               <ResponsiveBar
                 data={prepareDataForChart(selectedItem)}
                 keys={["depreciatedValue"]}
                 layout="horizontal"
                 indexBy="month"
-                margin={{ top: 50, right: 40, bottom: 50, left: 60 }}
+                margin={{ top: 20, right: 40, bottom: 20, left: 60 }}
                 // padding={0.2}
                 padding={selectedTimePeriod === 3 ? 0.5 : 0.15}
                 colors={{ scheme: "category10" }}
@@ -232,10 +224,14 @@ const Depreciation = () => {
                 enableGridY={false}
                 labelTextColor={theme.palette.background.alt}
                 label={(d) =>
-                  selectedTimePeriod === 1 || selectedTimePeriod === 2
+                  selectedTimePeriod === 1
+                    ? d.value
+                    : selectedTimePeriod === 2
                     ? d.value
                     : ""
                 }
+                // responsive={true}
+                // aspectRatio={0.8}
               />
             </Box>
           )}
