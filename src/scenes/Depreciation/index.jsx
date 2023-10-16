@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, ButtonGroup, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  CircularProgress,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import Header from "components/Header";
 import FlexBetween from "components/FlexBetween";
@@ -21,6 +28,7 @@ const Depreciation = () => {
   const [item, setItem] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedTimePeriod, setSelectedTimePeriod] = useState(1);
+  const [loading, setLoading] = useState(true);
 
   const formatMonth = (date) => {
     if (!date) return "N/A";
@@ -50,29 +58,29 @@ const Depreciation = () => {
     const dataForChart = [];
 
     if (selectedItem) {
-      const valor = selectedItem.value || 0;
-      const depreciacao = selectedItem.depreciation || 0;
+      const value = selectedItem.value || 0;
+      const depreciation = selectedItem.depreciation || 0;
 
-      let valorAtualizado = valor;
+      let updateValue = value;
 
       for (let i = 0; i < selectedTimePeriod * 12; i++) {
         const date = new Date(selectedItem.acquisitionDate);
         date.setMonth(date.getMonth() + i + 1);
 
-        const valorDepreciadoPorMes =
-          (valorAtualizado * (depreciacao / 100)) / 12;
+        const depreciationValuePerMonth =
+          (updateValue * (depreciation / 100)) / 12;
 
         const month = formatMonth(date);
 
         const depreciatedValue = (
-          valorAtualizado - valorDepreciadoPorMes
+          updateValue - depreciationValuePerMonth
         ).toFixed(2);
 
         dataForChart.push({
           month,
           depreciatedValue: parseFloat(depreciatedValue),
         });
-        valorAtualizado -= valorDepreciadoPorMes;
+        updateValue -= depreciationValuePerMonth;
       }
     }
 
@@ -152,7 +160,16 @@ const Depreciation = () => {
   ];
 
   useEffect(() => {
-    api2.get("api/item").then((response) => setItem(response.data));
+    api2
+      .get("api/item")
+      .then((response) => {
+        setItem(response.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Erro ao carregar dados: ", error);
+        setLoading(false);
+      });
   }, []);
 
   return (
@@ -160,7 +177,7 @@ const Depreciation = () => {
       <FlexBetween>
         <Header
           title="DEPRECIAÇÃO"
-          subtitle="Veja a lista das depreciação dos ativos."
+          subtitle="Veja a lista da depreciação dos ativos."
         />
         <ModalStyle open={open} onClose={handleClose} width="95%">
           <Typography id="modal-modal-title" variant="h5" component="h1">
@@ -200,7 +217,7 @@ const Depreciation = () => {
             </ButtonGroup>
           </Box>
           {selectedItem && (
-            <Box  sx={{ height: "29rem", width: "auto", maxWidth: "100%" }}>
+            <Box sx={{ height: "29rem", width: "auto", maxWidth: "100%" }}>
               <ResponsiveBar
                 data={prepareDataForChart(selectedItem)}
                 keys={["depreciatedValue"]}
@@ -239,70 +256,80 @@ const Depreciation = () => {
         onChange={setSearchInput}
         onSearch={handleSearch}
       />
-      <Box
-        height="80vh"
-        sx={{
-          "& .MuiDataGrid-root": {
-            border: "none",
-          },
-          "& .MuiDataGrid-cell": {
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: theme.palette.background.alt,
-            color: theme.palette.secondary[100],
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-virtualScroller": {
-            backgroundColor: theme.palette.primary.light,
-            overflowY: "auto",
-            scrollbarWidth: "thin",
-            "&::-webkit-scrollbar": {
-              width: "3px",
-            },
-            "&::-webkit-scrollbar-thumb": {
-              backgroundColor: "#b3b0b0",
-              borderRadius: "20px",
-            },
-            "&::-webkit-scrollbar-track": {
-              backgroundColor: "transparent",
-            },
-          },
-          "& .MuiDataGrid-FooterContainer": {
-            backgroundColor: theme.palette.background.alt,
-            color: theme.palette.secondary[100],
-            borderTop: "none",
-          },
-          "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-            color: `${theme.palette.secondary[200]} !important`,
-          },
-        }}
-      >
-        <DataGrid
-          getRowId={(row) => row._id}
-          rows={item.filter((row) =>
-            Object.values(row).some(
-              (value) =>
-                value &&
-                value
-                  .toString()
-                  .toLowerCase()
-                  .includes(searchInput.toLowerCase())
-            )
-          )}
-          rowsPerPageOptions={[20, 50, 100]}
-          columns={columns}
-          pagination
-          paginationMode="client"
-          onPageChange={(newPage) => setPage(newPage)}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          onSortModelChange={(newSortModel) => setSort(...newSortModel)}
-          components={{ Toolbar: GridToolbar }}
-          componentsProps={{
-            toolbar: { searchInput, setSearchInput, search },
+      {loading ? (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "80vh",
           }}
-        />
-      </Box>
+        >
+          <CircularProgress color="secondary" />
+        </Box>
+      ) : (
+        <Box
+          height="80vh"
+          sx={{
+            "& .MuiDataGrid-root": {
+              border: "none",
+            },
+            "& .MuiDataGrid-cell": {
+              borderBottom: "none",
+            },
+            "& .MuiDataGrid-columnHeaders": {
+              backgroundColor: theme.palette.background.alt,
+              color: theme.palette.secondary[100],
+              borderBottom: "none",
+            },
+            "& .MuiDataGrid-virtualScroller": {
+              backgroundColor: theme.palette.primary.light,
+              overflowY: "auto",
+              scrollbarWidth: "thin",
+              "&::-webkit-scrollbar": {
+                width: "3px",
+              },
+              "&::-webkit-scrollbar-thumb": {
+                backgroundColor: "#b3b0b0",
+                borderRadius: "20px",
+              },
+              "&::-webkit-scrollbar-track": {
+                backgroundColor: "transparent",
+              },
+            },
+            "& .MuiDataGrid-FooterContainer": {
+              backgroundColor: theme.palette.background.alt,
+              color: theme.palette.secondary[100],
+              borderTop: "none",
+            },
+            "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+              color: `${theme.palette.secondary[200]} !important`,
+            },
+          }}
+        >
+          <DataGrid
+            getRowId={(row) => row._id}
+            rows={item.filter((row) =>
+              Object.values(row).some(
+                (value) =>
+                  value &&
+                  value
+                    .toString()
+                    .toLowerCase()
+                    .includes(searchInput.toLowerCase())
+              )
+            )}
+            rowsPerPageOptions={[20, 50, 100]}
+            columns={columns}
+            pagination
+            paginationMode="client"
+            onPageChange={(newPage) => setPage(newPage)}
+            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+            onSortModelChange={(newSortModel) => setSort(...newSortModel)}
+            components={{ Toolbar: GridToolbar }}
+          />
+        </Box>
+      )}
     </Box>
   );
 };
