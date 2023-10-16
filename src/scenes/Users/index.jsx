@@ -331,6 +331,18 @@ const Users = () => {
           },
           "& .MuiDataGrid-virtualScroller": {
             backgroundColor: theme.palette.primary.light,
+            overflowY: "auto",
+            scrollbarWidth: "thin",
+            "&::-webkit-scrollbar": {
+              width: "3px",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: "#b3b0b0",
+              borderRadius: "20px",
+            },
+            "&::-webkit-scrollbar-track": {
+              backgroundColor: "transparent",
+            },
           },
           "& .MuiDataGrid-FooterContainer": {
             backgroundColor: theme.palette.background.alt,
