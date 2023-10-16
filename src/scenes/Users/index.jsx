@@ -8,6 +8,7 @@ import PersonAddOutlinedIcon from "@mui/icons-material/PersonAddOutlined";
 import { Link } from "react-router-dom";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
+import EditIcon from "@mui/icons-material/Edit";
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -78,24 +79,22 @@ const Users = () => {
         return (
           <>
             <Button
-              variant="contained"
+              variant="text"
               color="secondary"
               // onClick={(event) => {
               //   handleClick(event, cellValues)
               // }}
-              sx={{ marginRight: "5px" }}
             >
-              Editar
+              <EditIcon />
             </Button>
             <Button
-              variant="contained"
+              variant="text"
               color="error"
-              startIcon={<DeleteIcon />}
               // onClick={(event) => {
               //   handleClick(event, cellValues)
               // }}
             >
-              Apagar
+              <DeleteIcon />
             </Button>
           </>
         );
