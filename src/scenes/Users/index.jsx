@@ -13,6 +13,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ModalStyle from "components/ModalStyle";
 
 const Users = () => {
   const theme = useTheme();
@@ -38,18 +39,6 @@ const Users = () => {
       department,
     });
   }
-
-  const style = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: 400,
-    bgcolor: "background.paper",
-    border: "2px solid #000",
-    boxShadow: 24,
-    p: 4,
-  };
 
   const columns = [
     {
@@ -126,8 +115,14 @@ const Users = () => {
     // },
   ];
 
-  const showToastMessage = () => {
-    toast.success("Usuário cadastrado com sucesso!", {
+  const showToastSuccess = (message) => {
+    toast.success(message, {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  };
+
+  const showToastDelete = (message) => {
+    toast.success(message, {
       position: toast.POSITION.TOP_CENTER,
     });
   };
@@ -136,23 +131,6 @@ const Users = () => {
       <FlexBetween>
         <Header title="USUÁRIOS" subtitle="Lista de usuários" />
         <Box>
-          {/* <Button
-            sx={{
-              backgroundColor: theme.palette.secondary.light,
-              color: theme.palette.background.alt,
-              fontSize: "14px",
-              fontWeight: "bold",
-              padding: "10px 20px",
-            }}
-          >
-            <Link to="/novo-usuario/" className="btn-new"> 
-              <PersonAddOutlinedIcon sx={{ mr: "10px" }} />
-              Novo usuário
-            </Link>
-          </Button> */}
-
-          {// CRIAR UM COMPONENTE PARA ISSO
-          }
           <Button
             onClick={handleOpen}
             sx={{
@@ -161,65 +139,64 @@ const Users = () => {
               fontSize: "14px",
               fontWeight: "bold",
               padding: "10px 20px",
+              transition: "background-color 0.3s ease, color 0.3s ease",
+              "&:hover": {
+                backgroundColor: theme.palette.secondary.main,
+                color: theme.palette.primary.main,
+              },
             }}
           >
-            NOVO USUÁRIO
+            Novo usuário
           </Button>
-          <Modal
+          <ModalStyle
+            maxHeight="90%"
+            width="90%"
             open={open}
             onClose={handleClose}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
           >
-            <Box sx={style}>
-              <Typography id="modal-modal-title" variant="h6" component="h2">
-                Cadastro de novo usuário
-              </Typography>
-              <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                <form onSubmit={handleSubmit} className="form">
-                  <input
-                    type="text"
-                    placeholder="Usuário"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    className="input"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Nome"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="input"
-                  />
-                  <input
-                    type="email"
-                    placeholder="E-mail"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="input"
-                  />
-                  <input
-                    type="password"
-                    placeholder="Senha"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="input"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Departamento"
-                    value={department}
-                    onChange={(e) => setDeparment(e.target.value)}
-                    className="input"
-                  />
-                  <button onClick={showToastMessage} className="btn-submit">
-                    Cadastrar
-                  </button>
-                  {/* <PopupExample />  */}
-                </form>
-              </Typography>
-            </Box>
-          </Modal>
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+              Cadastro de novo usuário
+            </Typography>
+            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+              <form onSubmit={handleSubmit} className="form">
+                <input
+                  type="text"
+                  placeholder="Usuário"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="input"
+                />
+                <input
+                  type="text"
+                  placeholder="Nome"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="input"
+                />
+                <input
+                  type="email"
+                  placeholder="E-mail"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="input"
+                />
+                <input
+                  type="password"
+                  placeholder="Senha"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="input"
+                />
+                <input
+                  type="text"
+                  placeholder="Departamento"
+                  value={department}
+                  onChange={(e) => setDeparment(e.target.value)}
+                  className="input"
+                />
+              </form>
+            </Typography>
+          </ModalStyle>
         </Box>
       </FlexBetween>
       <Box
