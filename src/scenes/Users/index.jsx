@@ -8,13 +8,12 @@ import PersonAddOutlinedIcon from "@mui/icons-material/PersonAddOutlined";
 import { Link } from "react-router-dom";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
-import { PopupExample } from "components/Popup";
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const Customers = () => {
+const Users = () => {
   const theme = useTheme();
   const { data, isLoading } = useGetUserQuery();
   const [open, setOpen] = React.useState(false);
@@ -263,4 +262,4 @@ const Customers = () => {
   );
 };
 
-export default Customers;
+export default Users;

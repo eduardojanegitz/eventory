@@ -7,7 +7,7 @@ import { themeSettings } from "theme";
 import Layout from "scenes/Layout";
 import Dashboard from "scenes/Dashboard";
 import Products from "scenes/Items";
-import Customers from "scenes/Customers";
+import Users from "scenes/Users";
 import Transactions from "scenes/Transactions";
 import Overview from "scenes/Overview";
 import Breakdown from "scenes/Breakdown";
@@ -57,7 +57,7 @@ const App = () => {
                 <Route path="/tags" element={<Tags />} />
               </Route>
               <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
-                <Route path="/usuarios" element={<Customers />} />
+                <Route path="/usuarios" element={<Users />} />
                 <Route path="/novo-usuario" element={<NewUser />} />
                 <Route path="/cc" element={<Cost />} />
               </Route>
