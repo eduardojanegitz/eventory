@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Box, Button, Grid, MenuItem, useTheme } from "@mui/material";
 import { api2, useGetCustomersQuery, useGetUserQuery } from "state/api";
 import Header from "components/Header";
@@ -18,6 +18,8 @@ import ModalStyle from "components/ModalStyle";
 import Input from "components/Input";
 import Dropdown from "components/Dropdown";
 import { useEffect } from "react";
+import GridToolbar from "components/GridToolbar";
+import DataGridCustomToolbar from "components/DataGridCustomToolbar";
 
 const Users = () => {
   const ROLES = ["Admin", "Employee", "Manager"];
@@ -31,14 +33,43 @@ const Users = () => {
   const [editUser, setEditUser] = useState(null);
   const [searchInput, setSearchInput] = useState("");
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(20);
+  const [sort, setSort] = useState({});
+  const [search, setSearch] = useState("");
 
   const [username, setUsername] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [department, setDeparment] = useState("");
+  const [department, setDepartment] = useState("");
   const [roles, setRoles] = useState("");
   const [active, setActive] = useState("");
+
+  const handleUsername = (e) => {
+    setUsername(e.target.value);
+  };
+  const handleName = (e) => {
+    setName(e.target.value);
+  };
+  const handleEmail = (e) => {
+    setEmail(e.target.value);
+  };
+  const handlePassword = (e) => {
+    setPassword(e.target.value);
+  };
+  const handleDepartment = (e) => {
+    setDepartment(e.target.value);
+  };
+  const handleRoles = (e) => {
+    setRoles(e.target.value);
+  };
+  const handleActive = (e) => {
+    setActive(e.target.value);
+  };
+  const handleSearch = useCallback((searchInput) => {
+    setSearch(searchInput);
+  }, []);
 
   const loadData = async () => {
     try {
@@ -57,36 +88,40 @@ const Users = () => {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    try {
+      if (editUser && editUser._id) {
+        await api2.put(`api/user/${editUser._id}`, {
+          username,
+          password,
+          name,
+          email,
+          department,
+          roles,
+          active,
+        });
+        showToastSuccess("Usuário atualizado com sucesso!");
+      } else {
+        const response = await api2.post("api/user", {
+          username,
+          name,
+          email,
+          password,
+          department,
+          roles,
+          active,
+        });
+        showToastSuccess(
+          response.data.msg || "Usuário cadastrado com sucesso!"
+        );
+      }
 
-    if (editUser && editUser._id) {
-      await api2.put(`api/user/${editUser._id}`, {
-        username,
-        password,
-        name,
-        email,
-        department,
-        roles,
-        active,
-      });
-      showToastSuccess("Usuário atualizado com sucesso!");
-    } else {
-      await api2.post("api/user", {
-        username,
-        name,
-        email,
-        password,
-        department,
-        roles,
-        active,
-      });
-      showToastSuccess("Usuário cadastrado com sucesso!");
+      setEditUser(null);
+      setOpen(false);
+      loadData();
+    } catch (error) {
+      showToastError(error.response?.data?.error || "Erro desconhecido");
     }
-
-    setEditUser(null);
-    setOpen(false);
-    loadData();
   }
-
   const columns = [
     {
       field: "username",
@@ -95,7 +130,7 @@ const Users = () => {
     },
     {
       field: "name",
-      headerName: "Nome",
+      headerName: "Nome Completo",
       flex: 1,
     },
     {
@@ -106,6 +141,11 @@ const Users = () => {
     {
       field: "department",
       headerName: "Departamento",
+      flex: 1,
+    },
+    {
+      field: "roles",
+      headerName: "Nível de Acesso",
       flex: 1,
     },
     {
@@ -136,30 +176,6 @@ const Users = () => {
         );
       },
     },
-
-    // {
-    //     field: "phoneNumber",
-    //     headerName: "Número de telefone",
-    //     flex: 0.5,
-    //     renderCell: (params) => {
-    //         return params.value.replace(/^(\d{3})(\d{3})(\d{4})/, "($1)$2-$3");
-    //     }
-    //   },
-    //   {
-    //     field: "country",
-    //     headerName: "País",
-    //     flex: 0.4,
-    //   },
-    // {
-    //   field: "occupation",
-    //   headerName: "Occupation",
-    //   flex: 1,
-    // },
-    // {
-    //   field: "role",
-    //   headerName: "Role",
-    //   flex: 0.5,
-    // },
   ];
 
   const showToastSuccess = (message) => {
@@ -168,18 +184,19 @@ const Users = () => {
     });
   };
 
-  const showToastDelete = (message) => {
-    toast.success(message, {
+  const showToastError = (message) => {
+    toast.error(message, {
       position: toast.POSITION.TOP_CENTER,
     });
   };
   return (
     <Box m="1.5rem 2.5rem">
       <FlexBetween>
-        <Header title="USUÁRIOS" subtitle="Lista de usuários" />
+        <Header title="USUÁRIOS" subtitle="Veja a lista de usuários." />
         <Box>
           <Button
             onClick={handleOpen}
+            startIcon={<PersonAddOutlinedIcon />}
             sx={{
               backgroundColor: theme.palette.secondary.dark,
               color: theme.palette.background.alt,
@@ -217,7 +234,7 @@ const Users = () => {
                       type="text"
                       label="Usuário"
                       value={username}
-                      onChange={(e) => setUsername(e.target.value)}
+                      onChange={handleUsername}
                     />
                   </Grid>
                   <Grid item xs={8}>
@@ -225,7 +242,7 @@ const Users = () => {
                       type="text"
                       label="Nome"
                       value={name}
-                      onChange={(e) => setName(e.target.value)}
+                      onChange={handleName}
                     />
                   </Grid>
                   <Grid item xs={8}>
@@ -233,7 +250,7 @@ const Users = () => {
                       type="email"
                       label="E-mail"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={handleEmail}
                     />
                   </Grid>
                   <Grid item xs={4}>
@@ -241,7 +258,7 @@ const Users = () => {
                       type="password"
                       label="Senha"
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={handlePassword}
                     />
                   </Grid>
                   <Grid item xs={4}>
@@ -249,13 +266,14 @@ const Users = () => {
                       type="text"
                       label="Departamento"
                       value={department}
-                      onChange={(e) => setDeparment(e.target.value)}
+                      onChange={handleDepartment}
                     />
                   </Grid>
                   <Grid item xs={4}>
                     <Dropdown
+                      label="Nível de Acesso"
                       value={roles}
-                      onChange={(e) => setRoles(e.target.value)}
+                      onChange={handleRoles}
                     >
                       {ROLES.map((role) => (
                         <MenuItem key={role} value={role}>
@@ -266,8 +284,9 @@ const Users = () => {
                   </Grid>
                   <Grid item xs={4}>
                     <Dropdown
+                      label="Status"
                       value={active}
-                      onChange={(e) => setActive(e.target.value)}
+                      onChange={handleActive}
                     >
                       {ACTIVE.map((active) => (
                         <MenuItem key={active} value={active}>
@@ -290,6 +309,11 @@ const Users = () => {
           </ModalStyle>
         </Box>
       </FlexBetween>
+      <DataGridCustomToolbar
+        value={searchInput}
+        onChange={setSearchInput}
+        onSearch={handleSearch}
+      />
       <Box
         mt="20px"
         height="80vh"
@@ -319,10 +343,26 @@ const Users = () => {
         }}
       >
         <DataGrid
-          // isLoading={isLoading || !data}
           getRowId={(row) => row._id}
-          rows={user || []}
+          rows={user.filter((row) =>
+            Object.values(row).some(
+              (value) =>
+                value &&
+                value
+                  .toString()
+                  .toLowerCase()
+                  .includes(searchInput.toLowerCase())
+            )
+          )}
+          rowsPerPageOptions={[20, 50, 100]}
           columns={columns}
+          pagination
+          paginationMode="server"
+          sortingMode="server"
+          onPageChange={(newPage) => setPage(newPage)}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          onSortModelChange={(newSortModel) => setSort(...newSortModel)}
+          components={{ Toolbar: GridToolbar }}
         />
       </Box>
     </Box>
