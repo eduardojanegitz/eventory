@@ -6,21 +6,25 @@ import {
   useTheme,
   MenuItem,
   Grid,
+  CircularProgress,
 } from "@mui/material";
-import Header from "components/Header";
-import { api2 } from "state/api";
-import FlexBetween from "components/FlexBetween";
 import { DataGrid } from "@mui/x-data-grid";
-import DataGridCustomToolbar from "components/DataGridCustomToolbar";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { toast } from "react-toastify";
-import ModalStyle from "components/ModalStyle";
-import Input from "components/Input";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import SendIcon from "@mui/icons-material/Send";
 import EditIcon from "@mui/icons-material/Edit";
+import { toast } from "react-toastify";
+
+import Header from "components/Header";
+import FlexBetween from "components/FlexBetween";
+import DataGridCustomToolbar from "components/DataGridCustomToolbar";
+import ModalStyle from "components/ModalStyle";
+import Input from "components/Input";
 import Dropdown from "components/Dropdown";
 import GridToolbar from "components/GridToolbar";
+
+import { api2 } from "state/api";
+
 
 const Items = () => {
   const theme = useTheme();
@@ -45,6 +49,7 @@ const Items = () => {
   const [locationSelect, setLocationSelect] = useState([]);
   const [editItem, setEditItem] = useState(null);
   const [deleteItem, setDeleteItem] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
 
@@ -125,8 +130,10 @@ const Items = () => {
     try {
       const response = await api2.get("api/item");
       setItem(response.data);
+      setLoading(false);
     } catch (error) {
       console.error("Erro ao carregar dados da tabela:", error);
+      setLoading(false);
     }
   };
 
@@ -196,17 +203,17 @@ const Items = () => {
   const columns = [
     {
       field: "name",
-      headerName: "Nome do ativo",
+      headerName: "Nome",
       flex: 1,
     },
     {
       field: "description",
-      headerName: "Descrição do item",
+      headerName: "Descrição",
       flex: 1,
     },
     {
       field: "value",
-      headerName: "Valor",
+      headerName: "Valor (R$)",
       flex: 1,
     },
     {
@@ -454,75 +461,82 @@ const Items = () => {
         onChange={setSearchInput}
         onSearch={handleSearch}
       />
-      <Box
-        height="80vh"
-        sx={{
-          "& .MuiDataGrid-root": {
-            border: "none",
-          },
-          "& .MuiDataGrid-cell": {
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: theme.palette.background.alt,
-            color: theme.palette.secondary[100],
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-virtualScroller": {
-            backgroundColor: theme.palette.primary.light,
-            overflowY: "auto",
-            scrollbarWidth: "thin",
-            "&::-webkit-scrollbar": {
-              width: "3px",
-            },
-            "&::-webkit-scrollbar-thumb": {
-              backgroundColor: "#b3b0b0",
-              borderRadius: "20px",
-            },
-            "&::-webkit-scrollbar-track": {
-              backgroundColor: "transparent",
-            },
-          },
-          "& .MuiDataGrid-FooterContainer": {
-            backgroundColor: theme.palette.background.alt,
-            color: theme.palette.secondary[100],
-            borderTop: "none",
-          },
-          "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-            color: `${theme.palette.secondary[200]} !important`,
-          },
-        }}
-      >
-        <DataGrid
-          // loading={isLoading || !data}
-          getRowId={(row) => row._id}
-          // rows={item || []}
-          rowsPerOptions={[20, 50, 100]}
-          columns={columns}
-          // rowCount={(data && data.total) || 0}
-          pagination
-          page={page}
-          pageSize={pageSize}
-          paginationMode="client"
-          onPageChange={(newPage) => setPage(newPage)}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          onSortModelChange={(newSortModel) => setSort(...newSortModel)}
-          rows={item.filter((row) =>
-            Object.values(row).some(
-              (value) =>
-                value &&
-                value
-                  .toString()
-                  .toLowerCase()
-                  .includes(searchInput.toLowerCase())
-            )
-          )}
-          components={{ Toolbar: GridToolbar }}
-          componentsProps={{
-            toolbar: { searchInput, setSearchInput, setSearch },
+      {loading ? (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "80vh",
           }}
-        />
-      </Box>
+        >
+          <CircularProgress color="secondary" />
+        </Box>
+      ) : (
+        <Box
+          height="80vh"
+          sx={{
+            "& .MuiDataGrid-root": {
+              border: "none",
+            },
+            "& .MuiDataGrid-cell": {
+              borderBottom: "none",
+            },
+            "& .MuiDataGrid-columnHeaders": {
+              backgroundColor: theme.palette.background.alt,
+              color: theme.palette.secondary[100],
+              borderBottom: "none",
+            },
+            "& .MuiDataGrid-virtualScroller": {
+              backgroundColor: theme.palette.primary.light,
+              overflowY: "auto",
+              scrollbarWidth: "thin",
+              "&::-webkit-scrollbar": {
+                width: "3px",
+              },
+              "&::-webkit-scrollbar-thumb": {
+                backgroundColor: "#b3b0b0",
+                borderRadius: "20px",
+              },
+              "&::-webkit-scrollbar-track": {
+                backgroundColor: "transparent",
+              },
+            },
+            "& .MuiDataGrid-FooterContainer": {
+              backgroundColor: theme.palette.background.alt,
+              color: theme.palette.secondary[100],
+              borderTop: "none",
+            },
+            "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+              color: `${theme.palette.secondary[200]} !important`,
+            },
+          }}
+        >
+          <DataGrid
+            getRowId={(row) => row._id}
+            rowsPerOptions={[20, 50, 100]}
+            columns={columns}
+            pagination
+            page={page}
+            pageSize={pageSize}
+            paginationMode="client"
+            onPageChange={(newPage) => setPage(newPage)}
+            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+            onSortModelChange={(newSortModel) => setSort(...newSortModel)}
+            rows={item.filter((row) =>
+              Object.values(row).some(
+                (value) =>
+                  value &&
+                  value
+                    .toString()
+                    .toLowerCase()
+                    .includes(searchInput.toLowerCase())
+              )
+            )}
+            components={{ Toolbar: GridToolbar }}
+          />
+        </Box>
+      )}
     </Box>
   );
 };
