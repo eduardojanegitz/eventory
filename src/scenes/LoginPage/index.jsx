@@ -11,6 +11,7 @@ import { useRef, useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { api2 } from "state/api";
 import useAuth from "hooks/useAuth";
+import { toast } from "react-toastify";
 
 function ModeToggle() {
   const { mode, setMode } = useColorScheme();
@@ -29,7 +30,7 @@ const LoginPage = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || "/home";
+  // const from = location.state?.from?.pathname || "/home";
 
   const userRef = useRef();
   const errRef = useRef();
@@ -37,6 +38,12 @@ const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errMsg, setErrMsg] = useState("");
+
+  const showToastError = (message) => {
+    toast.error(message, {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  };
 
   useEffect(() => {
     userRef.current.focus();
@@ -69,7 +76,12 @@ const LoginPage = () => {
 
       setUsername("");
       setPassword("");
-      navigate(from, { replace: true });
+      // navigate(from, { replace: true });
+        if (roles.includes("Admin") || roles.includes("Manager")) {
+          navigate("/dashboard");
+        } else if (roles.includes("Employee")) {
+          navigate("/inventarios");
+        } 
     } catch (error) {
       if (!error.status) {
         setErrMsg("No Server Response");
@@ -99,10 +111,10 @@ const LoginPage = () => {
         <Sheet
           sx={{
             width: 300,
-            mx: "auto", // margin left & right
-            my: 4, // margin top & bottom
-            py: 3, // padding top & bottom
-            px: 2, // padding left & right
+            mx: "auto", 
+            my: 4, 
+            py: 3, 
+            px: 2, 
             display: "flex",
             flexDirection: "column",
             gap: 2,
