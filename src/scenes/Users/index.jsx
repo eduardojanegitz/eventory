@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Button, useTheme } from "@mui/material";
+import { Box, Button, Grid, MenuItem, useTheme } from "@mui/material";
 import { api2, useGetCustomersQuery, useGetUserQuery } from "state/api";
 import Header from "components/Header";
 import { DataGrid } from "@mui/x-data-grid";
@@ -14,8 +14,13 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ModalStyle from "components/ModalStyle";
+import Input from "components/Input";
+import Dropdown from "components/Dropdown";
 
 const Users = () => {
+  const ROLES = ["Admin", "Employee", "Manager"];
+  const ACTIVE = ["Ativo", "Inativo"];
+
   const theme = useTheme();
   const { data, isLoading } = useGetUserQuery();
   const [open, setOpen] = React.useState(false);
@@ -27,6 +32,8 @@ const Users = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [department, setDeparment] = useState("");
+  const [roles, setRoles] = useState("");
+  const [active, setActive] = useState("")
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -158,42 +165,78 @@ const Users = () => {
               Cadastro de novo usuário
             </Typography>
             <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-              <form onSubmit={handleSubmit} className="form">
-                <input
-                  type="text"
-                  placeholder="Usuário"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="input"
-                />
-                <input
-                  type="text"
-                  placeholder="Nome"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="input"
-                />
-                <input
-                  type="email"
-                  placeholder="E-mail"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="input"
-                />
-                <input
-                  type="password"
-                  placeholder="Senha"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="input"
-                />
-                <input
-                  type="text"
-                  placeholder="Departamento"
-                  value={department}
-                  onChange={(e) => setDeparment(e.target.value)}
-                  className="input"
-                />
+              <form component="form" onSubmit={handleSubmit}>
+                <Grid
+                  container
+                  rowSpacing={{ md: 5 }}
+                  columnSpacing={{ md: 2 }}
+                  columns={{ xs: 4, sm: 8, md: 12 }}
+                >
+                  <Grid item xs={4}>
+                    <Input
+                      type="text"
+                      label="Usuário"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid item xs={8}>
+                    <Input
+                      type="text"
+                      label="Nome"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid item xs={8}>
+                    <Input
+                      type="email"
+                      label="E-mail"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Input
+                      type="password"
+                      label="Senha"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Input
+                      type="text"
+                      label="Departamento"
+                      value={department}
+                      onChange={(e) => setDeparment(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Dropdown
+                      value={roles}
+                      onChange={(e) => setRoles(e.target.value)}
+                    >
+                      {ROLES.map((role) => (
+                        <MenuItem key={role} value={role}>
+                          {role}
+                        </MenuItem>
+                      ))}
+                    </Dropdown>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Dropdown
+                      value={active}
+                      onChange={(e) => setActive(e.target.value)}
+                    >
+                      {ACTIVE.map((active) => (
+                        <MenuItem key={active} value={active}>
+                          {active}
+                        </MenuItem>
+                      ))}
+                    </Dropdown>
+                  </Grid>
+                </Grid>
               </form>
             </Typography>
           </ModalStyle>
