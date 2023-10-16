@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import EditIcon from "@mui/icons-material/Edit";
+import SendIcon from "@mui/icons-material/Send";
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -16,16 +17,20 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ModalStyle from "components/ModalStyle";
 import Input from "components/Input";
 import Dropdown from "components/Dropdown";
+import { useEffect } from "react";
 
 const Users = () => {
   const ROLES = ["Admin", "Employee", "Manager"];
   const ACTIVE = ["Ativo", "Inativo"];
 
   const theme = useTheme();
-  const { data, isLoading } = useGetUserQuery();
+  const [user, setUser] = useState([]);
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const [editUser, setEditUser] = useState(null);
+  const [searchInput, setSearchInput] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const [username, setUsername] = useState("");
   const [name, setName] = useState("");
@@ -33,18 +38,53 @@ const Users = () => {
   const [password, setPassword] = useState("");
   const [department, setDeparment] = useState("");
   const [roles, setRoles] = useState("");
-  const [active, setActive] = useState("")
+  const [active, setActive] = useState("");
+
+  const loadData = async () => {
+    try {
+      const response = await api2.get("api/user");
+      setUser(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Erro ao carregar dados da tabela:", error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   async function handleSubmit(e) {
     e.preventDefault();
 
-    const response = await api2.post("api/user", {
-      username,
-      name,
-      email,
-      password,
-      department,
-    });
+    if (editUser && editUser._id) {
+      await api2.put(`api/user/${editUser._id}`, {
+        username,
+        password,
+        name,
+        email,
+        department,
+        roles,
+        active,
+      });
+      showToastSuccess("Usuário atualizado com sucesso!");
+    } else {
+      await api2.post("api/user", {
+        username,
+        name,
+        email,
+        password,
+        department,
+        roles,
+        active,
+      });
+      showToastSuccess("Usuário cadastrado com sucesso!");
+    }
+
+    setEditUser(null);
+    setOpen(false);
+    loadData();
   }
 
   const columns = [
@@ -237,6 +277,14 @@ const Users = () => {
                     </Dropdown>
                   </Grid>
                 </Grid>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="secondary"
+                  endIcon={<SendIcon />}
+                >
+                  {editUser && editUser._id ? "Atualizar" : "Cadastrar"}
+                </Button>
               </form>
             </Typography>
           </ModalStyle>
@@ -271,9 +319,9 @@ const Users = () => {
         }}
       >
         <DataGrid
-          isLoading={isLoading || !data}
+          // isLoading={isLoading || !data}
           getRowId={(row) => row._id}
-          rows={data || []}
+          rows={user || []}
           columns={columns}
         />
       </Box>
