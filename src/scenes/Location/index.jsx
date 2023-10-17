@@ -12,6 +12,7 @@ import Input from "components/Input";
 import ModalStyle from "components/ModalStyle";
 import GridToolbar from "components/GridToolbar";
 import EditIcon from "@mui/icons-material/Edit";
+import AddLocationAltIcon from "@mui/icons-material/AddLocationAlt";
 
 const Location = () => {
   const theme = useTheme();
@@ -104,7 +105,7 @@ const Location = () => {
             color="secondary"
             onClick={() => handleOpen(cellValues.row)}
           >
-           <EditIcon /> 
+            <EditIcon />
           </Button>
           <Button
             variant="text"
@@ -152,9 +153,13 @@ const Location = () => {
           response.data.msg || "Localização deletada com sucesso!"
         );
       } else {
-        console.error("Erro ao excluir o item.");
+        showToastError(response.data?.error || "Erro ao excluir o item.");
       }
     } catch (error) {
+      showToastError(
+        error.response?.data?.error ||
+          "Erro desconhecido. Entre em contato com o time de TI."
+      );
       console.error("Erro ao excluir o item:", error);
     }
   }
@@ -169,6 +174,7 @@ const Location = () => {
         <Box>
           <Button
             onClick={handleOpen}
+            startIcon={<AddLocationAltIcon />}
             sx={{
               backgroundColor: theme.palette.secondary.dark,
               color: theme.palette.background.alt,
@@ -233,6 +239,18 @@ const Location = () => {
           },
           "& .MuiDataGrid-virtualScroller": {
             backgroundColor: theme.palette.primary.light,
+            overflowY: "auto",
+            scrollbarWidth: "thin",
+            "&::-webkit-scrollbar": {
+              width: "3px",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: "#b3b0b0",
+              borderRadius: "20px",
+            },
+            "&::-webkit-scrollbar-track": {
+              backgroundColor: "transparent",
+            },
           },
           "& .MuiDataGrid-FooterContainer": {
             backgroundColor: theme.palette.background.alt,
@@ -259,15 +277,11 @@ const Location = () => {
           rowsPerPageOptions={[20, 50, 100]}
           columns={columns}
           pagination
-          paginationMode="server"
-          sortingMode="server"
+          paginationMode="client"
           onPageChange={(newPage) => setPage(newPage)}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
           onSortModelChange={(newSortModel) => setSort(...newSortModel)}
           components={{ Toolbar: GridToolbar }}
-          componentsProps={{
-            toolbar: { searchInput, setSearchInput, setSearch },
-          }}
         />
       </Box>
     </Box>
