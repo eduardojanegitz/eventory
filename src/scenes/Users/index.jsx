@@ -102,7 +102,7 @@ const Users = () => {
     e.preventDefault();
     try {
       if (editUser && editUser._id) {
-        await api2.put(`api/user/${editUser._id}`, {
+        const response = await api2.put(`api/user/${editUser._id}`, {
           username,
           password,
           name,
@@ -111,7 +111,9 @@ const Users = () => {
           roles,
           active,
         });
-        showToastSuccess("Usuário atualizado com sucesso!");
+        showToastSuccess(
+          response.data.msg || "Usuário atualizado com sucesso!"
+        );
       } else {
         const response = await api2.post("api/user", {
           username,
