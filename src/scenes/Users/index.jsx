@@ -27,8 +27,7 @@ const Users = () => {
 
   const theme = useTheme();
   const [user, setUser] = useState([]);
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
+  const [open, setOpen] = useState(false);
   const handleClose = () => setOpen(false);
   const [editUser, setEditUser] = useState(null);
   const [searchInput, setSearchInput] = useState("");
@@ -37,6 +36,17 @@ const Users = () => {
   const [pageSize, setPageSize] = useState(20);
   const [sort, setSort] = useState({});
   const [search, setSearch] = useState("");
+
+  const handleOpen = (user = null) => {
+    setEditUser(user);
+    setUsername(user ? user.username : "");
+    setName(user ? user.name : "");
+    setEmail(user ? user.email : "");
+    setDepartment(user ? user.department : "");
+    setRoles(user ? user.roles : "");
+    setActive(user ? user.active : "");
+    setOpen(true);
+  };
 
   const [username, setUsername] = useState("");
   const [name, setName] = useState("");
@@ -149,6 +159,11 @@ const Users = () => {
       flex: 1,
     },
     {
+      field: "active",
+      headerName: "Status",
+      flex: 1,
+    },
+    {
       field: "Ação",
       flex: 1,
       renderCell: (cellValues) => {
@@ -157,9 +172,9 @@ const Users = () => {
             <Button
               variant="text"
               color="secondary"
-              // onClick={(event) => {
-              //   handleClick(event, cellValues)
-              // }}
+              onClick={() => {
+                handleOpen(cellValues.row);
+              }}
             >
               <EditIcon />
             </Button>
