@@ -26,6 +26,8 @@ const Location = () => {
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState([]);
   const [editLocation, setEditLocation] = useState(null);
+  const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
+  const [deleteLocation, setDeleteLocation] = useState(null);
 
   const handleOpen = (location = null) => {
     setEditLocation(location);
@@ -110,7 +112,10 @@ const Location = () => {
           <Button
             variant="text"
             color="error"
-            onClick={() => handleDeleteClick(cellValues.row._id)}
+            onClick={() => {
+              setConfirmationModalOpen(true);
+              setDeleteLocation(cellValues.row);
+            }}
           >
             <DeleteIcon />
           </Button>
@@ -144,9 +149,9 @@ const Location = () => {
     });
   };
 
-  async function handleDeleteClick(id) {
+  async function handleDeleteClick() {
     try {
-      const response = await api2.delete(`api/location/${id}`);
+      const response = await api2.delete(`api/location/${deleteLocation._id}`);
       if (response.status === 200) {
         loadData();
         showToastSuccess(
@@ -171,6 +176,33 @@ const Location = () => {
           title="LOCALIZAÇÃO"
           subtitle="Veja a lista das localização dos ativos."
         />
+        <ModalStyle
+          open={isConfirmationModalOpen}
+          onClose={() => setConfirmationModalOpen(false)}
+        >
+          <Typography sx={{ mb: "30px" }}>
+            Tem certeza de que deseja excluir esta localização?
+          </Typography>
+          <FlexBetween>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => {
+                handleDeleteClick();
+                setConfirmationModalOpen(false);
+              }}
+            >
+              Confirmar
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={() => setConfirmationModalOpen(false)}
+            >
+              Cancelar
+            </Button>
+          </FlexBetween>
+        </ModalStyle>
         <Box>
           <Button
             onClick={handleOpen}
