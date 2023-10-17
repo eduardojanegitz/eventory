@@ -36,6 +36,8 @@ const Users = () => {
   const [pageSize, setPageSize] = useState(20);
   const [sort, setSort] = useState({});
   const [search, setSearch] = useState("");
+  const [deleteUser, setDeleteUser] = useState(null);
+  const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
 
   const handleOpen = (user = null) => {
     setEditUser(user);
@@ -129,9 +131,31 @@ const Users = () => {
       setOpen(false);
       loadData();
     } catch (error) {
-      showToastError(error.response?.data?.error || "Erro desconhecido");
+      showToastError(
+        error.response?.data?.error ||
+          "Erro desconhecido. Entre em contato com o time de TI."
+      );
     }
   }
+
+  async function handleDeleteClick() {
+    try {
+      const response = await api2.delete(`api/user/${deleteUser._id}`);
+      if (response.status === 200) {
+        loadData();
+        showToastSuccess(response.data.msg || "Usuário deletado com sucesso");
+      } else {
+        showToastError(response.data?.error || "Erro ao excluir o item.");
+      }
+    } catch (error) {
+      showToastError(
+        error.reponse?.data?.error ||
+          "Erro desconhecido. Entre em contato com o time de TI"
+      );
+      console.error("Erro ao excluir o item:", error);
+    }
+  }
+
   const columns = [
     {
       field: "username",
@@ -181,9 +205,10 @@ const Users = () => {
             <Button
               variant="text"
               color="error"
-              // onClick={(event) => {
-              //   handleClick(event, cellValues)
-              // }}
+              onClick={() => {
+                setConfirmationModalOpen(true);
+                setDeleteUser(cellValues.row);
+              }}
             >
               <DeleteIcon />
             </Button>
@@ -208,6 +233,33 @@ const Users = () => {
     <Box m="1.5rem 2.5rem">
       <FlexBetween>
         <Header title="USUÁRIOS" subtitle="Veja a lista de usuários." />
+        <ModalStyle
+          open={isConfirmationModalOpen}
+          onClose={() => setConfirmationModalOpen(false)}
+        >
+          <Typography sx={{ mb: "30px" }}>
+            Tem certeza de que deseja excluir este usuário?
+          </Typography>
+          <FlexBetween>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => {
+                handleDeleteClick();
+                setConfirmationModalOpen(false);
+              }}
+            >
+              Confirmar
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={() => setConfirmationModalOpen(false)}
+            >
+              Cancelar
+            </Button>
+          </FlexBetween>
+        </ModalStyle>
         <Box>
           <Button
             onClick={handleOpen}
@@ -384,8 +436,7 @@ const Users = () => {
           rowsPerPageOptions={[20, 50, 100]}
           columns={columns}
           pagination
-          paginationMode="server"
-          sortingMode="server"
+          paginationMode="client"
           onPageChange={(newPage) => setPage(newPage)}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
           onSortModelChange={(newSortModel) => setSort(...newSortModel)}
