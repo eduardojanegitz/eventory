@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Box, Button, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -44,9 +44,9 @@ const Location = () => {
   const handleDescription = (e) => {
     setDescription(e.target.value);
   };
-  const handleSearch = (searchInput) => {
+  const handleSearch = useCallback((searchInput) => {
     setSearch(searchInput);
-  };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
