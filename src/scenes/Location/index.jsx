@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Box, Button, Typography, useTheme } from "@mui/material";
+import { Box, Button, CircularProgress, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SendIcon from "@mui/icons-material/Send";
@@ -28,6 +28,7 @@ const Location = () => {
   const [editLocation, setEditLocation] = useState(null);
   const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
   const [deleteLocation, setDeleteLocation] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const handleOpen = (location = null) => {
     setEditLocation(location);
@@ -86,50 +87,14 @@ const Location = () => {
     }
   };
 
-  const columns = [
-    {
-      field: "name",
-      headerName: "Localização",
-      flex: 1,
-    },
-    {
-      field: "description",
-      headerName: "Descrição",
-      flex: 1,
-    },
-    {
-      field: "Ação",
-      flex: 1,
-      renderCell: (cellValues) => (
-        <>
-          <Button
-            variant="text"
-            color="secondary"
-            onClick={() => handleOpen(cellValues.row)}
-          >
-            <EditIcon />
-          </Button>
-          <Button
-            variant="text"
-            color="error"
-            onClick={() => {
-              setConfirmationModalOpen(true);
-              setDeleteLocation(cellValues.row);
-            }}
-          >
-            <DeleteIcon />
-          </Button>
-        </>
-      ),
-    },
-  ];
-
   const loadData = async () => {
     try {
       const response = await api2.get("api/location");
       setLocation(response.data);
+      setLoading(false);
     } catch (error) {
       console.error("Erro ao carregar dados da tabela:", error);
+      setLoading(false);
     }
   };
 
@@ -168,6 +133,44 @@ const Location = () => {
       console.error("Erro ao excluir o item:", error);
     }
   }
+
+  const columns = [
+    {
+      field: "name",
+      headerName: "Localização",
+      flex: 1,
+    },
+    {
+      field: "description",
+      headerName: "Descrição",
+      flex: 1,
+    },
+    {
+      field: "Ação",
+      flex: 1,
+      renderCell: (cellValues) => (
+        <>
+          <Button
+            variant="text"
+            color="secondary"
+            onClick={() => handleOpen(cellValues.row)}
+          >
+            <EditIcon />
+          </Button>
+          <Button
+            variant="text"
+            color="error"
+            onClick={() => {
+              setConfirmationModalOpen(true);
+              setDeleteLocation(cellValues.row);
+            }}
+          >
+            <DeleteIcon />
+          </Button>
+        </>
+      ),
+    },
+  ];
 
   return (
     <Box m="1.5rem 2.5rem">
@@ -260,67 +263,80 @@ const Location = () => {
         onChange={setSearchInput}
         onSearch={handleSearch}
       />
-      <Box
-        height="80vh"
-        sx={{
-          "& .MuiDataGrid-root": {
-            border: "none",
-          },
-          "& .MuiDataGrid-cell": {
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: theme.palette.background.alt,
-            color: theme.palette.secondary[100],
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-virtualScroller": {
-            backgroundColor: theme.palette.primary.light,
-            overflowY: "auto",
-            scrollbarWidth: "thin",
-            "&::-webkit-scrollbar": {
-              width: "3px",
+      {loading ? (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "80vh",
+          }}
+        >
+          <CircularProgress color="secondary" />
+        </Box>
+      ) : (
+        <Box
+          height="80vh"
+          sx={{
+            "& .MuiDataGrid-root": {
+              border: "none",
             },
-            "&::-webkit-scrollbar-thumb": {
-              backgroundColor: "#b3b0b0",
-              borderRadius: "20px",
+            "& .MuiDataGrid-cell": {
+              borderBottom: "none",
             },
-            "&::-webkit-scrollbar-track": {
-              backgroundColor: "transparent",
+            "& .MuiDataGrid-columnHeaders": {
+              backgroundColor: theme.palette.background.alt,
+              color: theme.palette.secondary[100],
+              borderBottom: "none",
             },
-          },
-          "& .MuiDataGrid-FooterContainer": {
-            backgroundColor: theme.palette.background.alt,
-            color: theme.palette.secondary[100],
-            borderTop: "none",
-          },
-          "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-            color: `${theme.palette.secondary[200]} !important`,
-          },
-        }}
-      >
-        <DataGrid
-          getRowId={(row) => row._id}
-          rows={location.filter((row) =>
-            Object.values(row).some(
-              (value) =>
-                value &&
-                value
-                  .toString()
-                  .toLowerCase()
-                  .includes(searchInput.toLowerCase())
-            )
-          )}
-          rowsPerPageOptions={[20, 50, 100]}
-          columns={columns}
-          pagination
-          paginationMode="client"
-          onPageChange={(newPage) => setPage(newPage)}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          onSortModelChange={(newSortModel) => setSort(...newSortModel)}
-          components={{ Toolbar: GridToolbar }}
-        />
-      </Box>
+            "& .MuiDataGrid-virtualScroller": {
+              backgroundColor: theme.palette.primary.light,
+              overflowY: "auto",
+              scrollbarWidth: "thin",
+              "&::-webkit-scrollbar": {
+                width: "3px",
+              },
+              "&::-webkit-scrollbar-thumb": {
+                backgroundColor: "#b3b0b0",
+                borderRadius: "20px",
+              },
+              "&::-webkit-scrollbar-track": {
+                backgroundColor: "transparent",
+              },
+            },
+            "& .MuiDataGrid-FooterContainer": {
+              backgroundColor: theme.palette.background.alt,
+              color: theme.palette.secondary[100],
+              borderTop: "none",
+            },
+            "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+              color: `${theme.palette.secondary[200]} !important`,
+            },
+          }}
+        >
+          <DataGrid
+            getRowId={(row) => row._id}
+            rows={location.filter((row) =>
+              Object.values(row).some(
+                (value) =>
+                  value &&
+                  value
+                    .toString()
+                    .toLowerCase()
+                    .includes(searchInput.toLowerCase())
+              )
+            )}
+            rowsPerPageOptions={[20, 50, 100]}
+            columns={columns}
+            pagination
+            paginationMode="client"
+            onPageChange={(newPage) => setPage(newPage)}
+            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+            onSortModelChange={(newSortModel) => setSort(...newSortModel)}
+            components={{ Toolbar: GridToolbar }}
+          />
+        </Box>
+      )}
     </Box>
   );
 };
