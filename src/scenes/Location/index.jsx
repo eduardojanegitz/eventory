@@ -181,6 +181,11 @@ const Location = () => {
               fontSize: "14px",
               fontWeight: "bold",
               padding: "10px 20px",
+              transition: "background-color 0.3s ease, color 0.3s ease",
+              "&:hover": {
+                backgroundColor: theme.palette.secondary.main,
+                color: theme.palette.primary.main,
+              },
             }}
           >
             Nova Localização
@@ -195,13 +200,13 @@ const Location = () => {
               <form onSubmit={handleSubmit} className="form">
                 <Input
                   type="text"
-                  placeholder="Nome da localização"
+                  label="Nome da localização"
                   value={name}
                   onChange={handleName}
                 />
                 <Input
                   type="text"
-                  placeholder="Descrição"
+                  label="Descrição"
                   value={description}
                   onChange={handleDescription}
                 />
