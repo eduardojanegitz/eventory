@@ -1,19 +1,12 @@
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Button,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { Box, Button, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SendIcon from "@mui/icons-material/Send";
-import Modal from "@mui/material/Modal";
 import { toast } from "react-toastify";
 import Header from "components/Header";
 import FlexBetween from "components/FlexBetween";
 import DataGridCustomToolbar from "components/DataGridCustomToolbar";
-import useAxiosPrivate from "hooks/useAxiosPrivate";
 import { api2 } from "state/api";
 import Input from "components/Input";
 import ModalStyle from "components/ModalStyle";
@@ -57,25 +50,36 @@ const Location = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (editLocation && editLocation._id) {
-      await api2.put(`api/location/${editLocation._id}`, {
-        name,
-        description,
-      });
-      showToastSuccess("Localização atualizada com sucesso!");
-    } else {
-      await api2.post("api/location/", {
-        name,
-        description,
-      });
-      showToastSuccess("Localização cadastrada com sucesso!");
-    }
+    try {
+      if (editLocation && editLocation._id) {
+        const response = await api2.put(`api/location/${editLocation._id}`, {
+          name,
+          description,
+        });
+        showToastSuccess(
+          response.data.msg || "Localização atualizada com sucesso!"
+        );
+      } else {
+        const response = await api2.post("api/location/", {
+          name,
+          description,
+        });
+        showToastSuccess(
+          response.data.msg || "Localização cadastrada com sucesso!"
+        );
+      }
 
-    setName("");
-    setDescription("");
-    setEditLocation(null);
-    setOpen(false);
-    loadData();
+      setName("");
+      setDescription("");
+      setEditLocation(null);
+      setOpen(false);
+      loadData();
+    } catch (error) {
+      showToastError(
+        error.response?.data?.error ||
+          "Erro desconhecido. Entre em contato com o time de TI."
+      );
+    }
   };
 
   const columns = [
@@ -129,13 +133,13 @@ const Location = () => {
   }, []);
 
   const showToastSuccess = (message) => {
-    toast.success(message , {
+    toast.success(message, {
       position: toast.POSITION.TOP_CENTER,
     });
   };
 
-  const showToastDelete = () => {
-    toast.success("Localização deletada com sucesso!", {
+  const showToastError = (message) => {
+    toast.error(message, {
       position: toast.POSITION.TOP_CENTER,
     });
   };
@@ -145,7 +149,9 @@ const Location = () => {
       const response = await api2.delete(`api/location/${id}`);
       if (response.status === 200) {
         loadData();
-        showToastDelete();
+        showToastSuccess(
+          response.data.msg || "Localização deletada com sucesso!"
+        );
       } else {
         console.error("Erro ao excluir o item.");
       }
@@ -174,38 +180,37 @@ const Location = () => {
           >
             Nova Localização
           </Button>
-            <ModalStyle
-            open={open}
-            onClose={handleClose}
-            >
-              <Typography id="modal-modal-title" variant="h5" component="h1">
-                {editLocation && editLocation._id ? "Editar localização" : "Nova localização"}
-              </Typography>
-              <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                <form onSubmit={handleSubmit} className="form">
-                  <Input
-                    type="text"
-                    placeholder="Nome da localização"
-                    value={name}
-                    onChange={handleName}
-                  />
-                  <Input
-                    type="text"
-                    placeholder="Descrição"
-                    value={description}
-                    onChange={handleDescription}
-                  />
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    color="secondary"
-                    endIcon={<SendIcon />}
-                  >
-                    {editLocation && editLocation._id ? "Atualizar" : "Cadastrar"}
-                  </Button>
-                </form>
-              </Typography>
-            </ModalStyle>
+          <ModalStyle open={open} onClose={handleClose}>
+            <Typography id="modal-modal-title" variant="h5" component="h1">
+              {editLocation && editLocation._id
+                ? "Editar localização"
+                : "Nova localização"}
+            </Typography>
+            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+              <form onSubmit={handleSubmit} className="form">
+                <Input
+                  type="text"
+                  placeholder="Nome da localização"
+                  value={name}
+                  onChange={handleName}
+                />
+                <Input
+                  type="text"
+                  placeholder="Descrição"
+                  value={description}
+                  onChange={handleDescription}
+                />
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="secondary"
+                  endIcon={<SendIcon />}
+                >
+                  {editLocation && editLocation._id ? "Atualizar" : "Cadastrar"}
+                </Button>
+              </form>
+            </Typography>
+          </ModalStyle>
         </Box>
       </FlexBetween>
       <DataGridCustomToolbar
