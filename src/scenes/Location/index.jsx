@@ -11,6 +11,7 @@ import { api2 } from "state/api";
 import Input from "components/Input";
 import ModalStyle from "components/ModalStyle";
 import GridToolbar from "components/GridToolbar";
+import EditIcon from "@mui/icons-material/Edit";
 
 const Location = () => {
   const theme = useTheme();
@@ -85,7 +86,7 @@ const Location = () => {
   const columns = [
     {
       field: "name",
-      headerName: "Nome do ativo",
+      headerName: "Localização",
       flex: 1,
     },
     {
@@ -99,20 +100,18 @@ const Location = () => {
       renderCell: (cellValues) => (
         <>
           <Button
-            variant="contained"
+            variant="text"
             color="secondary"
-            sx={{ marginRight: "5px" }}
             onClick={() => handleOpen(cellValues.row)}
           >
-            Editar
+           <EditIcon /> 
           </Button>
           <Button
-            variant="contained"
+            variant="text"
             color="error"
-            startIcon={<DeleteIcon />}
             onClick={() => handleDeleteClick(cellValues.row._id)}
           >
-            Apagar
+            <DeleteIcon />
           </Button>
         </>
       ),
