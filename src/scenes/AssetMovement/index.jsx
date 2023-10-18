@@ -42,18 +42,20 @@ const AssetMovement = () => {
   const [reason, setReason] = useState("");
   const [observations, setObservations] = useState("");
   const [id, setId] = useState("");
-  const [data, setData] = useState([])
+  const [data, setData] = useState([]);
   const axiosPrivate = useAxiosPrivate();
 
-  // const { data, isLoading } = useGetMovementQuery({
-  //   page,
-  //   pageSize,
-  //   sort: JSON.stringify(sort),
-  //   search,
-  // });
-
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+    setId("");
+    setName("");
+    setItem("");
+    setActualLocation("");
+    setNewLocation("");
+    setReason("");
+    setObservations("");
+  };
   const handleItem = (e) => setItem(e.target.value);
   const handleLocation = (e) => setNewLocation(e.target.value);
   const handleReason = (e) => setReason(e.target.value);
@@ -63,19 +65,16 @@ const AssetMovement = () => {
   };
 
   useEffect(() => {
-    api2.get("/api/movement").then((response) => setData(response.data))
-  }, [])
-
-
-  const adicionar = async () => {
-    const response = await api2.get(`api/item/${item}`);
-    setId(response.data._id);
-    setActualLocation(response.data.location);
-    setName(response.data.name);
-  };
+    api2.get("/api/movement").then((response) => setData(response.data));
+  }, []);
 
   const showToastMessage = () => {
     toast.success("Movimentação realizada com sucesso!", {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  };
+  const showToastError = (message) => {
+    toast.error(message, {
       position: toast.POSITION.TOP_CENTER,
     });
   };
@@ -100,6 +99,21 @@ const AssetMovement = () => {
     showToastMessage();
   };
 
+  const handleTagBlur = async () => {
+    if (!item.trim()) {
+      showToastError("Informe a tag do ativo antes de sair do campo.");
+    } else {
+      const response = await api2.get(`api/movement/item/${item}`);
+      if (!response.data) {
+        showToastError("Não existe essa tag cadastrada na plataforma.");
+      } else {
+        setId(response.data._id);
+        setActualLocation(response.data.location);
+        setName(response.data.name);
+      }
+    }
+  };
+
   const columns = [
     {
       field: "name",
@@ -113,7 +127,7 @@ const AssetMovement = () => {
     },
     {
       field: "newLocation",
-      headerName: "Nova Localização",
+      headerName: "Nova localização",
       flex: 1,
     },
     {
@@ -135,24 +149,10 @@ const AssetMovement = () => {
       field: "createdAt",
       headerName: "Data",
       flex: 1,
-    },
-    {
-      field: "Ação",
-      flex: 1,
-      renderCell: (cellValues) => (
-        <>
-          <Button
-            variant="contained"
-            color="secondary"
-            sx={{ marginRight: "5px" }}
-          >
-            Editar
-          </Button>
-          <Button variant="contained" color="error" startIcon={<DeleteIcon />}>
-            Apagar
-          </Button>
-        </>
-      ),
+      valueGetter: (params) => {
+        const date = new Date(params.row.createdAt);
+        return date.toLocaleString("pt-BR");
+      },
     },
   ];
 
@@ -176,83 +176,63 @@ const AssetMovement = () => {
           >
             Nova Movimentação
           </Button>
-          <Modal
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-          >
-            <ModalStyle>
-              <Typography id="modal-modal-title" variant="h5" component="h1">
-                Nova movimentação do ativo
-              </Typography>
-              <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                <form onSubmit={handleSubmit} className="form">
-                  <Input
-                    type="text"
-                    placeholder="Código do item"
-                    value={item}
-                    onChange={handleItem}
-                    onBlur={adicionar}
-                  />
-                  {/* <Input 
-                     type="text"
-                     placeholder="Nome"
-                     value={item}
-                     onChange={(e) => setItem(e.target.value)}
-                     // className="input"
-                     onBlur={adicionar}
-                  /> */}
-                  {/* <TextField
-          required
-          id="filled-basic"
-          label="Nome"
-        /> */}
-                  <Input
-                    type="text"
-                    placeholder="Nome do item *"
-                    value={name}
-                    readOnly={true}
-                  />
-                  <Input
-                    type="text"
-                    placeholder="Localização Atual *"
-                    value={actualLocation}
-                    readOnly={true}
-                  />
-                  <Input
-                    type="text"
-                    placeholder="Nova localização"
-                    value={newLocation}
-                    onChange={handleLocation}
-                  />
-                  <Input
-                    type="text"
-                    placeholder="Motivo"
-                    value={reason}
-                    onChange={handleReason}
-                  />
-                  <Input
-                    type="text"
-                    placeholder="Observações"
-                    value={observations}
-                    onChange={handleObservations}
-                  />
-                  <p>
-                    Registros marcados com * são preenchidos automaticamente
-                  </p>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    color="secondary"
-                    endIcon={<SendIcon />}
-                  >
-                    Confirmar movimentação
-                  </Button>
-                </form>
-              </Typography>
-            </ModalStyle>
-          </Modal>
+          <ModalStyle open={open} onClose={handleClose}>
+            <Typography id="modal-modal-title" variant="h5" component="h1">
+              Nova movimentação do ativo
+            </Typography>
+            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+              <form onSubmit={handleSubmit} className="form">
+                <Input
+                  type="text"
+                  label="Tag do ativo"
+                  value={item}
+                  onChange={handleItem}
+                  onBlur={handleTagBlur}
+                  color="error"
+                />
+                <Input
+                  type="text"
+                  label="Nome do item *"
+                  value={name}
+                  disabled={true}
+                />
+                <Input
+                  type="text"
+                  label="Localização Atual -"
+                  value={actualLocation}
+                  disabled={true}
+                  color="error"
+                />
+                <Input
+                  type="text"
+                  label="Nova localização"
+                  value={newLocation}
+                  onChange={handleLocation}
+                />
+                <Input
+                  type="text"
+                  label="Motivo"
+                  value={reason}
+                  onChange={handleReason}
+                />
+                <Input
+                  type="text"
+                  label="Observações"
+                  value={observations}
+                  onChange={handleObservations}
+                />
+                <p>Registros marcados com * são preenchidos automaticamente</p>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="secondary"
+                  endIcon={<SendIcon />}
+                >
+                  Confirmar movimentação
+                </Button>
+              </form>
+            </Typography>
+          </ModalStyle>
         </Box>
       </FlexBetween>
       <DataGridCustomToolbar
