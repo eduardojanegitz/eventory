@@ -7,22 +7,20 @@ import {
   Box,
   Button,
   CircularProgress,
-  FormControl,
-  InputLabel,
   MenuItem,
-  Select,
 } from "@mui/material";
 import DataGridCustomToolbar from "components/DataGridCustomToolbar";
 import FlexBetween from "components/FlexBetween";
 import { useNavigate } from "react-router-dom";
-import AddIcon from "@mui/icons-material/Add";
 
 import Typography from "@mui/material/Typography";
 import ModalStyle from "components/ModalStyle";
 import { toast } from "react-toastify";
 import GridToolbar from "components/GridToolbar";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import SendIcon from "@mui/icons-material/Send";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
+import Dropdown from "components/Dropdown";
 
 const Inventory = () => {
   const theme = useTheme();
@@ -227,11 +225,7 @@ const Inventory = () => {
             >
               Sala que está realizando o inventário
             </Typography>
-            <FormControl sx={{ minWidth: 200 }}>
-              <InputLabel htmlFor="location-select">
-                Selecione a localização
-              </InputLabel>
-              <Select
+              <Dropdown
                 sx={{
                   width: "25rem",
                   mb: "1rem",
@@ -248,16 +242,15 @@ const Inventory = () => {
                     {location.name}
                   </MenuItem>
                 ))}
-              </Select>
-            </FormControl>
+              </Dropdown>
 
             <Button
               variant="contained"
               color="secondary"
+              endIcon={<SendIcon />}
               onClick={() => handleNewInventory(selectedLocation)}
             >
-              <AddIcon sx={{ mr: "10px" }} />
-              Novo inventário
+              Avançar
             </Button>
             <Typography
               id="modal-modal-description"
