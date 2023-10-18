@@ -44,6 +44,7 @@ const navItems = [
   {
     text: "Dashboard",
     icon: <HomeOutlined />,
+    nav: "dashboard"
   },
   // {
   //   text: "Consulta",
@@ -52,18 +53,22 @@ const navItems = [
   {
     text: "Itens",
     icon: <ManageSearchIcon />,
+    nav: "itens"
   },
   {
     text: "Usuários",
     icon: <Groups2Outlined />,
+    nav: "usuarios"
   },
   {
     text: "Localização",
     icon: <AddLocationAltOutlined />,
+    nav: "localizacao"
   },
   {
     text: "Movimentação",
     icon: <TransferWithinAStationIcon />,
+    nav: "movimentacao"
   },
   // {
   //   text: "CC",
@@ -72,10 +77,12 @@ const navItems = [
   {
     text: "Inventários",
     icon: <InventoryIcon   />,
+    nav: "inventarios"
   },
   {
     text: "Divergências",
     icon: <RuleIcon   />,
+    nav: "divergencias"
   },
   {
     text: "Gráficos",
@@ -84,10 +91,12 @@ const navItems = [
   {
     text: "Depreciação",
     icon: <BarChartIcon />,
+    nav: "depreciacao"
   },
   {
     text: "Categorias",
     icon: <PieChartOutlined />,
+    nav: "categorias"
   },
   // {
   //   text: "Leitura de etiquetas",
@@ -148,7 +157,7 @@ const Sidebar = ({
               </FlexBetween>
             </Box>
             <List>
-              {navItems.map(({ text, icon }) => {
+              {navItems.map(({ text, icon, nav }) => {
                 if (!icon) {
                   return (
                     <Typography key={text} sx={{ m: "2.25rem 0 1rem 3rem " }}>
@@ -163,16 +172,16 @@ const Sidebar = ({
                   <ListItem key={text} disablePadding>
                     <ListItemButton
                       onClick={() => {
-                        navigate(`/${lcText}`);
-                        setActive(lcText);
+                        navigate(`/${nav}`);
+                        setActive(nav);
                       }}
                       sx={{
                         backgroundColor:
-                          active === lcText
+                          active === nav
                             ? theme.palette.secondary[300]
                             : "transparent",
                         color:
-                          active === lcText
+                          active === nav
                             ? theme.palette.primary[600]
                             : theme.palette.secondary[100],
                       }}
@@ -181,7 +190,7 @@ const Sidebar = ({
                         sx={{
                           ml: "2rem",
                           color:
-                            active === lcText
+                            active === nav
                               ? theme.palette.primary[600]
                               : theme.palette.secondary[200],
                         }}
@@ -189,7 +198,7 @@ const Sidebar = ({
                         {icon}
                       </ListItemIcon>
                       <ListItemText primary={text} />
-                      {active === lcText && (
+                      {active === nav  && (
                         <ChevronRightOutlined sx={{ ml: "auto" }} />
                       )}
                     </ListItemButton>
