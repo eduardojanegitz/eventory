@@ -17,6 +17,7 @@ const Dropdown = ({ children, value, onChange, label, id }) => {
         onChange={onChange}
         id={id}
         color="secondary"
+        sx={{mb: "15px"}}
       >
         {children}
       </Select>

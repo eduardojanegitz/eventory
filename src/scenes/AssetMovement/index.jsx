@@ -10,6 +10,7 @@ import {
   useTheme,
   InputBase,
   TextField,
+  MenuItem,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -27,6 +28,7 @@ import ModalStyle from "components/ModalStyle";
 import GridToolbar from "components/GridToolbar";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import { useNavigate } from "react-router-dom";
+import Dropdown from "components/Dropdown";
 
 const AssetMovement = () => {
   const navigate = useNavigate();
@@ -37,6 +39,7 @@ const AssetMovement = () => {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
   const [searchInput, setSearchInput] = useState("");
+  const [location, setLocation] = useState([]);
   const [name, setName] = useState("");
   const [item, setItem] = useState("");
   const [list2, setList2] = useState("");
@@ -69,6 +72,10 @@ const AssetMovement = () => {
 
   useEffect(() => {
     api2.get("/api/movement").then((response) => setData(response.data));
+  }, []);
+
+  useEffect(() => {
+    api2.get("/api/location").then((response) => setLocation(response.data));
   }, []);
 
   const showToastSuccess = (message) => {
@@ -228,12 +235,17 @@ const AssetMovement = () => {
                   disabled={true}
                   color="error"
                 />
-                <Input
-                  type="text"
+                <Dropdown
                   label="Nova localização"
                   value={newLocation}
                   onChange={handleLocation}
-                />
+                >
+                  {location.map((location) => (
+                    <MenuItem key={location.name} value={location.name}>
+                      {location.name}
+                    </MenuItem>
+                  ))}
+                </Dropdown>
                 <Input
                   type="text"
                   label="Motivo"
