@@ -8,7 +8,6 @@ import Layout from "scenes/Layout";
 import Dashboard from "scenes/Dashboard";
 import Products from "scenes/Items";
 import Users from "scenes/Users";
-import Transactions from "scenes/Transactions";
 import Overview from "scenes/Overview";
 import Breakdown from "scenes/Breakdown";
 import Tags from "scenes/Tags";
@@ -28,6 +27,7 @@ import Divergences from "scenes/Divergences";
 import Location from "scenes/Location";
 import Depreciation from "scenes/Depreciation";
 import ItemGroup from "scenes/ItemGroup";
+import Inventory from "scenes/Inventory";
 
 const ROLES = {
   Employee: "Employee",
@@ -54,7 +54,7 @@ const App = () => {
                 }
               >
                 <Route path="/home" element={<Home />} />
-                <Route path="/inventarios" element={<Transactions />} />
+                <Route path="/inventarios" element={<Inventory />} />
                 <Route path="/tags" element={<Tags />} />
               </Route>
               <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>

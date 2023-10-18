@@ -24,7 +24,7 @@ import ModalStyle from "components/ModalStyle";
 import { toast } from "react-toastify";
 import GridToolbar from "components/GridToolbar";
 
-const Transactions = () => {
+const Inventory = () => {
   const theme = useTheme();
   const navigate = useNavigate();
 
@@ -251,4 +251,4 @@ const Transactions = () => {
   );
 };
 
-export default Transactions;
+export default Inventory;
