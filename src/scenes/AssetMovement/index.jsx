@@ -25,9 +25,11 @@ import { api2, useGetMovementQuery } from "state/api";
 import Input from "components/Input";
 import ModalStyle from "components/ModalStyle";
 import GridToolbar from "components/GridToolbar";
-import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
+import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
+import { useNavigate } from "react-router-dom";
 
 const AssetMovement = () => {
+  const navigate = useNavigate();
   const theme = useTheme();
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(20);
@@ -69,8 +71,8 @@ const AssetMovement = () => {
     api2.get("/api/movement").then((response) => setData(response.data));
   }, []);
 
-  const showToastMessage = () => {
-    toast.success("Movimentação realizada com sucesso!", {
+  const showToastSuccess = (message) => {
+    toast.success(message, {
       position: toast.POSITION.TOP_CENTER,
     });
   };
@@ -83,21 +85,37 @@ const AssetMovement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    await axiosPrivate.post("api/movement/", {
-      id,
-      name,
-      actualLocation,
-      newLocation,
-      reason,
-      observations,
-    });
-    setId("");
-    setName("");
-    setActualLocation("");
-    setNewLocation("");
-    setReason("");
-    setObservations("");
-    showToastMessage();
+    try {
+      const response = await axiosPrivate.post("api/movement/", {
+        id,
+        name,
+        actualLocation,
+        newLocation,
+        reason,
+        observations,
+      });
+
+      showToastSuccess(
+        response.data.msg || "Movimentação realizada com sucesso!"
+      );
+
+      setId("");
+      setName("");
+      setActualLocation("");
+      setNewLocation("");
+      setReason("");
+      setObservations("");
+    } catch (error) {
+      if (error.response.status === 401) {
+        showToastError("Acesso expirado. Faça o login novamente.");
+        navigate("/");
+      } else {
+        showToastError(
+          error.response?.data?.error ||
+            "Erro desconhecido. Entre em contato com o time de TI."
+        );
+      }
+    }
   };
 
   const handleTagBlur = async () => {
@@ -305,17 +323,13 @@ const AssetMovement = () => {
           rowsPerPageOptions={[20, 50, 100]}
           columns={columns}
           pagination
-          // page={page}
-          // pageSize={pageSize}
-          paginationMode="server"
-          sortingMode="server"
-          // onPageChange={(newPage) => setPage(newPage)}
-          // onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          page={page}
+          pageSize={pageSize}
+          paginationMode="client"
+          onPageChange={(newPage) => setPage(newPage)}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
           onSortModelChange={(newSortModel) => setSort(...newSortModel)}
           components={{ Toolbar: GridToolbar }}
-          componentsProps={{
-            toolbar: { searchInput, setSearchInput, setSearch },
-          }}
         />
       </Box>
     </Box>
