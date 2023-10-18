@@ -7,7 +7,7 @@ const Input = ({
   value,
   onChange,
   onBlur,
-  readOnly,
+  disabled,
   label,
 }) => {
   const theme = useTheme();
@@ -19,7 +19,7 @@ const Input = ({
       value={value}
       onChange={onChange}
       onBlur={onBlur}
-      disabled={readOnly}
+      disabled={disabled}
       required
       color="info"
       sx={{
