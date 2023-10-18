@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import { api2, useGetInventoryQuery } from "state/api";
+import { api2 } from "state/api";
 import Header from "components/Header";
 import { useTheme } from "@emotion/react";
 import {
@@ -19,7 +19,6 @@ import { useNavigate } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 
 import Typography from "@mui/material/Typography";
-import Modal from "@mui/material/Modal";
 import ModalStyle from "components/ModalStyle";
 import { toast } from "react-toastify";
 import GridToolbar from "components/GridToolbar";
@@ -35,16 +34,10 @@ const Inventory = () => {
 
   const [data, setData] = useState([]);
 
-  const [location, setLocation] = useState("");
   const [locationSelect, setLocationSelect] = useState([]);
 
   const [searchInput, setSearchInput] = useState("");
-  // const { data, isLoading } = useGetInventoryQuery({
-  //   page,
-  //   pageSize,
-  //   sort: JSON.stringify(sort),
-  //   search,
-  // });
+ 
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -81,7 +74,6 @@ const Inventory = () => {
       headerName: "Data do inventário",
       flex: 1,
       valueGetter: (params) => {
-        // Formate a data para o formato brasileiro (dd/mm/yyyy)
         const date = new Date(params.row.createdAt);
         return date.toLocaleString("pt-BR");
       },
@@ -90,15 +82,7 @@ const Inventory = () => {
       field: "user",
       headerName: "Responsável",
       flex: 0.5,
-      // sortable: false,
-      // renderCell: (params) => params.value.length,
     },
-    // {
-    //   field: "cost",
-    //   headerName: "Custo",
-    //   flex: 1,
-    //   renderCell: (params) => `${Number(params.value).toFixed(2)}`,
-    // },
   ];
 
   const handleNewInventory = (location) => {
@@ -125,64 +109,62 @@ const Inventory = () => {
               fontSize: "14px",
               fontWeight: "bold",
               padding: "10px 20px",
-              transition: "background-color 0.3s ease, color 0.3s ease", // Adiciona uma transição suave
+              transition: "background-color 0.3s ease, color 0.3s ease", 
               "&:hover": {
-                backgroundColor: theme.palette.secondary.main, // Define a cor quando o mouse passa por cima
+                backgroundColor: theme.palette.secondary.main,
                 color: theme.palette.primary.main,
               },
             }}
           >
             NOVO INVENTÁRIO
           </Button>
-            <ModalStyle
-             open={open}
-             onClose={handleClose}>
-              <Typography
-                id="modal-modal-title"
-                variant="h6"
-                component="h2"
-                sx={{ mb: "1rem" }}
+          <ModalStyle open={open} onClose={handleClose}>
+            <Typography
+              id="modal-modal-title"
+              variant="h6"
+              component="h2"
+              sx={{ mb: "1rem" }}
+            >
+              Sala que está realizando o inventário
+            </Typography>
+            <FormControl sx={{ minWidth: 200 }}>
+              <InputLabel htmlFor="location-select">
+                Selecione a localização
+              </InputLabel>
+              <Select
+                // variant="solid"
+                sx={{
+                  width: "25rem",
+                  mb: "1rem",
+                  borderRadius: "8px",
+                  padding: "8px",
+                }}
+                value={selectedLocation}
+                onChange={(e) => setSelectedLocation(e.target.value)}
+                label="Selecione a localização"
+                id="location-select"
               >
-                Sala que está realizando o inventário
-              </Typography>
-              <FormControl sx={{ minWidth: 200 }}>
-                <InputLabel htmlFor="location-select">
-                  Selecione a localização
-                </InputLabel>
-                <Select
-                  // variant="solid"
-                  sx={{
-                    width: "25rem",
-                    mb: "1rem",
-                    borderRadius: "8px",
-                    padding: "8px",
-                  }}
-                  value={selectedLocation}
-                  onChange={(e) => setSelectedLocation(e.target.value)}
-                  label="Selecione a localização"
-                  id="location-select"
-                >
-                  {locationSelect.map((location) => (
-                    <MenuItem key={location._id} value={location.name}>
-                      {location.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+                {locationSelect.map((location) => (
+                  <MenuItem key={location._id} value={location.name}>
+                    {location.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={() => handleNewInventory(selectedLocation)}
-              >
-                <AddIcon sx={{ mr: "10px" }} />
-                Novo inventário
-              </Button>
-              <Typography
-                id="modal-modal-description"
-                sx={{ mt: 2 }}
-              ></Typography>
-            </ModalStyle>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => handleNewInventory(selectedLocation)}
+            >
+              <AddIcon sx={{ mr: "10px" }} />
+              Novo inventário
+            </Button>
+            <Typography
+              id="modal-modal-description"
+              sx={{ mt: 2 }}
+            ></Typography>
+          </ModalStyle>
         </Box>
       </FlexBetween>
       <DataGridCustomToolbar
@@ -218,7 +200,6 @@ const Inventory = () => {
         }}
       >
         <DataGrid
-          // loading={isLoading || !data}
           getRowId={(row) => row._id}
           rows={data.filter((row) =>
             Object.values(row).some(
@@ -232,19 +213,15 @@ const Inventory = () => {
           )}
           rowsPerOptions={[20, 50, 100]}
           columns={columns}
-          // rowCount={(data && data[80].item) || 0}
           pagination
-          // page={page}
-          // pageSize={pageSize}
+          page={page}
+          pageSize={pageSize}
           paginationMode="server"
           sortingMode="server"
           onPageChange={(newPage) => setPage(newPage)}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
           onSortModelChange={(newSortModel) => setSort(...newSortModel)}
           components={{ Toolbar: GridToolbar }}
-          // componentsProps={{
-          //   toolbar: { searchInput, setSearchInput, setSearch },
-          // }}
         />
       </Box>
     </Box>
