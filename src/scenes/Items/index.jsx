@@ -25,7 +25,6 @@ import GridToolbar from "components/GridToolbar";
 
 import { api2 } from "state/api";
 
-
 const Items = () => {
   const theme = useTheme();
 
@@ -46,12 +45,14 @@ const Items = () => {
   const [tag, setTag] = useState("");
   const [depreciation, setDepreciation] = useState("");
   const [costCenter, setCostCenter] = useState("");
+  const [itemGroup, setItemGroup] = useState("");
   const [locationSelect, setLocationSelect] = useState([]);
   const [editItem, setEditItem] = useState(null);
   const [deleteItem, setDeleteItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
+  const [itemGroupData, setItemGroupData] = useState([]);
 
   const handleOpen = (item = null) => {
     setEditItem(item);
@@ -106,6 +107,9 @@ const Items = () => {
   const handleCostCenter = (e) => {
     setCostCenter(e.target.value);
   };
+  const handleItemGroup = (e) => {
+    setItemGroup(e.target.value);
+  };
   const handleSearch = (searchInput) => {
     setSearch(searchInput);
   };
@@ -141,6 +145,11 @@ const Items = () => {
     api2
       .get("api/location")
       .then((response) => setLocationSelect(response.data));
+  }, []);
+  useEffect(() => {
+    api2
+      .get("api/item-group")
+      .then((response) => setItemGroupData(response.data));
   }, []);
 
   useEffect(() => {
@@ -433,6 +442,20 @@ const Items = () => {
                       value={depreciation}
                       onChange={handleDepreciation}
                     />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Dropdown
+                      type="text" 
+                      label="Grupo de itens"
+                      value={itemGroup}
+                      onChange={handleItemGroup}
+                    >
+                      {itemGroupData.map((data) => (
+                        <MenuItem key={data.name} value={data.name}>
+                          {data.name}
+                        </MenuItem>
+                      ))}
+                    </Dropdown>
                   </Grid>
                   {/* <Grid item xs={8}>
                       <Input
