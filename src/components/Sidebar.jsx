@@ -38,6 +38,7 @@ import TableViewIcon from '@mui/icons-material/TableView';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import RuleIcon from '@mui/icons-material/Rule';
 import BarChartIcon from '@mui/icons-material/BarChart';
+import TransferWithinAStationIcon from '@mui/icons-material/TransferWithinAStation';
 
 const navItems = [
   {
@@ -62,7 +63,7 @@ const navItems = [
   },
   {
     text: "Movimentação",
-    icon: <ShoppingCartOutlined />,
+    icon: <TransferWithinAStationIcon />,
   },
   // {
   //   text: "CC",

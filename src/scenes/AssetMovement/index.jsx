@@ -25,6 +25,7 @@ import { api2, useGetMovementQuery } from "state/api";
 import Input from "components/Input";
 import ModalStyle from "components/ModalStyle";
 import GridToolbar from "components/GridToolbar";
+import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 
 const AssetMovement = () => {
   const theme = useTheme();
@@ -166,12 +167,18 @@ const AssetMovement = () => {
         <Box>
           <Button
             onClick={handleOpen}
+            startIcon={<CompareArrowsIcon />}
             sx={{
               backgroundColor: theme.palette.secondary.dark,
               color: theme.palette.background.alt,
               fontSize: "14px",
               fontWeight: "bold",
               padding: "10px 20px",
+              transition: "background-color 0.3s ease, color 0.3s ease",
+              "&:hover": {
+                backgroundColor: theme.palette.secondary.main,
+                color: theme.palette.primary.main,
+              },
             }}
           >
             Nova Movimentação
@@ -221,7 +228,7 @@ const AssetMovement = () => {
                   value={observations}
                   onChange={handleObservations}
                 />
-                <Typography color="darkgray" sx={{mb: "15px"}}>
+                <Typography color="darkgray" sx={{ mb: "15px" }}>
                   Os campos Nome do Item e Localização Atual são preenchidos
                   automaticamente, basta informar o número da tag do ativo.
                 </Typography>
