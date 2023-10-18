@@ -1,5 +1,3 @@
-// Transactions
-
 import React, { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { api2 } from "state/api";
@@ -8,6 +6,7 @@ import { useTheme } from "@emotion/react";
 import {
   Box,
   Button,
+  CircularProgress,
   FormControl,
   InputLabel,
   MenuItem,
@@ -22,6 +21,8 @@ import Typography from "@mui/material/Typography";
 import ModalStyle from "components/ModalStyle";
 import { toast } from "react-toastify";
 import GridToolbar from "components/GridToolbar";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 
 const Inventory = () => {
   const theme = useTheme();
@@ -29,23 +30,32 @@ const Inventory = () => {
 
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(20);
-  const [sort, setSort] = useState({});
-  const [search, setSearch] = useState("");
+  const [itemsForInventory, setItemsForInventory] = useState([]);
+  const [isItemsModalOpen, setIsItemsModalOpen] = useState(false);
 
   const [data, setData] = useState([]);
 
   const [locationSelect, setLocationSelect] = useState([]);
 
   const [searchInput, setSearchInput] = useState("");
- 
+  const [selectedLocation, setSelectedLocation] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-  const handleSearch = (searchInput) => {
-    setSearch(searchInput);
+  const handleOpen = () => {
+    setOpen(true);
   };
-  const [selectedLocation, setSelectedLocation] = useState("");
+  const handleOpenItemsModal = (row) => {
+    setItemsForInventory(row.item);
+    setIsItemsModalOpen(true);
+  };
+  const handleClose = () => setOpen(false);
+  const handleCloseItemsModal = () => {
+    setIsItemsModalOpen(false);
+  };
+  const handleSearch = (searchInput) => {
+    setSearchInput(searchInput);
+  };
 
   const showToastWarning = () => {
     toast.warning("Primeiro selecione uma localização!", {
@@ -54,7 +64,16 @@ const Inventory = () => {
   };
 
   useEffect(() => {
-    api2.get("/api/inventory").then((response) => setData(response.data));
+    api2
+      .get("/api/inventory")
+      .then((response) => {
+        setData(response.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Erro ao carregar dados da tabela", error);
+        setLoading(false);
+      });
   }, []);
 
   useEffect(() => {
@@ -83,6 +102,22 @@ const Inventory = () => {
       headerName: "Responsável",
       flex: 0.5,
     },
+    {
+      field: "Ação",
+      flex: 0.5,
+      renderCell: (cellValues) => (
+        <>
+          <Button
+            variant="contained"
+            color="secondary"
+            sx={{ marginRight: "5px" }}
+            onClick={() => handleOpenItemsModal(cellValues.row)}
+          >
+            <VisibilityIcon />
+          </Button>
+        </>
+      ),
+    },
   ];
 
   const handleNewInventory = (location) => {
@@ -100,16 +135,81 @@ const Inventory = () => {
           title="INVENTÁRIOS"
           subtitle="Veja a lista de inventários realizados"
         />
+        <ModalStyle
+          open={isItemsModalOpen}
+          onClose={handleCloseItemsModal}
+          width="90%"
+        >
+          <Typography variant="h6" component="h2" sx={{ mb: "1rem" }}>
+            Itens do Inventário
+          </Typography>
+          <Box
+            height="50vh"
+            width="100%"
+            sx={{
+              "& .MuiDataGrid-root": {
+                border: "none",
+              },
+              "& .MuiDataGrid-cell": {
+                borderBottom: "none",
+              },
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: theme.palette.background.alt,
+                color: theme.palette.secondary[100],
+                borderBottom: "none",
+              },
+              "& .MuiDataGrid-virtualScroller": {
+                backgroundColor: theme.palette.primary.light,
+                overflowY: "auto",
+                scrollbarWidth: "thin",
+                "&::-webkit-scrollbar": {
+                  width: "3px",
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  backgroundColor: "#b3b0b0",
+                  borderRadius: "20px",
+                },
+                "&::-webkit-scrollbar-track": {
+                  backgroundColor: "transparent",
+                },
+              },
+              "& .MuiDataGrid-FooterContainer": {
+                backgroundColor: theme.palette.background.alt,
+                color: theme.palette.secondary[100],
+                borderTop: "none",
+              },
+              "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+                color: `${theme.palette.secondary[200]} !important`,
+              },
+            }}
+          >
+            <DataGrid
+              rows={itemsForInventory.map((item, index) => ({
+                ...item,
+                id: index,
+              }))}
+              columns={[
+                { field: "nome", headerName: "Nome", flex: 1 },
+                { field: "descricao", headerName: "Descrição", flex: 1 },
+                { field: "localizacao", headerName: "Localização", flex: 1 },
+                { field: "serial", headerName: "Número de série", flex: 1 },
+              ]}
+              pageSize={20}
+              pagination
+            />
+          </Box>
+        </ModalStyle>
         <Box>
           <Button
             onClick={handleOpen}
+            startIcon={<AddCircleOutlineOutlinedIcon />}
             sx={{
               backgroundColor: theme.palette.secondary.dark,
               color: theme.palette.background.default,
               fontSize: "14px",
               fontWeight: "bold",
               padding: "10px 20px",
-              transition: "background-color 0.3s ease, color 0.3s ease", 
+              transition: "background-color 0.3s ease, color 0.3s ease",
               "&:hover": {
                 backgroundColor: theme.palette.secondary.main,
                 color: theme.palette.primary.main,
@@ -132,7 +232,6 @@ const Inventory = () => {
                 Selecione a localização
               </InputLabel>
               <Select
-                // variant="solid"
                 sx={{
                   width: "25rem",
                   mb: "1rem",
@@ -172,58 +271,81 @@ const Inventory = () => {
         onChange={setSearchInput}
         onSearch={handleSearch}
       />
-      <Box
-        height="80vh"
-        sx={{
-          "& .MuiDataGrid-root": {
-            border: "none",
-          },
-          "& .MuiDataGrid-cell": {
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: theme.palette.background.alt,
-            color: theme.palette.secondary[100],
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-virtualScroller": {
-            backgroundColor: theme.palette.primary.light,
-          },
-          "& .MuiDataGrid-FooterContainer": {
-            backgroundColor: theme.palette.background.alt,
-            color: theme.palette.secondary[100],
-            borderTop: "none",
-          },
-          "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-            color: `${theme.palette.secondary[200]} !important`,
-          },
-        }}
-      >
-        <DataGrid
-          getRowId={(row) => row._id}
-          rows={data.filter((row) =>
-            Object.values(row).some(
-              (value) =>
-                value &&
-                value
-                  .toString()
-                  .toLowerCase()
-                  .includes(searchInput.toLowerCase())
-            )
-          )}
-          rowsPerOptions={[20, 50, 100]}
-          columns={columns}
-          pagination
-          page={page}
-          pageSize={pageSize}
-          paginationMode="server"
-          sortingMode="server"
-          onPageChange={(newPage) => setPage(newPage)}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          onSortModelChange={(newSortModel) => setSort(...newSortModel)}
-          components={{ Toolbar: GridToolbar }}
-        />
-      </Box>
+      {loading ? (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "80vh",
+          }}
+        >
+          <CircularProgress color="secondary" />
+        </Box>
+      ) : (
+        <Box
+          height="80vh"
+          sx={{
+            "& .MuiDataGrid-root": {
+              border: "none",
+            },
+            "& .MuiDataGrid-cell": {
+              borderBottom: "none",
+            },
+            "& .MuiDataGrid-columnHeaders": {
+              backgroundColor: theme.palette.background.alt,
+              color: theme.palette.secondary[100],
+              borderBottom: "none",
+            },
+            "& .MuiDataGrid-virtualScroller": {
+              backgroundColor: theme.palette.primary.light,
+              overflowY: "auto",
+              scrollbarWidth: "thin",
+              "&::-webkit-scrollbar": {
+                width: "3px",
+              },
+              "&::-webkit-scrollbar-thumb": {
+                backgroundColor: "#b3b0b0",
+                borderRadius: "20px",
+              },
+              "&::-webkit-scrollbar-track": {
+                backgroundColor: "transparent",
+              },
+            },
+            "& .MuiDataGrid-FooterContainer": {
+              backgroundColor: theme.palette.background.alt,
+              color: theme.palette.secondary[100],
+              borderTop: "none",
+            },
+            "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+              color: `${theme.palette.secondary[200]} !important`,
+            },
+          }}
+        >
+          <DataGrid
+            getRowId={(row) => row._id}
+            rows={data.filter((row) =>
+              Object.values(row).some(
+                (value) =>
+                  value &&
+                  value
+                    .toString()
+                    .toLowerCase()
+                    .includes(searchInput.toLowerCase())
+              )
+            )}
+            rowsPerOptions={[20, 50, 100]}
+            columns={columns}
+            pagination
+            page={page}
+            pageSize={pageSize}
+            paginationMode="client"
+            onPageChange={(newPage) => setPage(newPage)}
+            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+            components={{ Toolbar: GridToolbar }}
+          />
+        </Box>
+      )}
     </Box>
   );
 };

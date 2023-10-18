@@ -27,25 +27,26 @@ import {
   TrendingUpOutlined,
   PieChartOutlined,
   PointOfSaleOutlined,
-  AddLocationAltOutlined
+  AddLocationAltOutlined,
 } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import FlexBetween from "./FlexBetween";
 import profileImage from "assets/profile.jpeg";
-import ManageSearchIcon from '@mui/icons-material/ManageSearch';
-import TableViewIcon from '@mui/icons-material/TableView';
-import InventoryIcon from '@mui/icons-material/Inventory';
-import RuleIcon from '@mui/icons-material/Rule';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import TransferWithinAStationIcon from '@mui/icons-material/TransferWithinAStation';
-import CategoryIcon from '@mui/icons-material/Category';
+import ManageSearchIcon from "@mui/icons-material/ManageSearch";
+import TableViewIcon from "@mui/icons-material/TableView";
+import InventoryIcon from "@mui/icons-material/Inventory";
+import RuleIcon from "@mui/icons-material/Rule";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import TransferWithinAStationIcon from "@mui/icons-material/TransferWithinAStation";
+import CategoryIcon from '@mui/icons-material/CategoryOutlined';
+import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
 
 const navItems = [
   {
     text: "Dashboard",
     icon: <HomeOutlined />,
-    nav: "dashboard"
+    nav: "dashboard",
   },
   // {
   //   text: "Consulta",
@@ -54,27 +55,27 @@ const navItems = [
   {
     text: "Itens",
     icon: <ManageSearchIcon />,
-    nav: "itens"
+    nav: "itens",
   },
   {
     text: "Grupo de Itens",
     icon: <CategoryIcon />,
-    nav: "grupo-de-itens"
+    nav: "grupo-de-itens",
   },
   {
     text: "Usuários",
     icon: <Groups2Outlined />,
-    nav: "usuarios"
+    nav: "usuarios",
   },
   {
     text: "Localização",
     icon: <AddLocationAltOutlined />,
-    nav: "localizacao"
+    nav: "localizacao",
   },
   {
     text: "Movimentação",
     icon: <TransferWithinAStationIcon />,
-    nav: "movimentacao"
+    nav: "movimentacao",
   },
   // {
   //   text: "CC",
@@ -82,13 +83,13 @@ const navItems = [
   // },
   {
     text: "Inventários",
-    icon: <InventoryIcon   />,
-    nav: "inventarios"
+    icon: <InventoryOutlinedIcon />,
+    nav: "inventarios",
   },
   {
     text: "Divergências",
-    icon: <RuleIcon   />,
-    nav: "divergencias"
+    icon: <RuleIcon />,
+    nav: "divergencias",
   },
   {
     text: "Gráficos",
@@ -97,12 +98,12 @@ const navItems = [
   {
     text: "Depreciação",
     icon: <BarChartIcon />,
-    nav: "depreciacao"
+    nav: "depreciacao",
   },
   {
     text: "Categorias",
     icon: <PieChartOutlined />,
-    nav: "categorias"
+    nav: "categorias",
   },
   // {
   //   text: "Leitura de etiquetas",
@@ -204,7 +205,7 @@ const Sidebar = ({
                         {icon}
                       </ListItemIcon>
                       <ListItemText primary={text} />
-                      {active === nav  && (
+                      {active === nav && (
                         <ChevronRightOutlined sx={{ ml: "auto" }} />
                       )}
                     </ListItemButton>
