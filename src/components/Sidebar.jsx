@@ -39,6 +39,7 @@ import InventoryIcon from '@mui/icons-material/Inventory';
 import RuleIcon from '@mui/icons-material/Rule';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import TransferWithinAStationIcon from '@mui/icons-material/TransferWithinAStation';
+import CategoryIcon from '@mui/icons-material/Category';
 
 const navItems = [
   {
@@ -54,6 +55,11 @@ const navItems = [
     text: "Itens",
     icon: <ManageSearchIcon />,
     nav: "itens"
+  },
+  {
+    text: "Grupo de Itens",
+    icon: <CategoryIcon />,
+    nav: "grupo-de-itens"
   },
   {
     text: "Usuários",
