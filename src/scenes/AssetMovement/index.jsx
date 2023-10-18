@@ -192,13 +192,13 @@ const AssetMovement = () => {
                 />
                 <Input
                   type="text"
-                  label="Nome do item *"
+                  label="Nome do item"
                   value={name}
                   disabled={true}
                 />
                 <Input
                   type="text"
-                  label="Localização Atual -"
+                  label="Localização Atual"
                   value={actualLocation}
                   disabled={true}
                   color="error"
@@ -221,7 +221,10 @@ const AssetMovement = () => {
                   value={observations}
                   onChange={handleObservations}
                 />
-                <p>Registros marcados com * são preenchidos automaticamente</p>
+                <Typography color="darkgray" sx={{mb: "15px"}}>
+                  Os campos Nome do Item e Localização Atual são preenchidos
+                  automaticamente, basta informar o número da tag do ativo.
+                </Typography>
                 <Button
                   type="submit"
                   variant="contained"
