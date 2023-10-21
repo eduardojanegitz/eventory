@@ -31,6 +31,13 @@ import useAxiosPrivate from "hooks/useAxiosPrivate";
 import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
 
+const StyledTableContainer = styled(TableContainer) `
+  overflow-x: 'auto';
+
+  @media (max-width: 600px) {
+    max-width: 100%;
+  }
+`
 const Tags = () => {
   const [item, setItem] = useState();
   const [list, setList] = useState([]);
@@ -171,13 +178,13 @@ const Tags = () => {
         </Button>
       </form>
 
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+      <StyledTableContainer component={Paper}>
+        <Table  aria-label="simple table">
           <TableHead>
             <TableRow>
               <TableCell>Nome</TableCell>
               <TableCell align="right">Descrição</TableCell>
-              <TableCell align="right">Número de serial</TableCell>
+              <TableCell align="right">Série</TableCell>
               <TableCell align="right">Ação</TableCell>
             </TableRow>
           </TableHead>
@@ -201,7 +208,7 @@ const Tags = () => {
             ))}
           </TableBody>
         </Table>
-      </TableContainer>
+      </StyledTableContainer>
     </Box>
   );
 };
