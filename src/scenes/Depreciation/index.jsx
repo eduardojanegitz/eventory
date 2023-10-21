@@ -182,7 +182,7 @@ const Depreciation = () => {
         <ModalStyle open={open} onClose={handleClose} width="95%">
           <Typography id="modal-modal-title" variant="h5" component="h1">
             {selectedTimePeriod === 1
-              ? "Valor depreciado por mês durante 1 ano"
+              ? "Valor residual por mês durante 1 ano"
               : selectedTimePeriod === 2
               ? "Valor depreciado por mês durante 2 anos"
               : "Valor depreciado por mês durante 3 anos"}
