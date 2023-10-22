@@ -30,14 +30,15 @@ import Paper from "@mui/material/Paper";
 import useAxiosPrivate from "hooks/useAxiosPrivate";
 import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
+import PostAddIcon from "@mui/icons-material/PostAdd";
 
-const StyledTableContainer = styled(TableContainer) `
-  overflow-x: 'auto';
+const StyledTableContainer = styled(TableContainer)`
+  overflow-x: "auto";
 
   @media (max-width: 600px) {
     max-width: 100%;
   }
-`
+`;
 const Tags = () => {
   const [item, setItem] = useState("");
   const [list, setList] = useState([]);
@@ -61,18 +62,18 @@ const Tags = () => {
       .then((response) => setBackEnd(response.data));
   }, []);
 
-  const showToastMessage = () => {
-    toast.success("Inventário realizado com sucesso!", {
+  const showToastSuccess = (message) => {
+    toast.success(message, {
       position: toast.POSITION.TOP_CENTER,
     });
   };
-  const showToastError = () => {
-    toast.error("Inventário divergente!", {
+  const showToastError = (message) => {
+    toast.error(message, {
       position: toast.POSITION.TOP_CENTER,
     });
   };
-  const showToastError2 = () => {
-    toast.error("Os itens não podem inventariado duas vezes!", {
+  const showToastWarning = (message) => {
+    toast.warning(message, {
       position: toast.POSITION.TOP_CENTER,
     });
   };
@@ -93,7 +94,9 @@ const Tags = () => {
     );
 
     if (hasDuplicates) {
-      showToastError2();
+      showToastError(
+        "O item não pode ser lido mais de uma vez no mesmo inventário!"
+      );
     } else {
       const divergences = [];
 
@@ -112,25 +115,27 @@ const Tags = () => {
       });
 
       if (divergences.length === 0 && list.length === backEnd.length) {
-        await axiosPrivate.post("api/inventory", {
+        const response = await axiosPrivate.post("api/inventory", {
           list,
-          location: locationValue
+          location: locationValue,
         });
-        showToastMessage();
+        showToastSuccess(
+          response.data.msg || "Inventário realizado com sucesso!"
+        );
       } else {
-        await axiosPrivate.post("api/divergences", {
+        const response = await axiosPrivate.post("api/divergences", {
           divergences,
-          location: locationValue
+          location: locationValue,
         });
 
-        showToastError();
+        showToastError(response.data.msg || "Inventário divergente!");
       }
     }
   }
 
   const addItem = async () => {
     if (itemName.current.value === "") {
-      window.alert("Preencha o item");
+      showToastWarning("Preencha o item");
     } else {
       try {
         const response = await api2.get(`api/inventory/item/${item}`);
@@ -158,30 +163,38 @@ const Tags = () => {
         title="LEITURA DE TAGS"
         subtitle={`Localização: ${locationValue}`}
       />
-
-      <form onSubmit={handleSubmit} className="form-tag">
-        <Input
-          type="text"
-          value={item}
-          refInput={itemName}
-          onChange={(e) => setItem(e.target.value)}
-          label="Digite o item"
-        />
-        <Button
-          sx={{ mr: "5px" }}
-          variant="contained"
-          color="secondary"
-          onClick={addItem}
-        >
-          ADICIONAR
-        </Button>
-        <Button type="submit" color="error" variant="contained">
-          FINALIZAR
-        </Button>
-      </form>
+      <Box sx={{ mt: "25px" }}>
+        <form onSubmit={handleSubmit}>
+          <Input
+            type="text"
+            value={item}
+            refInput={itemName}
+            onChange={(e) => setItem(e.target.value)}
+            label="Faça aqui a leitura da tag..."
+          />
+          <Box sx={{ mb: "15px" }}>
+            <Button
+              sx={{ mr: "5px" }}
+              variant="contained"
+              color="secondary"
+              onClick={addItem}
+            >
+              ADICIONAR
+            </Button>
+            <Button
+              type="submit"
+              endIcon={<PostAddIcon />}
+              color="error"
+              variant="contained"
+            >
+              FINALIZAR
+            </Button>
+          </Box>
+        </form>
+      </Box>
 
       <StyledTableContainer component={Paper}>
-        <Table  aria-label="simple table">
+        <Table aria-label="simple table">
           <TableHead>
             <TableRow>
               <TableCell>Nome</TableCell>
