@@ -144,9 +144,11 @@ const Tags = () => {
       try {
         const response = await api2.get(`api/inventory/item/${item}`);
         const newItem = response.data;
+        const itemId = Date.now();
         setList((prevList) => [
           ...prevList,
           {
+            id: itemId,
             descricao: newItem.description,
             nome: newItem.name,
             localizacao: newItem.location,
@@ -163,6 +165,10 @@ const Tags = () => {
         console.error("Erro ao buscar informações do item: ", error);
       }
     }
+  };
+
+  const removeItem = (itemId) => {
+    setList((prevList) => prevList.filter((item) => item.id !== itemId));
   };
   return (
     <Box m="1.5rem 2.5rem">
@@ -258,7 +264,7 @@ const Tags = () => {
                     <TableCell>{listItem.tag}</TableCell>
                     <TableCell>
                       <IconButton aria-label="delete">
-                        <DeleteIcon color="error" />
+                        <DeleteIcon color="error" onClick={() => removeItem(listItem.id)}/>
                       </IconButton>
                     </TableCell>
                   </TableRow>
