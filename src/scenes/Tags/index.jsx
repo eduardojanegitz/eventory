@@ -1,4 +1,4 @@
-import { Box, Button, InputBase, useTheme } from "@mui/material";
+import { Box, Button, InputBase } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import FlexBetween from "components/FlexBetween";
 import Header from "components/Header";
@@ -22,15 +22,17 @@ import DeleteIcon from "@mui/icons-material/Delete";
 
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
+import TableCell, { tableCellClasses } from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import useAxiosPrivate from "hooks/useAxiosPrivate";
 import { toast } from "react-toastify";
+import { useTheme } from "@emotion/react";
 import { useLocation } from "react-router-dom";
-import PostAddIcon from "@mui/icons-material/PostAdd";
+import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 
 const StyledTableContainer = styled(TableContainer)`
   overflow-x: "auto";
@@ -40,6 +42,7 @@ const StyledTableContainer = styled(TableContainer)`
   }
 `;
 const Tags = () => {
+  const theme = useTheme();
   const [item, setItem] = useState("");
   const [list, setList] = useState([]);
   const [backEnd, setBackEnd] = useState([]);
@@ -177,14 +180,15 @@ const Tags = () => {
               sx={{ mr: "5px" }}
               variant="contained"
               color="secondary"
+              endIcon={<PlaylistAddIcon />}
               onClick={addItem}
             >
               ADICIONAR
             </Button>
             <Button
               type="submit"
-              endIcon={<PostAddIcon />}
               color="error"
+              endIcon={<PlaylistAddCheckIcon />}
               variant="contained"
             >
               FINALIZAR
@@ -194,31 +198,61 @@ const Tags = () => {
       </Box>
 
       <StyledTableContainer component={Paper}>
-        <Table aria-label="simple table">
+        <Table
+          aria-label="simple table"
+          sx={{
+            backgroundColor: theme.palette.background.alt,
+            border: "none",
+            [`& .${tableCellClasses.root}`]: {
+              border: "none",
+            },
+          }}
+        >
           <TableHead>
-            <TableRow>
-              <TableCell>Nome</TableCell>
-              <TableCell align="right">Descrição</TableCell>
-              <TableCell align="right">Série</TableCell>
-              <TableCell align="right">Tag</TableCell>
-              <TableCell align="right">Ação</TableCell>
+            <TableRow
+              sx={{
+                backgroundColor: theme.palette.secondary[100], 
+              }}
+            >
+              <TableCell
+                sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
+              >
+                Nome
+              </TableCell>
+              <TableCell
+                sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
+              >
+                Descrição
+              </TableCell>
+              <TableCell
+                sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
+              >
+                Série
+              </TableCell>
+              <TableCell
+                sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
+              >
+                Tag
+              </TableCell>
+              <TableCell
+                sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
+              >
+                Ação
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {list.map((listItem, index) => (
-              <TableRow
-                key={index}
-                // sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
+              <TableRow key={index}>
                 <TableCell component="th" scope="row">
                   {listItem.nome}
                 </TableCell>
-                <TableCell align="right">{listItem.descricao}</TableCell>
-                <TableCell align="right">{listItem.serial}</TableCell>
-                <TableCell align="right">{listItem.tag}</TableCell>
-                <TableCell align="right">
-                  <IconButton edge="end" aria-label="delete">
-                    <DeleteIcon />
+                <TableCell>{listItem.descricao}</TableCell>
+                <TableCell>{listItem.serial}</TableCell>
+                <TableCell>{listItem.tag}</TableCell>
+                <TableCell>
+                  <IconButton aria-label="delete">
+                    <DeleteIcon color="error" />
                   </IconButton>
                 </TableCell>
               </TableRow>
