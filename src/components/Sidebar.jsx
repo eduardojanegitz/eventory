@@ -58,7 +58,7 @@ const navItems = [
     nav: "itens",
   },
   {
-    text: "Grupo de Itens",
+    text: "Grupos de Itens",
     icon: <CategoryIcon />,
     nav: "grupo-de-itens",
   },
