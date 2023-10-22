@@ -46,6 +46,7 @@ const Tags = () => {
   const [item, setItem] = useState("");
   const [list, setList] = useState([]);
   const [backEnd, setBackEnd] = useState([]);
+  const [isTableVisible, setIsTableVisible] = useState(false);
 
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -155,6 +156,9 @@ const Tags = () => {
         ]);
         setItem("");
         itemName.current.focus();
+        if (!isTableVisible) {
+          setIsTableVisible(true);
+        }
       } catch (error) {
         console.error("Erro ao buscar informações do item: ", error);
       }
@@ -196,71 +200,75 @@ const Tags = () => {
           </Box>
         </form>
       </Box>
+      {
+        isTableVisible && (
 
-      <StyledTableContainer component={Paper}>
-        <Table
-          aria-label="simple table"
-          sx={{
-            backgroundColor: theme.palette.background.alt,
-            border: "none",
-            [`& .${tableCellClasses.root}`]: {
-              border: "none",
-            },
-          }}
-        >
-          <TableHead>
-            <TableRow
+          <StyledTableContainer component={Paper}>
+            <Table
+              aria-label="simple table"
               sx={{
-                backgroundColor: theme.palette.secondary[100], 
+                backgroundColor: theme.palette.background.alt,
+                border: "none",
+                [`& .${tableCellClasses.root}`]: {
+                  border: "none",
+                },
               }}
             >
-              <TableCell
-                sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
-              >
-                Nome
-              </TableCell>
-              <TableCell
-                sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
-              >
-                Descrição
-              </TableCell>
-              <TableCell
-                sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
-              >
-                Série
-              </TableCell>
-              <TableCell
-                sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
-              >
-                Tag
-              </TableCell>
-              <TableCell
-                sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
-              >
-                Ação
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {list.map((listItem, index) => (
-              <TableRow key={index}>
-                <TableCell component="th" scope="row">
-                  {listItem.nome}
-                </TableCell>
-                <TableCell>{listItem.descricao}</TableCell>
-                <TableCell>{listItem.serial}</TableCell>
-                <TableCell>{listItem.tag}</TableCell>
-                <TableCell>
-                  <IconButton aria-label="delete">
-                    <DeleteIcon color="error" />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </StyledTableContainer>
-    </Box>
+              <TableHead>
+                <TableRow
+                  sx={{
+                    backgroundColor: theme.palette.secondary[100], 
+                  }}
+                >
+                  <TableCell
+                    sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
+                  >
+                    Nome
+                  </TableCell>
+                  <TableCell
+                    sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
+                  >
+                    Descrição
+                  </TableCell>
+                  <TableCell
+                    sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
+                  >
+                    Série
+                  </TableCell>
+                  <TableCell
+                    sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
+                  >
+                    Tag
+                  </TableCell>
+                  <TableCell
+                    sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
+                  >
+                    Ação
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {list.map((listItem, index) => (
+                  <TableRow key={index}>
+                    <TableCell component="th" scope="row">
+                      {listItem.nome}
+                    </TableCell>
+                    <TableCell>{listItem.descricao}</TableCell>
+                    <TableCell>{listItem.serial}</TableCell>
+                    <TableCell>{listItem.tag}</TableCell>
+                    <TableCell>
+                      <IconButton aria-label="delete">
+                        <DeleteIcon color="error" />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </StyledTableContainer>
+          )
+        }
+        </Box>
   );
 };
 
