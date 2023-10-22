@@ -39,10 +39,9 @@ const StyledTableContainer = styled(TableContainer) `
   }
 `
 const Tags = () => {
-  const [item, setItem] = useState();
+  const [item, setItem] = useState("");
   const [list, setList] = useState([]);
   const [backEnd, setBackEnd] = useState([]);
-  const [showError, setShowError] = useState(false);
 
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -50,7 +49,6 @@ const Tags = () => {
 
   let itemName = useRef();
 
-  // permission
   const axiosPrivate = useAxiosPrivate();
 
   useEffect(() => {
@@ -62,8 +60,6 @@ const Tags = () => {
       .get(`api/inventory/location/${locationValue}`)
       .then((response) => setBackEnd(response.data));
   }, []);
-
-  const { data } = useGetItemByTagQuery(item);
 
   const showToastMessage = () => {
     toast.success("Inventário realizado com sucesso!", {
@@ -115,9 +111,10 @@ const Tags = () => {
         }
       });
 
-      if (divergences.length == 0 && list.length === backEnd.length) {
+      if (divergences.length === 0 && list.length === backEnd.length) {
         await axiosPrivate.post("api/inventory", {
           list,
+          location: locationValue
         });
         showToastMessage();
       } else {
@@ -131,45 +128,50 @@ const Tags = () => {
     }
   }
 
-  const adicionarItem = () => {
+  const addItem = async () => {
     if (itemName.current.value === "") {
       window.alert("Preencha o item");
     } else {
-      setList([
-        ...list,
-
-        {
-          descricao: data.description,
-          nome: data.name,
-          localizacao: data.location,
-          serial: data.serialNumber,
-        },
-      ]);
-      setItem("");
-      itemName.current.focus();
+      try {
+        const response = await api2.get(`api/inventory/item/${item}`);
+        const newItem = response.data;
+        setList((prevList) => [
+          ...prevList,
+          {
+            descricao: newItem.description,
+            nome: newItem.name,
+            localizacao: newItem.location,
+            serial: newItem.serialNumber,
+            tag: newItem.tag,
+          },
+        ]);
+        setItem("");
+        itemName.current.focus();
+      } catch (error) {
+        console.error("Erro ao buscar informações do item: ", error);
+      }
     }
   };
   return (
     <Box m="1.5rem 2.5rem">
       <Header
-        title="LEITURA DE ETIQUETAS"
-        subtitle={`Faça aqui a sua leitura. Localização: ${locationValue}`}
+        title="LEITURA DE TAGS"
+        subtitle={`Localização: ${locationValue}`}
       />
 
       <form onSubmit={handleSubmit} className="form-tag">
-        <input
+        <Input
           type="text"
           value={item}
-          ref={itemName}
+          refInput={itemName}
           onChange={(e) => setItem(e.target.value)}
-          className="input-tag"
-          placeholder="Digite o item"
+          label="Digite o item"
         />
         <Button
           sx={{ mr: "5px" }}
           variant="contained"
           color="secondary"
-          onClick={adicionarItem}
+          onClick={addItem}
         >
           ADICIONAR
         </Button>
@@ -185,20 +187,22 @@ const Tags = () => {
               <TableCell>Nome</TableCell>
               <TableCell align="right">Descrição</TableCell>
               <TableCell align="right">Série</TableCell>
+              <TableCell align="right">Tag</TableCell>
               <TableCell align="right">Ação</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {list.map((list) => (
+            {list.map((listItem, index) => (
               <TableRow
-                key={list.serialNumber}
+                key={index}
                 // sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
                 <TableCell component="th" scope="row">
-                  {list.nome}
+                  {listItem.nome}
                 </TableCell>
-                <TableCell align="right">{list.descricao}</TableCell>
-                <TableCell align="right">{list.serial}</TableCell>
+                <TableCell align="right">{listItem.descricao}</TableCell>
+                <TableCell align="right">{listItem.serial}</TableCell>
+                <TableCell align="right">{listItem.tag}</TableCell>
                 <TableCell align="right">
                   <IconButton edge="end" aria-label="delete">
                     <DeleteIcon />
