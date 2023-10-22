@@ -96,6 +96,11 @@ const Inventory = () => {
       },
     },
     {
+      field: "location", 
+      headerName: "Localização",
+      flex: 1
+    },
+    {
       field: "user",
       headerName: "Responsável",
       flex: 0.5,
@@ -191,6 +196,7 @@ const Inventory = () => {
                 { field: "descricao", headerName: "Descrição", flex: 1 },
                 { field: "localizacao", headerName: "Localização", flex: 1 },
                 { field: "serial", headerName: "Número de série", flex: 1 },
+                { field: "tag", headerName: "Tag", flex: 1 },
               ]}
               pageSize={20}
               pagination
