@@ -9,6 +9,8 @@ const Input = ({
   onBlur,
   disabled,
   label,
+  refInput,
+  required
 }) => {
   const theme = useTheme();
   return (
@@ -20,7 +22,8 @@ const Input = ({
       onChange={onChange}
       onBlur={onBlur}
       disabled={disabled}
-      required
+      ref={refInput}
+      required={required} 
       color="info"
       sx={{
         width: "100%",
