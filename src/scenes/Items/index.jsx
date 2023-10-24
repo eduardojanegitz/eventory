@@ -444,16 +444,6 @@ const Items = () => {
                     />
                   </Grid>
                   <Grid item xs={4}>
-                    <Input
-                      type="number"
-                      placeholder="Taxa de depreciação %"
-                      value={depreciation}
-                      onChange={handleDepreciation}
-                      disabled
-
-                    />
-                  </Grid>
-                  <Grid item xs={4}>
                     <Dropdown
                       type="text" 
                       label="Grupo de itens"
@@ -466,6 +456,16 @@ const Items = () => {
                         </MenuItem>
                       ))}
                     </Dropdown>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Input
+                      type="number"
+                      placeholder="Taxa de depreciação %"
+                      value={depreciation}
+                      onChange={handleDepreciation}
+                      disabled
+
+                    />
                   </Grid>
                   {/* <Grid item xs={8}>
                       <Input
