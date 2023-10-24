@@ -87,6 +87,9 @@ const LoginPage = () => {
           src={image}
           sx={{
             height: "65vh",
+            "@media (max-width: 768px)" : {
+              display: "none"
+            }
           }}
         />
         <Box
@@ -98,6 +101,9 @@ const LoginPage = () => {
             alignItems: "center",
             justifyContent: "center",
             gap: "40px",
+            "@media (max-width: 768px)" : {
+              p: "16px"
+            }
           }}
         >
           <Typography>
