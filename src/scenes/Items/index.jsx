@@ -68,8 +68,8 @@ const Items = () => {
     setOpen(true);
   };
 
-  const handleOpenWritteOff = () => setOpenWritteOff(true)
-  const handleCloseWritteOff = () => setOpenWritteOff(false)
+  const handleOpenWritteOff = () => setOpenWritteOff(true);
+  const handleCloseWritteOff = () => setOpenWritteOff(false);
 
   const handleClose = () => {
     setOpen(false);
@@ -121,14 +121,15 @@ const Items = () => {
   };
 
   const updateDepreciation = (selectedItemGroup) => {
-    const selectedGroup = itemGroupData.find((group) => group.name === selectedItemGroup);
+    const selectedGroup = itemGroupData.find(
+      (group) => group.name === selectedItemGroup
+    );
     if (selectedGroup) {
       setDepreciation(selectedGroup.depreciation); // Atualiza a taxa de depreciação
     } else {
       setDepreciation(""); // Limpa a taxa de depreciação se o grupo não for encontrado
     }
   };
-  
 
   const [item, setItem] = useState([]);
 
@@ -367,6 +368,7 @@ const Items = () => {
                       label="Nome do ativo"
                       value={name}
                       onChange={handleName}
+                      required
                     />
                   </Grid>
                   <Grid item xs={8}>
@@ -375,6 +377,7 @@ const Items = () => {
                       label="Descrição do ativo"
                       value={description}
                       onChange={handleDescription}
+                      required
                     />
                   </Grid>
                   <Grid item xs={4}>
@@ -383,6 +386,7 @@ const Items = () => {
                       label="Valor do ativo"
                       value={value}
                       onChange={handleValue}
+                      required
                     />
                   </Grid>
                   {(!editItem || (editItem && !editItem.acquisitionDate)) && (
@@ -391,16 +395,18 @@ const Items = () => {
                         type="date"
                         value={acquisitionDate}
                         onChange={handleAcquisitionDate}
+                        required
                       />
                     </Grid>
                   )}
-                    
+
                   <Grid item xs={4}>
                     <Input
                       type="text"
                       label="Fornecedor"
                       value={supplier}
                       onChange={handleSupplier}
+                      required
                     />
                   </Grid>
                   {(!editItem || (editItem && !editItem.location)) && (
@@ -410,6 +416,7 @@ const Items = () => {
                         onChange={handleLocation}
                         label="Localização"
                         id="location-select"
+                        required
                       >
                         {locationSelect.map((location) => (
                           <MenuItem key={location._id} value={location.name}>
@@ -425,6 +432,7 @@ const Items = () => {
                       label="Número de série"
                       value={serialNumber}
                       onChange={handleSerialNumber}
+                      required
                     />
                   </Grid>
                   <Grid item xs={4}>
@@ -433,6 +441,7 @@ const Items = () => {
                       label="Número da tag"
                       value={tag}
                       onChange={handleTag}
+                      required
                     />
                   </Grid>
                   <Grid item xs={8}>
@@ -441,14 +450,16 @@ const Items = () => {
                       label="Filial"
                       value={branch}
                       onChange={handleBranch}
+                      required
                     />
                   </Grid>
                   <Grid item xs={4}>
                     <Dropdown
-                      type="text" 
+                      type="text"
                       label="Grupo de itens"
                       value={itemGroup}
                       onChange={handleItemGroup}
+                      required
                     >
                       {itemGroupData.map((data) => (
                         <MenuItem key={data.name} value={data.name}>
@@ -464,7 +475,6 @@ const Items = () => {
                       value={depreciation}
                       onChange={handleDepreciation}
                       disabled
-
                     />
                   </Grid>
                   {/* <Grid item xs={8}>
@@ -481,28 +491,28 @@ const Items = () => {
                   variant="contained"
                   color="secondary"
                   endIcon={<SendIcon />}
-                  sx={{mr: 5}}
+                  sx={{ mr: 5 }}
                 >
                   {editItem && editItem._id ? "Atualizar" : "Cadastrar"}
                 </Button>
                 <Button
-            onClick={handleOpenWritteOff}
-            startIcon={<AddCircleOutlineIcon />}
-            variant="contained"
-            color="error"
-          >
-            Dar baixa
-          </Button>
-          <ModalStyle open={openWritteOff} onClose={handleCloseWritteOff}>
-            <Typography>Dar baixa no item</Typography>
-                    <Grid item xs={4}>
-                      <Input
-                        type="date"
-                        value={writeOffDate}
-                        onChange={handleWriteOffDate}
-                      />
-                    </Grid>
-          </ModalStyle>
+                  onClick={handleOpenWritteOff}
+                  startIcon={<AddCircleOutlineIcon />}
+                  variant="contained"
+                  color="error"
+                >
+                  Dar baixa
+                </Button>
+                <ModalStyle open={openWritteOff} onClose={handleCloseWritteOff}>
+                  <Typography>Dar baixa no item</Typography>
+                  <Grid item xs={4}>
+                    <Input
+                      type="date"
+                      value={writeOffDate}
+                      onChange={handleWriteOffDate}
+                    />
+                  </Grid>
+                </ModalStyle>
               </form>
             </Typography>
           </ModalStyle>
