@@ -26,6 +26,7 @@ const ItemGroup = () => {
   const [description, setDescription] = useState("");
   const [active, setActive] = useState("");
   const [itemGroup, setItemGroup] = useState([]);
+  const [depreciation, setDepreciation] = useState([])
   const [editItemGroup, setEditItemGroup] = useState(null);
   const [deleteItemGroup, setDeleteItemGroup] = useState(null);
   const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
@@ -53,6 +54,9 @@ const ItemGroup = () => {
   const handleActive = (e) => {
     setActive(e.target.value);
   };
+  const handleDepreciation = (e) => {
+    setDepreciation(e.target.value)
+  }
   const handleSearch = useCallback((searchInput) => {
     setSearch(searchInput);
   }, []);
@@ -65,7 +69,8 @@ const ItemGroup = () => {
         const response = await api2.put(`api/item-group/${editItemGroup._id}`, {
           name,
           description,
-          active
+          active,
+          depreciation
         });
         showToastSuccess(
           response.data.msg || "Grupo de itens atualizada com sucesso!"
@@ -74,7 +79,8 @@ const ItemGroup = () => {
         const response = await api2.post("api/item-group", {
           name,
           description,
-          active
+          active,
+          depreciation
         });
         showToastSuccess(
           response.data.msg || "Grupo de itens cadastrada com sucesso!"
@@ -84,6 +90,7 @@ const ItemGroup = () => {
       setName("");
       setDescription("");
       setActive("")
+      setDepreciation("")
       setEditItemGroup(null);
       setOpen(false);
       loadData();
@@ -151,6 +158,11 @@ const ItemGroup = () => {
     {
       field: "description",
       headerName: "Descrição",
+      flex: 1,
+    },
+    {
+      field: "depreciation",
+      headerName: "Taxa de depreciação",
       flex: 1,
     },
     {
@@ -257,6 +269,12 @@ const ItemGroup = () => {
                   label="Descrição do Grupo"
                   value={description}
                   onChange={handleDescription}
+                />
+                <Input
+                  type="text"
+                  label="Taxa de depreciação"
+                  value={depreciation}
+                  onChange={handleDepreciation}
                 />
                 <Input
                   type="text"
