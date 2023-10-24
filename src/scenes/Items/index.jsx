@@ -7,12 +7,15 @@ import {
   MenuItem,
   Grid,
   CircularProgress,
+  InputLabel,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import SendIcon from "@mui/icons-material/Send";
 import EditIcon from "@mui/icons-material/Edit";
+import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
+import BookmarkRemoveOutlinedIcon from '@mui/icons-material/BookmarkRemoveOutlined';
 import { toast } from "react-toastify";
 
 import Header from "components/Header";
@@ -25,7 +28,6 @@ import GridToolbar from "components/GridToolbar";
 
 import { api2 } from "state/api";
 
-
 const Items = () => {
   const theme = useTheme();
 
@@ -34,24 +36,32 @@ const Items = () => {
   const [sort, setSort] = useState({});
   const [search, setSearch] = useState("");
 
+  const [item, setItem] = useState([]);
+  const [locationSelect, setLocationSelect] = useState([]);
+  const [itemGroupData, setItemGroupData] = useState([]);
+
   const [branch, setBranch] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [acquisitionDate, setAcquisitionDate] = useState("");
   const [writeOffDate, setWriteOffDate] = useState("");
   const [value, setValue] = useState("");
+  const [responsable, setResponsable] = useState("");
   const [location, setLocation] = useState("");
   const [supplier, setSupplier] = useState("");
   const [serialNumber, setSerialNumber] = useState("");
   const [tag, setTag] = useState("");
   const [depreciation, setDepreciation] = useState("");
   const [costCenter, setCostCenter] = useState("");
-  const [locationSelect, setLocationSelect] = useState([]);
+  const [itemGroup, setItemGroup] = useState("");
+
   const [editItem, setEditItem] = useState(null);
   const [deleteItem, setDeleteItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  const [openWritteOff, setOpenWritteOff] = useState(false);
   const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
+  const [itemImage, setItemImage] = useState(null);
 
   const handleOpen = (item = null) => {
     setEditItem(item);
@@ -66,10 +76,23 @@ const Items = () => {
     setOpen(true);
   };
 
+  const handleOpenWritteOff = () => setOpenWritteOff(true);
+  const handleCloseWritteOff = () => setOpenWritteOff(false);
+
   const handleClose = () => {
     setOpen(false);
   };
 
+  const handleImageChange = (e) => {
+    const selectedImage = e.target.files[0];
+    if (selectedImage) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setItemImage(e.target.result);
+      };
+      reader.readAsDataURL(selectedImage);
+    }
+  };
   const handleBranch = (e) => {
     setBranch(e.target.value);
   };
@@ -100,17 +123,34 @@ const Items = () => {
   const handleDepreciation = (e) => {
     setDepreciation(e.target.value);
   };
+  const handleResponsable = (e) => {
+    setResponsable(e.target.value);
+  };
   const handleLocation = (e) => {
     setLocation(e.target.value);
   };
   const handleCostCenter = (e) => {
     setCostCenter(e.target.value);
   };
+  const handleItemGroup = (e) => {
+    const selectedItemGroup = e.target.value;
+    setItemGroup(selectedItemGroup);
+    updateDepreciation(selectedItemGroup);
+  };
   const handleSearch = (searchInput) => {
     setSearch(searchInput);
   };
 
-  const [item, setItem] = useState([]);
+  const updateDepreciation = (selectedItemGroup) => {
+    const selectedGroup = itemGroupData.find(
+      (group) => group.name === selectedItemGroup
+    );
+    if (selectedGroup) {
+      setDepreciation(selectedGroup.depreciation);
+    } else {
+      setDepreciation("");
+    }
+  };
 
   const [searchInput, setSearchInput] = useState("");
 
@@ -142,6 +182,11 @@ const Items = () => {
       .get("api/location")
       .then((response) => setLocationSelect(response.data));
   }, []);
+  useEffect(() => {
+    api2
+      .get("api/item-group")
+      .then((response) => setItemGroupData(response.data));
+  }, []);
 
   useEffect(() => {
     loadData();
@@ -170,12 +215,12 @@ const Items = () => {
         name,
         description,
         value,
+        responsable,
         location,
         supplier,
         serialNumber,
         tag,
         acquisitionDate,
-        writeOffDate,
         depreciation,
       });
       showToastSuccess("Item cadastrado com sucesso!");
@@ -202,6 +247,11 @@ const Items = () => {
 
   const columns = [
     {
+      field: "branch",
+      headerName: "Filial",
+      flex: 0.2,
+    },
+    {
       field: "name",
       headerName: "Nome",
       flex: 1,
@@ -217,9 +267,14 @@ const Items = () => {
       flex: 1,
     },
     {
+      field: "responsable",
+      headerName: "Responsável",
+      flex: 1,
+    },
+    {
       field: "location",
       headerName: "Localidade",
-      flex: 1,
+      flex: 0.3,
     },
     {
       field: "supplier",
@@ -228,13 +283,22 @@ const Items = () => {
     },
     {
       field: "serialNumber",
-      headerName: "Número de série",
-      flex: 1,
+      headerName: "Série",
+      flex: 0.5,
     },
     {
       field: "tag",
       headerName: "Tag",
+      flex: 0.6,
+    },
+    {
+      field: "acquisitionDate",
+      headerName: "Data",
       flex: 1,
+      valueGetter: (params) => {
+        const date = new Date(params.row.createdAt);
+        return date.toLocaleDateString("pt-BR");
+      },
     },
     {
       field: "Ação",
@@ -328,6 +392,40 @@ const Items = () => {
             <Typography id="modal-modal-title" variant="h5" component="h1">
               {editItem && editItem._id ? "Edição de item" : "Cadastro de item"}
             </Typography>
+            <Box display="flex" alignItems="center" justifyContent="flex-start">
+              <Button
+                sx={{
+                  width: "80px",
+                  height: "80px",
+                  borderRadius: "50%",
+                  bgcolor: "lightgray",
+                  marginRight: "20px",
+                  overflow: "hidden",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <InputLabel htmlFor="imageInput">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={handleImageChange}
+                    id="imageInput"
+                  />
+                  {itemImage ? (
+                    <img
+                      src={itemImage}
+                      alt="Imagem do ativo"
+                      style={{ width: "100%" }}
+                    />
+                  ) : (
+                    <PhotoCameraIcon fontSize="large" color="secondary" />
+                  )}
+                </InputLabel>
+              </Button>
+            </Box>
             <Typography id="modal-modal-description" sx={{ mt: 2 }}>
               <form component="form" onSubmit={handleSubmit}>
                 <Grid
@@ -342,6 +440,7 @@ const Items = () => {
                       label="Nome do ativo"
                       value={name}
                       onChange={handleName}
+                      required
                     />
                   </Grid>
                   <Grid item xs={8}>
@@ -350,6 +449,7 @@ const Items = () => {
                       label="Descrição do ativo"
                       value={description}
                       onChange={handleDescription}
+                      required
                     />
                   </Grid>
                   <Grid item xs={4}>
@@ -358,6 +458,7 @@ const Items = () => {
                       label="Valor do ativo"
                       value={value}
                       onChange={handleValue}
+                      required
                     />
                   </Grid>
                   {(!editItem || (editItem && !editItem.acquisitionDate)) && (
@@ -366,24 +467,26 @@ const Items = () => {
                         type="date"
                         value={acquisitionDate}
                         onChange={handleAcquisitionDate}
+                        required
                       />
                     </Grid>
                   )}
-                  {(!editItem || (editItem && !editItem.writeOffDate)) && (
-                    <Grid item xs={4}>
-                      <Input
-                        type="date"
-                        value={writeOffDate}
-                        onChange={handleWriteOffDate}
-                      />
-                    </Grid>
-                  )}
+
                   <Grid item xs={4}>
                     <Input
                       type="text"
                       label="Fornecedor"
                       value={supplier}
                       onChange={handleSupplier}
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Input
+                      type="text"
+                      label="Responsável"
+                      value={responsable}
+                      onChange={handleResponsable}
                     />
                   </Grid>
                   {(!editItem || (editItem && !editItem.location)) && (
@@ -408,6 +511,7 @@ const Items = () => {
                       label="Número de série"
                       value={serialNumber}
                       onChange={handleSerialNumber}
+                      required
                     />
                   </Grid>
                   <Grid item xs={4}>
@@ -416,6 +520,7 @@ const Items = () => {
                       label="Número da tag"
                       value={tag}
                       onChange={handleTag}
+                      required
                     />
                   </Grid>
                   <Grid item xs={8}>
@@ -424,14 +529,31 @@ const Items = () => {
                       label="Filial"
                       value={branch}
                       onChange={handleBranch}
+                      required
                     />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Dropdown
+                      type="text"
+                      label="Grupo de itens"
+                      value={itemGroup}
+                      onChange={handleItemGroup}
+                      required
+                    >
+                      {itemGroupData.map((data) => (
+                        <MenuItem key={data.name} value={data.name}>
+                          {data.name}
+                        </MenuItem>
+                      ))}
+                    </Dropdown>
                   </Grid>
                   <Grid item xs={4}>
                     <Input
                       type="number"
-                      label="Taxa de depreciação %"
+                      placeholder="Taxa de depreciação %"
                       value={depreciation}
                       onChange={handleDepreciation}
+                      disabled
                     />
                   </Grid>
                   {/* <Grid item xs={8}>
@@ -448,9 +570,28 @@ const Items = () => {
                   variant="contained"
                   color="secondary"
                   endIcon={<SendIcon />}
+                  sx={{ mr: 5 }}
                 >
                   {editItem && editItem._id ? "Atualizar" : "Cadastrar"}
                 </Button>
+                <Button
+                  onClick={handleOpenWritteOff}
+                  endIcon={<BookmarkRemoveOutlinedIcon />}
+                  variant="contained"
+                  color="error"
+                >
+                  Dar baixa
+                </Button>
+                <ModalStyle open={openWritteOff} onClose={handleCloseWritteOff}>
+                  <Typography>Dar baixa no item</Typography>
+                  <Grid item xs={4}>
+                    <Input
+                      type="date"
+                      value={writeOffDate}
+                      onChange={handleWriteOffDate}
+                    />
+                  </Grid>
+                </ModalStyle>
               </form>
             </Typography>
           </ModalStyle>

@@ -1,4 +1,4 @@
-import { Box, Button, InputBase, useTheme } from "@mui/material";
+import { Box, Button, InputBase } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import FlexBetween from "components/FlexBetween";
 import Header from "components/Header";
@@ -22,20 +22,31 @@ import DeleteIcon from "@mui/icons-material/Delete";
 
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
+import TableCell, { tableCellClasses } from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import useAxiosPrivate from "hooks/useAxiosPrivate";
 import { toast } from "react-toastify";
+import { useTheme } from "@emotion/react";
 import { useLocation } from "react-router-dom";
+import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 
+const StyledTableContainer = styled(TableContainer)`
+  overflow-x: "auto";
+
+  @media (max-width: 600px) {
+    max-width: 100%;
+  }
+`;
 const Tags = () => {
-  const [item, setItem] = useState();
+  const theme = useTheme();
+  const [item, setItem] = useState("");
   const [list, setList] = useState([]);
   const [backEnd, setBackEnd] = useState([]);
-  const [showError, setShowError] = useState(false);
+  const [isTableVisible, setIsTableVisible] = useState(false);
 
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -43,7 +54,6 @@ const Tags = () => {
 
   let itemName = useRef();
 
-  // permission
   const axiosPrivate = useAxiosPrivate();
 
   useEffect(() => {
@@ -56,20 +66,18 @@ const Tags = () => {
       .then((response) => setBackEnd(response.data));
   }, []);
 
-  const { data } = useGetItemByTagQuery(item);
-
-  const showToastMessage = () => {
-    toast.success("Inventário realizado com sucesso!", {
+  const showToastSuccess = (message) => {
+    toast.success(message, {
       position: toast.POSITION.TOP_CENTER,
     });
   };
-  const showToastError = () => {
-    toast.error("Inventário divergente!", {
+  const showToastError = (message) => {
+    toast.error(message, {
       position: toast.POSITION.TOP_CENTER,
     });
   };
-  const showToastError2 = () => {
-    toast.error("Os itens não podem inventariado duas vezes!", {
+  const showToastWarning = (message) => {
+    toast.warning(message, {
       position: toast.POSITION.TOP_CENTER,
     });
   };
@@ -90,7 +98,9 @@ const Tags = () => {
     );
 
     if (hasDuplicates) {
-      showToastError2();
+      showToastError(
+        "O item não pode ser lido mais de uma vez no mesmo inventário!"
+      );
     } else {
       const divergences = [];
 
@@ -108,101 +118,163 @@ const Tags = () => {
         }
       });
 
-      if (divergences.length == 0 && list.length === backEnd.length) {
-        await axiosPrivate.post("api/inventory", {
+      if (divergences.length === 0 && list.length === backEnd.length) {
+        const response = await axiosPrivate.post("api/inventory", {
           list,
+          location: locationValue,
         });
-        showToastMessage();
+        showToastSuccess(
+          response.data.msg || "Inventário realizado com sucesso!"
+        );
       } else {
-        await axiosPrivate.post("api/divergences", {
+        const response = await axiosPrivate.post("api/divergences", {
           divergences,
-          location: locationValue
+          location: locationValue,
         });
 
-        showToastError();
+        showToastError(response.data.msg || "Inventário divergente!");
       }
     }
   }
 
-  const adicionarItem = () => {
+  const addItem = async () => {
     if (itemName.current.value === "") {
-      window.alert("Preencha o item");
+      showToastWarning("Preencha o item");
     } else {
-      setList([
-        ...list,
-
-        {
-          descricao: data.description,
-          nome: data.name,
-          localizacao: data.location,
-          serial: data.serialNumber,
-        },
-      ]);
-      setItem("");
-      itemName.current.focus();
+      try {
+        const response = await api2.get(`api/inventory/item/${item}`);
+        const newItem = response.data;
+        const itemId = Date.now();
+        setList((prevList) => [
+          ...prevList,
+          {
+            id: itemId,
+            descricao: newItem.description,
+            nome: newItem.name,
+            localizacao: newItem.location,
+            serial: newItem.serialNumber,
+            tag: newItem.tag,
+          },
+        ]);
+        setItem("");
+        itemName.current.focus();
+        if (!isTableVisible) {
+          setIsTableVisible(true);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar informações do item: ", error);
+      }
     }
+  };
+
+  const removeItem = (itemId) => {
+    setList((prevList) => prevList.filter((item) => item.id !== itemId));
   };
   return (
     <Box m="1.5rem 2.5rem">
       <Header
-        title="LEITURA DE ETIQUETAS"
-        subtitle={`Faça aqui a sua leitura. Localização: ${locationValue}`}
+        title="LEITURA DE TAGS"
+        subtitle={`Localização: ${locationValue}`}
       />
+      <Box sx={{ mt: "25px" }}>
+        <form onSubmit={handleSubmit}>
+          <Input
+            type="text"
+            value={item}
+            refInput={itemName}
+            onChange={(e) => setItem(e.target.value)}
+            label="Faça aqui a leitura da tag..."
+          />
+          <Box sx={{ mb: "15px" }}>
+            <Button
+              sx={{ mr: "5px" }}
+              variant="contained"
+              color="secondary"
+              endIcon={<PlaylistAddIcon />}
+              onClick={addItem}
+            >
+              ADICIONAR
+            </Button>
+            <Button
+              type="submit"
+              color="error"
+              endIcon={<PlaylistAddCheckIcon />}
+              variant="contained"
+            >
+              FINALIZAR
+            </Button>
+          </Box>
+        </form>
+      </Box>
+      {
+        isTableVisible && (
 
-      <form onSubmit={handleSubmit} className="form-tag">
-        <input
-          type="text"
-          value={item}
-          ref={itemName}
-          onChange={(e) => setItem(e.target.value)}
-          className="input-tag"
-          placeholder="Digite o item"
-        />
-        <Button
-          sx={{ mr: "5px" }}
-          variant="contained"
-          color="secondary"
-          onClick={adicionarItem}
-        >
-          ADICIONAR
-        </Button>
-        <Button type="submit" color="error" variant="contained">
-          FINALIZAR
-        </Button>
-      </form>
-
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Nome</TableCell>
-              <TableCell align="right">Descrição</TableCell>
-              <TableCell align="right">Número de serial</TableCell>
-              <TableCell align="right">Ação</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {list.map((list) => (
-              <TableRow
-                key={list.serialNumber}
-                // sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  {list.nome}
-                </TableCell>
-                <TableCell align="right">{list.descricao}</TableCell>
-                <TableCell align="right">{list.serial}</TableCell>
-                <TableCell align="right">
-                  <IconButton edge="end" aria-label="delete">
-                    <DeleteIcon />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Box>
+          <StyledTableContainer component={Paper}>
+            <Table
+              aria-label="simple table"
+              sx={{
+                backgroundColor: theme.palette.background.alt,
+                border: "none",
+                [`& .${tableCellClasses.root}`]: {
+                  border: "none",
+                },
+              }}
+            >
+              <TableHead>
+                <TableRow
+                  sx={{
+                    backgroundColor: theme.palette.secondary[100], 
+                  }}
+                >
+                  <TableCell
+                    sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
+                  >
+                    Nome
+                  </TableCell>
+                  <TableCell
+                    sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
+                  >
+                    Descrição
+                  </TableCell>
+                  <TableCell
+                    sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
+                  >
+                    Série
+                  </TableCell>
+                  <TableCell
+                    sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
+                  >
+                    Tag
+                  </TableCell>
+                  <TableCell
+                    sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
+                  >
+                    Ação
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {list.map((listItem, index) => (
+                  <TableRow key={index}>
+                    <TableCell component="th" scope="row">
+                      {listItem.nome}
+                    </TableCell>
+                    <TableCell>{listItem.descricao}</TableCell>
+                    <TableCell>{listItem.serial}</TableCell>
+                    <TableCell>{listItem.tag}</TableCell>
+                    <TableCell>
+                      <IconButton aria-label="delete">
+                        <DeleteIcon color="error" onClick={() => removeItem(listItem.id)}/>
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </StyledTableContainer>
+          )
+        }
+        </Box>
   );
 };
 

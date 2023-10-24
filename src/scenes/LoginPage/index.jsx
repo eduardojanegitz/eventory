@@ -1,29 +1,14 @@
-import { CssVarsProvider, useColorScheme } from "@mui/joy/styles";
-import Sheet from "@mui/joy/Sheet";
 import Typography from "@mui/joy/Typography";
-import FormControl from "@mui/joy/FormControl";
-import FormLabel from "@mui/joy/FormLabel";
-import Input from "@mui/joy/Input";
-import Button from "@mui/joy/Button";
-
-//auth
+import image from "../../assets/imagem-fundo-login.png";
+import Input from "components/Input";
+import { Button, Box } from "@mui/material";
 import { useRef, useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { api2 } from "state/api";
 import useAuth from "hooks/useAuth";
 import { toast } from "react-toastify";
-
-function ModeToggle() {
-  const { mode, setMode } = useColorScheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-  if (!mounted) {
-    return null;
-  }
-}
+import FlexBetween from "components/FlexBetween";
+import Header from "components/Header";
 
 const LoginPage = () => {
   const { setAuth } = useAuth();
@@ -32,12 +17,8 @@ const LoginPage = () => {
   const location = useLocation();
   // const from = location.state?.from?.pathname || "/home";
 
-  const userRef = useRef();
-  const errRef = useRef();
-
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [errMsg, setErrMsg] = useState("");
 
   const showToastError = (message) => {
     toast.error(message, {
@@ -45,13 +26,9 @@ const LoginPage = () => {
     });
   };
 
-  useEffect(() => {
-    userRef.current.focus();
-  }, []);
-
-  useEffect(() => {
-    setErrMsg("");
-  }, [username, password]);
+  // useEffect(() => {
+  //   userRef.current.focus();
+  // }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -77,92 +54,90 @@ const LoginPage = () => {
       setUsername("");
       setPassword("");
       // navigate(from, { replace: true });
-        if (roles.includes("Admin") || roles.includes("Manager")) {
-          navigate("/dashboard");
-        } else if (roles.includes("Employee")) {
-          navigate("/inventarios");
-        } 
-    } catch (error) {
-      if (!error.status) {
-        setErrMsg("No Server Response");
-      } else if (error.status === 400) {
-        setErrMsg("Missing Username or Password");
-      } else if (error.status === 401) {
-        setErrMsg("Unauthorized");
-      } else {
-        setErrMsg(error.data?.message);
+      if (roles.includes("Admin") || roles.includes("Manager")) {
+        navigate("/dashboard");
+      } else if (roles.includes("Employee")) {
+        navigate("/inventarios");
       }
-      errRef.current.focus();
+    } catch (error) {
+      if (error.response.status === 400) {
+        {
+          showToastError(
+            error.response.data.message || "Usuário e senha são obrigatórios!"
+          );
+        }
+      } else if (error.response.status === 401) {
+        showToastError(
+          error.response.data.message || "Usuário ou senha incorretos!"
+        );
+      } else {
+        showToastError("Erro interno no servidor");
+      }
     }
   };
   const handleUserInput = (e) => setUsername(e.target.value);
   const handlePwdInput = (e) => setPassword(e.target.value);
 
-  const errClass = errMsg ? "errmsg" : "offscreen";
-
-
   return (
-    <CssVarsProvider>
-      <main>
-        <p ref={errRef} className={errClass} aria-live="assertive">
-          {errMsg}
-        </p>
-        <ModeToggle />
-        <Sheet
+    <Box>
+      <FlexBetween>
+        <Box
+          component="img"
+          alt="profile"
+          src={image}
           sx={{
-            width: 300,
-            mx: "auto", 
-            my: 4, 
-            py: 3, 
-            px: 2, 
+            height: "65vh",
+            "@media (max-width: 768px)" : {
+              display: "none"
+            }
+          }}
+        />
+        <Box
+          sx={{
+            width: "100%",
+            height: "95vh",
             display: "flex",
             flexDirection: "column",
-            gap: 2,
-            borderRadius: "sm",
-            boxShadow: "md",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "40px",
+            "@media (max-width: 768px)" : {
+              p: "16px"
+            }
           }}
-          variant="outlined"
         >
-          <div>
-            <Typography level="h4" component="h1">
-              <b>Bem Vindo!</b>
-            </Typography>
-          </div>
+          <Typography>
+            <Header
+              title="Bem-vindo ao EVENTORY."
+              subtitle="Insira as credenciais para continuar"
+            />
+          </Typography>
           <form onSubmit={handleSubmit}>
-            <FormControl>
-              <FormLabel>Usúario</FormLabel>
-              <Input
-                name="username"
-                id="username"
-                ref={userRef}
-                value={username}
-                onChange={handleUserInput}
-                autoComplete="off"
-                required
-                type="text"
-                placeholder="Digite aqui o seu usuário..."
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Senha</FormLabel>
-              <Input
-                name="password"
-                type="password"
-                id="password"
-                onChange={handlePwdInput}
-                value={password}
-                required
-                placeholder="Digite aqui a sua senha..."
-              />
-            </FormControl>
+            <Input
+              id="username"
+              // ref={userRef}
+              value={username}
+              onChange={handleUserInput}
+              required
+              type="text"
+              label="Usuário"
+            />
+            <Input
+              type="password"
+              id="password"
+              onChange={handlePwdInput}
+              value={password}
+              required
+              label="Senha"
+            />
 
-            <Button type="submit" sx={{ mt: 1 }}>
+            <Button variant="contained" color="secondary" type="submit">
               Acessar
             </Button>
           </form>
-        </Sheet>
-      </main>
-    </CssVarsProvider>
+        </Box>
+      </FlexBetween>
+    </Box>
   );
 };
 

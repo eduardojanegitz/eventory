@@ -1,18 +1,16 @@
 import React, { useCallback, useState } from "react";
-import { Box, Button, Grid, MenuItem, useTheme } from "@mui/material";
-import { api2, useGetCustomersQuery, useGetUserQuery } from "state/api";
+import { Box, Button, CircularProgress, Grid, MenuItem, useTheme } from "@mui/material";
+import { api2 } from "state/api";
 import Header from "components/Header";
 import { DataGrid } from "@mui/x-data-grid";
 import FlexBetween from "components/FlexBetween";
 import PersonAddOutlinedIcon from "@mui/icons-material/PersonAddOutlined";
-import { Link } from "react-router-dom";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import EditIcon from "@mui/icons-material/Edit";
 import SendIcon from "@mui/icons-material/Send";
 
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ModalStyle from "components/ModalStyle";
 import Input from "components/Input";
@@ -102,7 +100,7 @@ const Users = () => {
     e.preventDefault();
     try {
       if (editUser && editUser._id) {
-        await api2.put(`api/user/${editUser._id}`, {
+        const response = await api2.put(`api/user/${editUser._id}`, {
           username,
           password,
           name,
@@ -111,7 +109,9 @@ const Users = () => {
           roles,
           active,
         });
-        showToastSuccess("Usuário atualizado com sucesso!");
+        showToastSuccess(
+          response.data.msg || "Usuário atualizado com sucesso!"
+        );
       } else {
         const response = await api2.post("api/user", {
           username,
@@ -381,68 +381,81 @@ const Users = () => {
         onChange={setSearchInput}
         onSearch={handleSearch}
       />
-      <Box
-        mt="20px"
-        height="80vh"
-        sx={{
-          "& .MuiDataGrid-root": {
-            border: "none",
-          },
-          "& .MuiDataGrid-cell": {
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: theme.palette.background.alt,
-            color: theme.palette.secondary[100],
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-virtualScroller": {
-            backgroundColor: theme.palette.primary.light,
-            overflowY: "auto",
-            scrollbarWidth: "thin",
-            "&::-webkit-scrollbar": {
-              width: "3px",
+      {loading ? (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "80vh",
+          }}
+        >
+          <CircularProgress color="secondary" />
+        </Box>
+      ) : (
+        <Box
+          mt="20px"
+          height="80vh"
+          sx={{
+            "& .MuiDataGrid-root": {
+              border: "none",
             },
-            "&::-webkit-scrollbar-thumb": {
-              backgroundColor: "#b3b0b0",
-              borderRadius: "20px",
+            "& .MuiDataGrid-cell": {
+              borderBottom: "none",
             },
-            "&::-webkit-scrollbar-track": {
-              backgroundColor: "transparent",
+            "& .MuiDataGrid-columnHeaders": {
+              backgroundColor: theme.palette.background.alt,
+              color: theme.palette.secondary[100],
+              borderBottom: "none",
             },
-          },
-          "& .MuiDataGrid-FooterContainer": {
-            backgroundColor: theme.palette.background.alt,
-            color: theme.palette.secondary[100],
-            borderTop: "none",
-          },
-          "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-            color: `${theme.palette.secondary[200]} !important`,
-          },
-        }}
-      >
-        <DataGrid
-          getRowId={(row) => row._id}
-          rows={user.filter((row) =>
-            Object.values(row).some(
-              (value) =>
-                value &&
-                value
-                  .toString()
-                  .toLowerCase()
-                  .includes(searchInput.toLowerCase())
-            )
-          )}
-          rowsPerPageOptions={[20, 50, 100]}
-          columns={columns}
-          pagination
-          paginationMode="client"
-          onPageChange={(newPage) => setPage(newPage)}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          onSortModelChange={(newSortModel) => setSort(...newSortModel)}
-          components={{ Toolbar: GridToolbar }}
-        />
-      </Box>
+            "& .MuiDataGrid-virtualScroller": {
+              backgroundColor: theme.palette.primary.light,
+              overflowY: "auto",
+              scrollbarWidth: "thin",
+              "&::-webkit-scrollbar": {
+                width: "3px",
+              },
+              "&::-webkit-scrollbar-thumb": {
+                backgroundColor: "#b3b0b0",
+                borderRadius: "20px",
+              },
+              "&::-webkit-scrollbar-track": {
+                backgroundColor: "transparent",
+              },
+            },
+            "& .MuiDataGrid-FooterContainer": {
+              backgroundColor: theme.palette.background.alt,
+              color: theme.palette.secondary[100],
+              borderTop: "none",
+            },
+            "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+              color: `${theme.palette.secondary[200]} !important`,
+            },
+          }}
+        >
+          <DataGrid
+            getRowId={(row) => row._id}
+            rows={user.filter((row) =>
+              Object.values(row).some(
+                (value) =>
+                  value &&
+                  value
+                    .toString()
+                    .toLowerCase()
+                    .includes(searchInput.toLowerCase())
+              )
+            )}
+            rowsPerPageOptions={[20, 50, 100]}
+            columns={columns}
+            pagination
+            paginationMode="client"
+            onPageChange={(newPage) => setPage(newPage)}
+            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+            onSortModelChange={(newSortModel) => setSort(...newSortModel)}
+            components={{ Toolbar: GridToolbar }}
+          />
+        </Box>
+      )}
     </Box>
   );
 };

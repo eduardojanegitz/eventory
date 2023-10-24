@@ -174,7 +174,7 @@ const Dashboard = () => {
         <StatBox
           title="Total de ativos"
           value={item.length}
-          increase={formattedGrowth}
+          increase={`+${formattedGrowth}`}
           description="Desde o mês passado"
           icon={
             <SummarizeIcon

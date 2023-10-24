@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Box, Button, CircularProgress, Typography, useTheme } from "@mui/material";
+import { Box, Button, CircularProgress, MenuItem, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SendIcon from "@mui/icons-material/Send";
@@ -12,9 +12,10 @@ import Input from "components/Input";
 import ModalStyle from "components/ModalStyle";
 import GridToolbar from "components/GridToolbar";
 import EditIcon from "@mui/icons-material/Edit";
-import AddLocationAltIcon from "@mui/icons-material/AddLocationAlt";
+import LayersIcon from '@mui/icons-material/Layers';
+import Dropdown from "components/Dropdown";
 
-const Location = () => {
+const ItemGroup = () => {
   const theme = useTheme();
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(20);
@@ -24,16 +25,19 @@ const Location = () => {
   const [searchInput, setSearchInput] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [location, setLocation] = useState([]);
-  const [editLocation, setEditLocation] = useState(null);
+  const [active, setActive] = useState("");
+  const [itemGroup, setItemGroup] = useState([]);
+  const [depreciation, setDepreciation] = useState([])
+  const [editItemGroup, setEditItemGroup] = useState(null);
+  const [deleteItemGroup, setDeleteItemGroup] = useState(null);
   const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
-  const [deleteLocation, setDeleteLocation] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const handleOpen = (location = null) => {
-    setEditLocation(location);
-    setName(location ? location.name : "");
-    setDescription(location ? location.description : "");
+  const handleOpen = (itemGroup = null) => {
+    setEditItemGroup(itemGroup);
+    setName(itemGroup ? itemGroup.name : "");
+    setDescription(itemGroup ? itemGroup.description : "");
+    setActive(itemGroup ? itemGroup.active : "");
     setOpen(true);
   };
 
@@ -48,6 +52,12 @@ const Location = () => {
   const handleDescription = (e) => {
     setDescription(e.target.value);
   };
+  const handleActive = (e) => {
+    setActive(e.target.value);
+  };
+  const handleDepreciation = (e) => {
+    setDepreciation(e.target.value)
+  }
   const handleSearch = useCallback((searchInput) => {
     setSearch(searchInput);
   }, []);
@@ -56,27 +66,33 @@ const Location = () => {
     e.preventDefault();
 
     try {
-      if (editLocation && editLocation._id) {
-        const response = await api2.put(`api/location/${editLocation._id}`, {
+      if (editItemGroup && editItemGroup._id) {
+        const response = await api2.put(`api/item-group/${editItemGroup._id}`, {
           name,
           description,
+          active,
+          depreciation
         });
         showToastSuccess(
-          response.data.msg || "Localização atualizada com sucesso!"
+          response.data.msg || "Grupo de itens atualizada com sucesso!"
         );
       } else {
-        const response = await api2.post("api/location/", {
+        const response = await api2.post("api/item-group", {
           name,
           description,
+          active,
+          depreciation
         });
         showToastSuccess(
-          response.data.msg || "Localização cadastrada com sucesso!"
+          response.data.msg || "Grupo de itens cadastrada com sucesso!"
         );
       }
 
       setName("");
       setDescription("");
-      setEditLocation(null);
+      setActive("")
+      setDepreciation("")
+      setEditItemGroup(null);
       setOpen(false);
       loadData();
     } catch (error) {
@@ -89,8 +105,8 @@ const Location = () => {
 
   const loadData = async () => {
     try {
-      const response = await api2.get("api/location");
-      setLocation(response.data);
+      const response = await api2.get("api/item-group");
+      setItemGroup(response.data);
       setLoading(false);
     } catch (error) {
       console.error("Erro ao carregar dados da tabela:", error);
@@ -116,21 +132,21 @@ const Location = () => {
 
   async function handleDeleteClick() {
     try {
-      const response = await api2.delete(`api/location/${deleteLocation._id}`);
+      const response = await api2.delete(`api/item-group/${deleteItemGroup._id}`);
       if (response.status === 200) {
         loadData();
         showToastSuccess(
-          response.data.msg || "Localização deletada com sucesso!"
+          response.data.msg || "Grupo de itens deletado com sucesso!"
         );
       } else {
-        showToastError(response.data?.error || "Erro ao excluir o item.");
+        showToastError(response.data?.error || "Erro ao excluir o grupo de itens.");
       }
     } catch (error) {
       showToastError(
         error.response?.data?.error ||
           "Erro desconhecido. Entre em contato com o time de TI."
       );
-      console.error("Erro ao excluir o item:", error);
+      console.error("Erro ao excluir o grupo de itens:", error);
     }
   }
 
@@ -143,6 +159,16 @@ const Location = () => {
     {
       field: "description",
       headerName: "Descrição",
+      flex: 1,
+    },
+    {
+      field: "depreciation",
+      headerName: "Taxa de depreciação",
+      flex: 1,
+    },
+    {
+      field: "active",
+      headerName: "Status",
       flex: 1,
     },
     {
@@ -162,7 +188,7 @@ const Location = () => {
             color="error"
             onClick={() => {
               setConfirmationModalOpen(true);
-              setDeleteLocation(cellValues.row);
+              setDeleteItemGroup(cellValues.row);
             }}
           >
             <DeleteIcon />
@@ -176,15 +202,15 @@ const Location = () => {
     <Box m="1.5rem 2.5rem">
       <FlexBetween>
         <Header
-          title="LOCALIZAÇÃO"
-          subtitle="Veja a lista das localização dos ativos."
+          title="GRUPO DE ITENS"
+          subtitle="Veja a lista dos grupos de itens."
         />
         <ModalStyle
           open={isConfirmationModalOpen}
           onClose={() => setConfirmationModalOpen(false)}
         >
           <Typography sx={{ mb: "30px" }}>
-            Tem certeza de que deseja excluir esta localização?
+            Tem certeza de que deseja excluir este grupo de itens?
           </Typography>
           <FlexBetween>
             <Button
@@ -209,7 +235,7 @@ const Location = () => {
         <Box>
           <Button
             onClick={handleOpen}
-            startIcon={<AddLocationAltIcon />}
+            startIcon={<LayersIcon />}
             sx={{
               backgroundColor: theme.palette.secondary.dark,
               color: theme.palette.background.alt,
@@ -223,35 +249,51 @@ const Location = () => {
               },
             }}
           >
-            Nova Localização
+            Novo Grupo
           </Button>
           <ModalStyle open={open} onClose={handleClose}>
             <Typography id="modal-modal-title" variant="h5" component="h1">
-              {editLocation && editLocation._id
-                ? "Editar localização"
-                : "Nova localização"}
+              {editItemGroup && editItemGroup._id
+                ? "Editar Grupo de Itens"
+                : "Novo Grupo de Itens"}
             </Typography>
             <Typography id="modal-modal-description" sx={{ mt: 2 }}>
               <form onSubmit={handleSubmit} className="form">
                 <Input
                   type="text"
-                  label="Nome da localização"
+                  label="Nome do Grupo"
                   value={name}
                   onChange={handleName}
                 />
                 <Input
                   type="text"
-                  label="Descrição"
+                  label="Descrição do Grupo"
                   value={description}
                   onChange={handleDescription}
                 />
+                <Input
+                  type="text"
+                  label="Taxa de depreciação"
+                  value={depreciation}
+                  onChange={handleDepreciation}
+                />
+                <Dropdown
+                  type="text"
+                  label="Status"
+                  value={active}
+                  onChange={handleActive}
+                  required
+                >
+                  <MenuItem value="Ativo">Ativo</MenuItem>
+                  <MenuItem value="Inativo">Inativo</MenuItem>
+                </Dropdown>
                 <Button
                   type="submit"
                   variant="contained"
                   color="secondary"
                   endIcon={<SendIcon />}
                 >
-                  {editLocation && editLocation._id ? "Atualizar" : "Cadastrar"}
+                  {editItemGroup && editItemGroup._id ? "Atualizar" : "Cadastrar"}
                 </Button>
               </form>
             </Typography>
@@ -316,7 +358,7 @@ const Location = () => {
         >
           <DataGrid
             getRowId={(row) => row._id}
-            rows={location.filter((row) =>
+            rows={itemGroup.filter((row) =>
               Object.values(row).some(
                 (value) =>
                   value &&
@@ -341,4 +383,4 @@ const Location = () => {
   );
 };
 
-export default Location;
+export default ItemGroup;
