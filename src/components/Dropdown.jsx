@@ -2,7 +2,7 @@ import React from "react";
 import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import { useTheme } from "@emotion/react";
 
-const Dropdown = ({ children, value, onChange, label, id }) => {
+const Dropdown = ({ children, value, onChange, label, id, required }) => {
   const theme = useTheme();
 
   return (
@@ -11,7 +11,7 @@ const Dropdown = ({ children, value, onChange, label, id }) => {
         {label}
       </InputLabel>
       <Select
-        required
+        required={required}
         label={label}
         value={value}
         onChange={onChange}
