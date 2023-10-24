@@ -15,6 +15,7 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import SendIcon from "@mui/icons-material/Send";
 import EditIcon from "@mui/icons-material/Edit";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
+import BookmarkRemoveOutlinedIcon from '@mui/icons-material/BookmarkRemoveOutlined';
 import { toast } from "react-toastify";
 
 import Header from "components/Header";
@@ -575,7 +576,7 @@ const Items = () => {
                 </Button>
                 <Button
                   onClick={handleOpenWritteOff}
-                  startIcon={<AddCircleOutlineIcon />}
+                  endIcon={<BookmarkRemoveOutlinedIcon />}
                   variant="contained"
                   color="error"
                 >
