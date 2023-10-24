@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Box, Button, CircularProgress, Typography, useTheme } from "@mui/material";
+import { Box, Button, CircularProgress, MenuItem, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SendIcon from "@mui/icons-material/Send";
@@ -13,6 +13,7 @@ import ModalStyle from "components/ModalStyle";
 import GridToolbar from "components/GridToolbar";
 import EditIcon from "@mui/icons-material/Edit";
 import LayersIcon from '@mui/icons-material/Layers';
+import Dropdown from "components/Dropdown";
 
 const ItemGroup = () => {
   const theme = useTheme();
@@ -276,12 +277,16 @@ const ItemGroup = () => {
                   value={depreciation}
                   onChange={handleDepreciation}
                 />
-                <Input
+                <Dropdown
                   type="text"
                   label="Status"
                   value={active}
                   onChange={handleActive}
-                />
+                  required
+                >
+                  <MenuItem value="Ativo">Ativo</MenuItem>
+                  <MenuItem value="Inativo">Inativo</MenuItem>
+                </Dropdown>
                 <Button
                   type="submit"
                   variant="contained"
