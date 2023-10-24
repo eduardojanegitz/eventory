@@ -51,6 +51,7 @@ const Items = () => {
   const [deleteItem, setDeleteItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  const [openWritteOff, setOpenWritteOff] = useState(false);
   const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
   const [itemGroupData, setItemGroupData] = useState([]);
 
@@ -66,6 +67,9 @@ const Items = () => {
     setDepreciation(item ? item.depreciation : "");
     setOpen(true);
   };
+
+  const handleOpenWritteOff = () => setOpenWritteOff(true)
+  const handleCloseWritteOff = () => setOpenWritteOff(false)
 
   const handleClose = () => {
     setOpen(false);
@@ -108,11 +112,23 @@ const Items = () => {
     setCostCenter(e.target.value);
   };
   const handleItemGroup = (e) => {
-    setItemGroup(e.target.value);
+    const selectedItemGroup = e.target.value;
+    setItemGroup(selectedItemGroup); // Atualiza o estado do grupo de itens
+    updateDepreciation(selectedItemGroup); // Atualiza a taxa de depreciação com base no grupo selecionado
   };
   const handleSearch = (searchInput) => {
     setSearch(searchInput);
   };
+
+  const updateDepreciation = (selectedItemGroup) => {
+    const selectedGroup = itemGroupData.find((group) => group.name === selectedItemGroup);
+    if (selectedGroup) {
+      setDepreciation(selectedGroup.depreciation); // Atualiza a taxa de depreciação
+    } else {
+      setDepreciation(""); // Limpa a taxa de depreciação se o grupo não for encontrado
+    }
+  };
+  
 
   const [item, setItem] = useState([]);
 
@@ -378,15 +394,7 @@ const Items = () => {
                       />
                     </Grid>
                   )}
-                  {(!editItem || (editItem && !editItem.writeOffDate)) && (
-                    <Grid item xs={4}>
-                      <Input
-                        type="date"
-                        value={writeOffDate}
-                        onChange={handleWriteOffDate}
-                      />
-                    </Grid>
-                  )}
+                    
                   <Grid item xs={4}>
                     <Input
                       type="text"
@@ -438,9 +446,11 @@ const Items = () => {
                   <Grid item xs={4}>
                     <Input
                       type="number"
-                      label="Taxa de depreciação %"
+                      placeholder="Taxa de depreciação %"
                       value={depreciation}
                       onChange={handleDepreciation}
+                      disabled
+
                     />
                   </Grid>
                   <Grid item xs={4}>
@@ -471,9 +481,28 @@ const Items = () => {
                   variant="contained"
                   color="secondary"
                   endIcon={<SendIcon />}
+                  sx={{mr: 5}}
                 >
                   {editItem && editItem._id ? "Atualizar" : "Cadastrar"}
                 </Button>
+                <Button
+            onClick={handleOpenWritteOff}
+            startIcon={<AddCircleOutlineIcon />}
+            variant="contained"
+            color="error"
+          >
+            Dar baixa
+          </Button>
+          <ModalStyle open={openWritteOff} onClose={handleCloseWritteOff}>
+            <Typography>Dar baixa no item</Typography>
+                    <Grid item xs={4}>
+                      <Input
+                        type="date"
+                        value={writeOffDate}
+                        onChange={handleWriteOffDate}
+                      />
+                    </Grid>
+          </ModalStyle>
               </form>
             </Typography>
           </ModalStyle>
