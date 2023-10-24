@@ -6,9 +6,8 @@ import { Routes, Route } from "react-router-dom";
 import { themeSettings } from "theme";
 import Layout from "scenes/Layout";
 import Dashboard from "scenes/Dashboard";
-import Products from "scenes/Products";
-import Customers from "scenes/Customers";
-import Transactions from "scenes/Transactions";
+import Products from "scenes/Items";
+import Users from "scenes/Users";
 import Overview from "scenes/Overview";
 import Breakdown from "scenes/Breakdown";
 import Tags from "scenes/Tags";
@@ -24,6 +23,11 @@ import { ToastContainer } from "react-toastify";
 import Missing from "components/Missing";
 import Unauthorized from "components/Unauthorized";
 import Home from "components/Home";
+import Divergences from "scenes/Divergences";
+import Location from "scenes/Location";
+import Depreciation from "scenes/Depreciation";
+import ItemGroup from "scenes/ItemGroup";
+import Inventory from "scenes/Inventory";
 
 const ROLES = {
   Employee: "Employee",
@@ -44,31 +48,36 @@ const App = () => {
           <Route element={<Layout />}>
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route element={<PersistLogin />}>
-            <Route
-              element={<RequireAuth allowedRoles={[...Object.values(ROLES)]} />}
-            >
-              <Route path="/home" element={<Home />} />
-              <Route path="/inventarios" element={<Transactions />} />
-              <Route path="/tags" element={<Tags />} />
-            </Route>
-            <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
-              <Route path="/usuarios" element={<Customers />} />
-              <Route path="/novo-usuario" element={<NewUser />} />
-              <Route path="/cc" element={<Cost />} />
-            </Route>
-            <Route
-              element={
-                <RequireAuth allowedRoles={[ROLES.Admin, ROLES.Manager]} />
-              }
-            >
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/itens" element={<Products />} />
-              <Route path="/novo-item" element={<NewItem />} />
-              <Route path="/Movimentacao" element={<AssetMovement />} />
-              <Route path="/new-movement" element={<NewMovement />} />
-              <Route path="/depreciacao" element={<Overview />} />
-              <Route path="/categorias" element={<Breakdown />} />
-</Route>
+              <Route
+                element={
+                  <RequireAuth allowedRoles={[...Object.values(ROLES)]} />
+                }
+              >
+                <Route path="/home" element={<Home />} />
+                <Route path="/inventarios" element={<Inventory />} />
+                <Route path="/tags" element={<Tags />} />
+              </Route>
+              <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
+                <Route path="/usuarios" element={<Users />} />
+                <Route path="/novo-usuario" element={<NewUser />} />
+                <Route path="/cc" element={<Cost />} />
+              </Route>
+              <Route
+                element={
+                  <RequireAuth allowedRoles={[ROLES.Admin, ROLES.Manager]} />
+                }
+              >
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/itens" element={<Products />} />
+                <Route path="/localizacao" element={<Location />} />
+                <Route path="/novo-item" element={<NewItem />} />
+                <Route path="/Movimentacao" element={<AssetMovement />} />
+                <Route path="/new-movement" element={<NewMovement />} />
+                <Route path="/depreciacao" element={<Depreciation />} />
+                <Route path="/grupo-de-itens" element={<ItemGroup />} />
+                <Route path="/categorias" element={<Breakdown />} />
+                <Route path="/divergencias" element={<Divergences />} />
+              </Route>
               <Route path="*" element={<Missing />} />
             </Route>
           </Route>

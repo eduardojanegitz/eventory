@@ -1,4 +1,4 @@
-import { Box, Button, InputBase, useTheme } from "@mui/material";
+import { Box, Button, InputBase } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import FlexBetween from "components/FlexBetween";
 import Header from "components/Header";
@@ -22,280 +22,259 @@ import DeleteIcon from "@mui/icons-material/Delete";
 
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
+import TableCell, { tableCellClasses } from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import useAxiosPrivate from "hooks/useAxiosPrivate";
+import { toast } from "react-toastify";
+import { useTheme } from "@emotion/react";
+import { useLocation } from "react-router-dom";
+import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 
+const StyledTableContainer = styled(TableContainer)`
+  overflow-x: "auto";
+
+  @media (max-width: 600px) {
+    max-width: 100%;
+  }
+`;
 const Tags = () => {
   const theme = useTheme();
-  const [item, setItem] = useState();
-  // const [descricao, setDescricao] = useState("")
-  // const [nome, setNome] = useState("")
-  // const [localizacao, setLocalizacao] = useState("")
-  // const [serial, setSerial] = useState("")
+  const [item, setItem] = useState("");
   const [list, setList] = useState([]);
+  const [backEnd, setBackEnd] = useState([]);
+  const [isTableVisible, setIsTableVisible] = useState(false);
+
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const locationValue = searchParams.get("location");
 
   let itemName = useRef();
 
-  // permission
   const axiosPrivate = useAxiosPrivate();
 
   useEffect(() => {
     itemName.current.focus();
   }, []);
 
-  // const userId = useSelector((state) => state.global.userId);
-  // const itemQ = 12345
-  const { data } = useGetItemByTagQuery(item);
-  // const { teste, setTeste } = useState(lista[0]);
+  useEffect(() => {
+    api2
+      .get(`api/inventory/location/${locationValue}`)
+      .then((response) => setBackEnd(response.data));
+  }, []);
 
-  // const { location, setLocation } = useState("");
-  // const { responsable, setResponsable } = useState("");
-  // const teste = (lista[0])
+  const showToastSuccess = (message) => {
+    toast.success(message, {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  };
+  const showToastError = (message) => {
+    toast.error(message, {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  };
+  const showToastWarning = (message) => {
+    toast.warning(message, {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  };
 
   async function handleSubmit(e) {
     e.preventDefault();
-    await axiosPrivate.post("api/inventory", {
-      list,
-    });
-  }
-  //   const response = await api2.post("api/invetory", {
-  //     location,
-  //     responsable,
-  //     // teste,
-  //     item
-  //   });
-  // }
 
-  // const columns = [
-  //   {
-  //     field: "name",
-  //     headerName: "Nome do ativo",
-  //     flex: 1,
-  //   },
-  //   {
-  //     field: "description",
-  //     headerName: "Descrição do item",
-  //     flex: 1,
-  //   },
-  //   {
-  //     field: "value",
-  //     headerName: "Valor",
-  //     flex: 1,
-  //   },
-  //   {
-  //     field: "serialNumber",
-  //     headerName: "Número de série",
-  //     flex: 1,
-  //   },
-  //   {
-  //     field: "tag",
-  //     headerName: "Número de série",
-  //     flex: 1,
-  //   },
-  // ];
+    const hasDuplicates = list.some(
+      (item, index) =>
+        list.findIndex(
+          (otherItem, otherIndex) =>
+            index !== otherIndex &&
+            item.nome === otherItem.nome &&
+            item.descricao === otherItem.descricao &&
+            item.localizacao === otherItem.localizacao &&
+            item.serial === otherItem.serial
+        ) !== -1
+    );
 
-  const adicionarItem = () => {
-    if (itemName.current.value === "") {
-      window.alert("Preencha o item");
+    if (hasDuplicates) {
+      showToastError(
+        "O item não pode ser lido mais de uma vez no mesmo inventário!"
+      );
     } else {
-      setList([
-        ...list,
+      const divergences = [];
 
-        {
-          descricao: data.description,
-          nome: data.name,
-          localizacao: data.location,
-          serial: data.serialNumber,
-        },
-      ]);
-      setItem("");
-      itemName.current.focus();
+      list.forEach((listItem) => {
+        const isMatch = backEnd.some(
+          (backendItem) =>
+            backendItem.name === listItem.nome &&
+            backendItem.description === listItem.descricao &&
+            backendItem.location === listItem.localizacao &&
+            backendItem.serialNumber === listItem.serial
+        );
+
+        if (!isMatch) {
+          divergences.push(listItem);
+        }
+      });
+
+      if (divergences.length === 0 && list.length === backEnd.length) {
+        const response = await axiosPrivate.post("api/inventory", {
+          list,
+          location: locationValue,
+        });
+        showToastSuccess(
+          response.data.msg || "Inventário realizado com sucesso!"
+        );
+      } else {
+        const response = await axiosPrivate.post("api/divergences", {
+          divergences,
+          location: locationValue,
+        });
+
+        showToastError(response.data.msg || "Inventário divergente!");
+      }
     }
+  }
 
-    // setItem(columns)
+  const addItem = async () => {
+    if (itemName.current.value === "") {
+      showToastWarning("Preencha o item");
+    } else {
+      try {
+        const response = await api2.get(`api/inventory/item/${item}`);
+        const newItem = response.data;
+        const itemId = Date.now();
+        setList((prevList) => [
+          ...prevList,
+          {
+            id: itemId,
+            descricao: newItem.description,
+            nome: newItem.name,
+            localizacao: newItem.location,
+            serial: newItem.serialNumber,
+            tag: newItem.tag,
+          },
+        ]);
+        setItem("");
+        itemName.current.focus();
+        if (!isTableVisible) {
+          setIsTableVisible(true);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar informações do item: ", error);
+      }
+    }
+  };
+
+  const removeItem = (itemId) => {
+    setList((prevList) => prevList.filter((item) => item.id !== itemId));
   };
   return (
     <Box m="1.5rem 2.5rem">
       <Header
-        title="LEITURA DE ETIQUETAS"
-        subtitle="Faça aqui a sua leitura."
+        title="LEITURA DE TAGS"
+        subtitle={`Localização: ${locationValue}`}
       />
-      {/* <FlexBetween
-        backgroundColor={theme.palette.background.alt}
-        borderRadius="9px"
-        gap="3rem"
-        p="0.1rem 1.5rem"
-        width="40%"
-        mt="2.5rem"
-      >
-        <InputBase placeholder="Local" />
-      </FlexBetween> */}
-      {/* 
-      <InputBase
-        // backgroundColor={theme.palette.background.alt}
-        // borderRadius="9px"
-        // gap="3rem"
-        // p="0.1rem 1.5 rem"
-        // width="40%"
-        // mt="2.5rem"
-        type="text"
-        value={item}
-        onChange={(e) => setItem(e.target.value)}
-        placeholder="Digite o item"
-      /> */}
-      {/* <Input type="text" user={data || {}} placeholder="Digite" disabled /> */}
-      {/* <Button
-        sx={{
-          backgroundColor: theme.palette.secondary.light,
-          color: theme.palette.background.alt,
-          fontSize: "12px",
-          fontWeight: "bold",
-          padding: "5px 10px",
-          mt: "0.8rem",
-        }}
-        onClick={adicionarItem}
-      >
-        Adicionar
-      </Button> */}
-      <form onSubmit={handleSubmit} className="form-tag">
-        {/* <input
-          type="text"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          placeholder="Localização"
-          className="input-tag"
-        />
-        <input
-          type="text"
-          value={responsable}
-          onChange={(e) => setResponsable(e.target.value)}
-          placeholder="Responsável"
-          className="input-tag"
-        /> */}
-        <input
-          type="text"
-          value={item}
-          ref={itemName}
-          onChange={(e) => setItem(e.target.value)}
-          className="input-tag"
-          placeholder="Digite o item"
-        />
-        <button className="btn-submit">FINALIZAR</button>
-      </form>
-      <button onClick={adicionarItem} className="btn-submit">
-        ADICIONAR
-      </button>
-
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Nome</TableCell>
-              <TableCell align="right">Descrição</TableCell>
-              <TableCell align="right">Número de serial</TableCell>
-              <TableCell align="right">Localização</TableCell>
-              <TableCell align="right">Ação</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {list.map((list) => (
-              <TableRow
-                key={list.serialNumber}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  {list.nome}
-                </TableCell>
-                <TableCell align="right">{list.descricao}</TableCell>
-                <TableCell align="right">{list.serial}</TableCell>
-                <TableCell align="right">{list.localizacao}</TableCell>
-                <TableCell align="right">
-                  <IconButton edge="end" aria-label="delete">
-                    <DeleteIcon />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      {/* <table >
-          <tr className="table-head">
-          <th>Nome</th>
-          <th>Descrição</th>
-          <th>Localização</th>
-          <th>Número de série</th>
-          </tr> */}
-      {/* <tr className="table-line"> */}
-      {/* <td>{lista[0]}</td>
-            <td>{lista[1]}</td>
-            <td>{lista[2]}</td>
-            <td>{lista[3]}</td> */}
-      {/* </tr> */}
-
-      {/* {lista.map((index, lista) => 
-          
-          {console.log([lista[0]])}
-          
-        )} */}
-      {/* </table> */}
-      {/* </div> */}
-      <div>{/* {data && data.description} */}</div>
-      {/* <Box
-        height="80vh"
-        sx={{
-          "& .MuiDataGrid-root": {
-            border: "none",
-          },
-          "& .MuiDataGrid-cell": {
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: theme.palette.background.alt,
-            color: theme.palette.secondary[100],
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-virtualScroller": {
-            backgroundColor: theme.palette.primary.light,
-          },
-          "& .MuiDataGrid-FooterContainer": {
-            backgroundColor: theme.palette.background.alt,
-            color: theme.palette.secondary[100],
-            borderTop: "none",
-          },
-          "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-            color: `${theme.palette.secondary[200]} !important`,
-          },
-        }}
-      >
-        <DataGrid
-          // loading={isLoading || !data}
-          getRowId={(row) => row._id}
-          rows={dataQ || []}
-          rowsPerOptions={[20, 50, 100]}
-          columns={columns}
-          // rowCount={(data && data.total) || 0}
-          pagination
-          // page={page}
-          // pageSize={pageSize}
-          paginationMode="server"
-          sortingMode="server"
-          // onPageChange={(newPage) => setPage(newPage)}
-          // onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          // onSortModelChange={(newSortModel) => setSort(...newSortModel)}
-          // components={{ Toolbar: DataGridCustomToolbar }}
-          // componentsProps={{
-          //   toolbar: { searchInput, setSearchInput, setSearch },
-          // }}
-        />
+      <Box sx={{ mt: "25px" }}>
+        <form onSubmit={handleSubmit}>
+          <Input
+            type="text"
+            value={item}
+            refInput={itemName}
+            onChange={(e) => setItem(e.target.value)}
+            label="Faça aqui a leitura da tag..."
+          />
+          <Box sx={{ mb: "15px" }}>
+            <Button
+              sx={{ mr: "5px" }}
+              variant="contained"
+              color="secondary"
+              endIcon={<PlaylistAddIcon />}
+              onClick={addItem}
+            >
+              ADICIONAR
+            </Button>
+            <Button
+              type="submit"
+              color="error"
+              endIcon={<PlaylistAddCheckIcon />}
+              variant="contained"
+            >
+              FINALIZAR
+            </Button>
+          </Box>
+        </form>
       </Box>
-       */}
-    </Box>
+      {
+        isTableVisible && (
+
+          <StyledTableContainer component={Paper}>
+            <Table
+              aria-label="simple table"
+              sx={{
+                backgroundColor: theme.palette.background.alt,
+                border: "none",
+                [`& .${tableCellClasses.root}`]: {
+                  border: "none",
+                },
+              }}
+            >
+              <TableHead>
+                <TableRow
+                  sx={{
+                    backgroundColor: theme.palette.secondary[100], 
+                  }}
+                >
+                  <TableCell
+                    sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
+                  >
+                    Nome
+                  </TableCell>
+                  <TableCell
+                    sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
+                  >
+                    Descrição
+                  </TableCell>
+                  <TableCell
+                    sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
+                  >
+                    Série
+                  </TableCell>
+                  <TableCell
+                    sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
+                  >
+                    Tag
+                  </TableCell>
+                  <TableCell
+                    sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
+                  >
+                    Ação
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {list.map((listItem, index) => (
+                  <TableRow key={index}>
+                    <TableCell component="th" scope="row">
+                      {listItem.nome}
+                    </TableCell>
+                    <TableCell>{listItem.descricao}</TableCell>
+                    <TableCell>{listItem.serial}</TableCell>
+                    <TableCell>{listItem.tag}</TableCell>
+                    <TableCell>
+                      <IconButton aria-label="delete">
+                        <DeleteIcon color="error" onClick={() => removeItem(listItem.id)}/>
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </StyledTableContainer>
+          )
+        }
+        </Box>
   );
 };
 

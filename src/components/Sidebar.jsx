@@ -27,35 +27,55 @@ import {
   TrendingUpOutlined,
   PieChartOutlined,
   PointOfSaleOutlined,
+  AddLocationAltOutlined,
 } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import FlexBetween from "./FlexBetween";
 import profileImage from "assets/profile.jpeg";
-import ManageSearchIcon from '@mui/icons-material/ManageSearch';
-import TableViewIcon from '@mui/icons-material/TableView';
-import InventoryIcon from '@mui/icons-material/Inventory';
+import ManageSearchIcon from "@mui/icons-material/ManageSearch";
+import TableViewIcon from "@mui/icons-material/TableView";
+import InventoryIcon from "@mui/icons-material/Inventory";
+import RuleIcon from "@mui/icons-material/Rule";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import TransferWithinAStationIcon from "@mui/icons-material/TransferWithinAStation";
+import CategoryIcon from '@mui/icons-material/CategoryOutlined';
+import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
 
 const navItems = [
   {
     text: "Dashboard",
     icon: <HomeOutlined />,
+    nav: "dashboard",
   },
-  {
-    text: "Consulta",
-    icon: null,
-  },
+  // {
+  //   text: "Consulta",
+  //   icon: null,
+  // },
   {
     text: "Itens",
     icon: <ManageSearchIcon />,
+    nav: "itens",
+  },
+  {
+    text: "Grupos de Itens",
+    icon: <CategoryIcon />,
+    nav: "grupo-de-itens",
   },
   {
     text: "Usuários",
     icon: <Groups2Outlined />,
+    nav: "usuarios",
+  },
+  {
+    text: "Localização",
+    icon: <AddLocationAltOutlined />,
+    nav: "localizacao",
   },
   {
     text: "Movimentação",
-    icon: <ShoppingCartOutlined />,
+    icon: <TransferWithinAStationIcon />,
+    nav: "movimentacao",
   },
   // {
   //   text: "CC",
@@ -63,19 +83,27 @@ const navItems = [
   // },
   {
     text: "Inventários",
-    icon: <InventoryIcon   />,
+    icon: <InventoryOutlinedIcon />,
+    nav: "inventarios",
+  },
+  {
+    text: "Divergências",
+    icon: <RuleIcon />,
+    nav: "divergencias",
   },
   {
     text: "Gráficos",
     icon: null,
   },
-  // {
-  //   text: "Depreciação",
-  //   icon: <PointOfSaleOutlined />,
-  // },
+  {
+    text: "Depreciação",
+    icon: <BarChartIcon />,
+    nav: "depreciacao",
+  },
   {
     text: "Categorias",
     icon: <PieChartOutlined />,
+    nav: "categorias",
   },
   // {
   //   text: "Leitura de etiquetas",
@@ -136,7 +164,7 @@ const Sidebar = ({
               </FlexBetween>
             </Box>
             <List>
-              {navItems.map(({ text, icon }) => {
+              {navItems.map(({ text, icon, nav }) => {
                 if (!icon) {
                   return (
                     <Typography key={text} sx={{ m: "2.25rem 0 1rem 3rem " }}>
@@ -151,16 +179,16 @@ const Sidebar = ({
                   <ListItem key={text} disablePadding>
                     <ListItemButton
                       onClick={() => {
-                        navigate(`/${lcText}`);
-                        setActive(lcText);
+                        navigate(`/${nav}`);
+                        setActive(nav);
                       }}
                       sx={{
                         backgroundColor:
-                          active === lcText
+                          active === nav
                             ? theme.palette.secondary[300]
                             : "transparent",
                         color:
-                          active === lcText
+                          active === nav
                             ? theme.palette.primary[600]
                             : theme.palette.secondary[100],
                       }}
@@ -169,7 +197,7 @@ const Sidebar = ({
                         sx={{
                           ml: "2rem",
                           color:
-                            active === lcText
+                            active === nav
                               ? theme.palette.primary[600]
                               : theme.palette.secondary[200],
                         }}
@@ -177,7 +205,7 @@ const Sidebar = ({
                         {icon}
                       </ListItemIcon>
                       <ListItemText primary={text} />
-                      {active === lcText && (
+                      {active === nav && (
                         <ChevronRightOutlined sx={{ ml: "auto" }} />
                       )}
                     </ListItemButton>

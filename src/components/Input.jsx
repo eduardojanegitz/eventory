@@ -1,23 +1,33 @@
-import { InputBase, useTheme } from "@mui/material";
+import { InputBase, TextField, useTheme } from "@mui/material";
 import React from "react";
 
-const Input = ({ type, placeholder, value, onChange, onBlur, readOnly }) => {
+const Input = ({
+  type,
+  placeholder,
+  value,
+  onChange,
+  onBlur,
+  disabled,
+  label,
+  refInput,
+  required
+}) => {
   const theme = useTheme();
   return (
-    <InputBase
+    <TextField
+      label={label}
       type={type}
       placeholder={placeholder}
       value={value}
       onChange={onChange}
       onBlur={onBlur}
-      disabled={readOnly}
+      disabled={disabled}
+      ref={refInput}
+      required={required} 
+      color="info"
       sx={{
-        border: ` 2px solid ${theme.palette.primary[100]}`,
-        borderRadius: "20px",
-        padding: "7px",
-        boxShadow: `4.5px 2.5px ${theme.palette.primary[100]}`,
-        width: "30rem",
-        marginBottom: "15px"
+        width: "100%",
+        mb: "15px",
       }}
     />
   );
