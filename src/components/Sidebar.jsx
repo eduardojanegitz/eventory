@@ -77,10 +77,11 @@ const navItems = [
     icon: <TransferWithinAStationIcon />,
     nav: "movimentacao",
   },
-  // {
-  //   text: "CC",
-  //   icon: <TableViewIcon />,
-  // },
+  {
+    text: "Centro de Custos",
+    icon: <TableViewIcon />,
+    nav: "centro-de-custo"
+  },
   {
     text: "Inventários",
     icon: <InventoryOutlinedIcon />,

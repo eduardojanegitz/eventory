@@ -7,6 +7,7 @@ import { themeSettings } from "theme";
 import Layout from "scenes/Layout";
 import Dashboard from "scenes/Dashboard";
 import Products from "scenes/Items";
+import CostCenter from "scenes/CostCenter";
 import Users from "scenes/Users";
 import Overview from "scenes/Overview";
 import Breakdown from "scenes/Breakdown";
@@ -69,6 +70,7 @@ const App = () => {
               >
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/itens" element={<Products />} />
+                <Route path="/centro-de-custo" element={<CostCenter />} />
                 <Route path="/localizacao" element={<Location />} />
                 <Route path="/novo-item" element={<NewItem />} />
                 <Route path="/Movimentacao" element={<AssetMovement />} />
