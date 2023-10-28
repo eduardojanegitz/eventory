@@ -1,17 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { Box, useTheme } from "@mui/material";
-import { api2, useGetItemByTagQuery } from "state/api";
+import { api2 } from "state/api";
 import { DataGrid } from "@mui/x-data-grid";
 import Header from "components/Header";
 import FlexBetween from "components/FlexBetween";
-import DataGridCustomToolbar from "components/DataGridCustomToolbar";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { toast } from "react-toastify";
+import GridToolbar from "components/GridToolbar";
+import DataGridCustomToolbar from "components/DataGridCustomToolbar";
+
+
 
 const Divergences = () => {
-    const theme = useTheme();
-    const [sort, setSort] = useState({});
+
+  const [page, setPage] = useState(0);
+  const [search, setSearch] = useState("");
+  const [pageSize, setPageSize] = useState(20);
+  const theme = useTheme();
+  const [sort, setSort] = useState({});
   const [divergences, setDivergences] = useState([]);
 
   const showToastMessage = () => {
@@ -54,6 +61,12 @@ const Divergences = () => {
       console.error("Erro ao excluir o item:", error);
     }
   }
+
+  const [searchInput, setSearchInput] = useState("");
+
+  const handleSearch = (searchInput) => {
+    setSearch(searchInput);
+  };
 
   const columns = [
     {
@@ -154,6 +167,12 @@ const Divergences = () => {
         subtitle="Veja a lista das divergência dos ativos."
       />
     </FlexBetween>
+
+    <DataGridCustomToolbar
+        value={searchInput}
+        onChange={setSearchInput}
+        onSearch={handleSearch}
+      />
     <Box
       height="80vh"
       sx={{
@@ -184,21 +203,27 @@ const Divergences = () => {
       <DataGrid
         // loading={isLoading || !data}
         getRowId={(row) => row._id}
-        rows={divergences || []}
+        rows={divergences.filter((row) =>
+          Object.values(row).some(
+            (value) =>
+              value &&
+              value
+                .toString()
+                .toLowerCase()
+                .includes(searchInput.toLowerCase())
+          )
+        )}
         rowsPerPageOptions={[20, 50, 100]}
         columns={columns}
         pagination
-        // page={page}
-        // pageSize={pageSize}
-        paginationMode="server"
-        sortingMode="server"
-        // onPageChange={(newPage) => setPage(newPage)}
-        // onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+        page={page}
+        pageSize={pageSize}
+        paginationMode="client"
+        onPageChange={(newPage) => setPage(newPage)}
+        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
         onSortModelChange={(newSortModel) => setSort(...newSortModel)}
-        components={{ Toolbar: DataGridCustomToolbar }}
-        // componentsProps={{
-        //   toolbar: { searchInput, setSearchInput, setSearch },
-        // }}
+        components={{ Toolbar: GridToolbar }}
+        
       />
     </Box>
   </Box>

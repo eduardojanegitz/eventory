@@ -220,7 +220,7 @@ const CostCenter = () => {
               color: theme.palette.background.alt,
               fontSize: "14px",
               fontWeight: "bold",
-              padding: "10px 20px",
+              padding: "10px 42px",
               transition: "background-color 0.3s ease, color 0.3s ease",
               "&:hover": {
                 backgroundColor: theme.palette.secondary.main,
