@@ -222,6 +222,7 @@ const Items = () => {
         tag,
         acquisitionDate,
         depreciation,
+        itemGroup
       });
       showToastSuccess("Item cadastrado com sucesso!");
     }
