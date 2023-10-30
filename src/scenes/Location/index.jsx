@@ -147,7 +147,7 @@ const Location = () => {
     },
     {
       field: "Ação",
-      flex: 1,
+      flex: 0.3,
       renderCell: (cellValues) => (
         <>
           <Button
