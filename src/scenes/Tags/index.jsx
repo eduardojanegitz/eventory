@@ -1,23 +1,11 @@
-import { Box, Button, InputBase } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
-import FlexBetween from "components/FlexBetween";
+import { Box, Button } from "@mui/material";
 import Header from "components/Header";
 import Input from "components/Input";
 import React, { useEffect, useState, useRef } from "react";
-import { useSelector } from "react-redux";
-import {
-  api2,
-  useGetCustomersQuery,
-  useGetItemByTagQuery,
-  useGetUserQuery,
-} from "state/api";
+import { api2 } from "state/api";
 
 import { styled } from "@mui/material/styles";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
 import IconButton from "@mui/material/IconButton";
-import Grid from "@mui/material/Grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 import Table from "@mui/material/Table";
@@ -145,21 +133,28 @@ const Tags = () => {
         const response = await api2.get(`api/inventory/item/${item}`);
         const newItem = response.data;
         const itemId = Date.now();
-        setList((prevList) => [
-          ...prevList,
-          {
-            id: itemId,
-            descricao: newItem.description,
-            nome: newItem.name,
-            localizacao: newItem.location,
-            serial: newItem.serialNumber,
-            tag: newItem.tag,
-          },
-        ]);
-        setItem("");
-        itemName.current.focus();
-        if (!isTableVisible) {
-          setIsTableVisible(true);
+
+        if (newItem === null) {
+          showToastError(
+            "Nenhum item encontrado com esse número de patrimônio."
+          );
+        } else {
+          setList((prevList) => [
+            ...prevList,
+            {
+              id: itemId,
+              descricao: newItem.description,
+              nome: newItem.name,
+              localizacao: newItem.location,
+              serial: newItem.serialNumber,
+              tag: newItem.tag,
+            },
+          ]);
+          setItem("");
+          itemName.current.focus();
+          if (!isTableVisible) {
+            setIsTableVisible(true);
+          }
         }
       } catch (error) {
         console.error("Erro ao buscar informações do item: ", error);
@@ -173,7 +168,7 @@ const Tags = () => {
   return (
     <Box m="1.5rem 2.5rem">
       <Header
-        title="LEITURA DE TAGS"
+        title="LEITURA DE PATRIMÔNIO"
         subtitle={`Localização: ${locationValue}`}
       />
       <Box sx={{ mt: "25px" }}>
@@ -183,7 +178,7 @@ const Tags = () => {
             value={item}
             refInput={itemName}
             onChange={(e) => setItem(e.target.value)}
-            label="Faça aqui a leitura da tag..."
+            label="Faça aqui a leitura da patrimônio..."
           />
           <Box sx={{ mb: "15px" }}>
             <Button
@@ -206,75 +201,90 @@ const Tags = () => {
           </Box>
         </form>
       </Box>
-      {
-        isTableVisible && (
-
-          <StyledTableContainer component={Paper}>
-            <Table
-              aria-label="simple table"
-              sx={{
-                backgroundColor: theme.palette.background.alt,
+      {isTableVisible && (
+        <StyledTableContainer component={Paper}>
+          <Table
+            aria-label="simple table"
+            sx={{
+              backgroundColor: theme.palette.background.alt,
+              border: "none",
+              [`& .${tableCellClasses.root}`]: {
                 border: "none",
-                [`& .${tableCellClasses.root}`]: {
-                  border: "none",
-                },
-              }}
-            >
-              <TableHead>
-                <TableRow
+              },
+            }}
+          >
+            <TableHead>
+              <TableRow
+                sx={{
+                  backgroundColor: theme.palette.secondary[100],
+                }}
+              >
+                <TableCell
                   sx={{
-                    backgroundColor: theme.palette.secondary[100], 
+                    color: theme.palette.background.alt,
+                    fontWeight: "bold",
                   }}
                 >
-                  <TableCell
-                    sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
-                  >
-                    Nome
+                  Item
+                </TableCell>
+                <TableCell
+                  sx={{
+                    color: theme.palette.background.alt,
+                    fontWeight: "bold",
+                  }}
+                >
+                  Descrição
+                </TableCell>
+                <TableCell
+                  sx={{
+                    color: theme.palette.background.alt,
+                    fontWeight: "bold",
+                  }}
+                >
+                  Nº de série
+                </TableCell>
+                <TableCell
+                  sx={{
+                    color: theme.palette.background.alt,
+                    fontWeight: "bold",
+                  }}
+                >
+                  Patrimônio
+                </TableCell>
+                <TableCell
+                  sx={{
+                    color: theme.palette.background.alt,
+                    fontWeight: "bold",
+                  }}
+                >
+                  Ação
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {list.map((listItem, index) => (
+                <TableRow key={index}>
+                  <TableCell component="th" scope="row">
+                    {listItem.nome}
                   </TableCell>
-                  <TableCell
-                    sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
-                  >
-                    Descrição
-                  </TableCell>
-                  <TableCell
-                    sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
-                  >
-                    Série
-                  </TableCell>
-                  <TableCell
-                    sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
-                  >
-                    Tag
-                  </TableCell>
-                  <TableCell
-                    sx={{ color: theme.palette.background.alt, fontWeight: "bold" }}
-                  >
-                    Ação
+                  <TableCell>{listItem.descricao}</TableCell>
+                  <TableCell>{listItem.serial}</TableCell>
+                  <TableCell>{listItem.tag}</TableCell>
+                  <TableCell>
+                    <IconButton aria-label="delete">
+                      <DeleteIcon
+                        color="error"
+                        onClick={() => removeItem(listItem.id)}
+                      />
+                    </IconButton>
                   </TableCell>
                 </TableRow>
-              </TableHead>
-              <TableBody>
-                {list.map((listItem, index) => (
-                  <TableRow key={index}>
-                    <TableCell component="th" scope="row">
-                      {listItem.nome}
-                    </TableCell>
-                    <TableCell>{listItem.descricao}</TableCell>
-                    <TableCell>{listItem.serial}</TableCell>
-                    <TableCell>{listItem.tag}</TableCell>
-                    <TableCell>
-                      <IconButton aria-label="delete">
-                        <DeleteIcon color="error" onClick={() => removeItem(listItem.id)}/>
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </StyledTableContainer>
-          )
-        }
-        </Box>
+              ))}
+            </TableBody>
+          </Table>
+        </StyledTableContainer>
+      )}
+    </Box>
   );
 };
 
