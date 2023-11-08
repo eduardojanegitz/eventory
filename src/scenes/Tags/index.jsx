@@ -178,7 +178,7 @@ const Tags = () => {
             value={item}
             refInput={itemName}
             onChange={(e) => setItem(e.target.value)}
-            label="Faça aqui a leitura da patrimônio..."
+            label="Faça aqui a leitura do patrimônio..."
           />
           <Box sx={{ mb: "15px" }}>
             <Button
