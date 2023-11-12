@@ -1,13 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   LightModeOutlined,
   DarkModeOutlined,
   Menu as MenuIcon,
-  Search,
-  SettingsOutlined,
   ArrowDropDownCircleOutlined,
-  HelpCenterOutlined,
-  HelpCenterRounded,
   HelpOutline,
 } from "@mui/icons-material";
 import FlexBetween from "components/FlexBetween";
@@ -19,13 +15,11 @@ import {
   Box,
   Button,
   IconButton,
-  InputBase,
   Menu,
   MenuItem,
   Toolbar,
   Typography,
 } from "@mui/material";
-import profileImage from "assets/profile.jpeg";
 import { useLocation, useNavigate } from "react-router-dom";
 import useLogout from "hooks/useLogout";
 
@@ -34,7 +28,6 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
   const theme = useTheme();
 
   const navigate = useNavigate();
-  const { pathname } = useLocation();
 
   const logout = useLogout();
 
@@ -43,21 +36,15 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
     navigate('/')
   }
 
-  // Redux toolkit
-  // const [sendLogout, { isLoading, isSuccess, isError, error }] =
-  //   useSendLogoutMutation();
-
-  // useEffect(() => {
-  //   if(isSuccess) navigate('/')
-  // }, [isSuccess, navigate])
-
-
   const [anchorEl, setAnchorEl] = useState(null);
   const isOpen = Boolean(anchorEl);
   const handleClick = (event) => setAnchorEl(event.currentTarget);
-  const handleClose = () => (setAnchorEl(null), signOut());
-  // if(isLoading) return <p>logging out</p>
-  // if(isError) return <p>Erro: {error.data?.message}</p>
+  const handleClose = () => (setAnchorEl(null));
+
+  const handleSignOut = () => {
+    signOut();
+    handleClose(); 
+  }
 
   return (
     <AppBar
@@ -73,17 +60,6 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
           <IconButton onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
             <MenuIcon />
           </IconButton>
-          {/* <FlexBetween
-            backgroundColor={theme.palette.background.alt}
-            borderRadius="9px"
-            gap="3rem"
-            p="0.1rem 1.5rem"
-          >
-            <InputBase placeholder="Pesquisar..." />
-            <IconButton>
-              <Search />
-            </IconButton>
-          </FlexBetween> */}
         </FlexBetween>
         {/* RIGHT SIDE */}
         <FlexBetween gap="1.5rem">
@@ -109,15 +85,6 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
                 gap: "1rem",
               }}
             >
-              <Box
-                component="img"
-                alt="profile"
-                src={profileImage}
-                height="40px"
-                width="40px"
-                borderRadius="50%"
-                sx={{ objectFit: "cover" }}
-              />
               <Box textAlign="left">
                 <Typography
                   fontWeight="bold"
@@ -142,7 +109,7 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
                 onClose={handleClose}
                 anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
               >
-                <MenuItem onClick={handleClose}>Log Out</MenuItem>
+                <MenuItem onClick={handleSignOut}>Sair</MenuItem>
               </Menu>
             </Button>
           </FlexBetween>
