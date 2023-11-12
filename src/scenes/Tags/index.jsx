@@ -18,7 +18,7 @@ import Paper from "@mui/material/Paper";
 import useAxiosPrivate from "hooks/useAxiosPrivate";
 import { toast } from "react-toastify";
 import { useTheme } from "@emotion/react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 
@@ -31,6 +31,7 @@ const StyledTableContainer = styled(TableContainer)`
 `;
 const Tags = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const [item, setItem] = useState("");
   const [list, setList] = useState([]);
   const [backEnd, setBackEnd] = useState([]);
@@ -73,55 +74,82 @@ const Tags = () => {
   async function handleSubmit(e) {
     e.preventDefault();
 
-    const hasDuplicates = list.some(
+    try {
+      const hasDuplicates = checkForDuplicates(list);
+      const divergences = findDivergences(list, backEnd);
+
+      if (hasDuplicates) {
+        showToastError(
+          "O item não pode ser lido mais de uma vez no mesmo inventário!"
+        );
+      } else if (divergences.length === 0 && list.length === backEnd.length) {
+        await handleInventorySubmit(list, locationValue);
+      } else {
+        await handleDivergences(divergences, locationValue);
+      }
+    } catch (error) {
+      handleError(error);
+    }
+  }
+
+  function checkForDuplicates(list) {
+    return list.some(
       (item, index) =>
         list.findIndex(
           (otherItem, otherIndex) =>
-            index !== otherIndex &&
-            item.nome === otherItem.nome &&
-            item.descricao === otherItem.descricao &&
-            item.localizacao === otherItem.localizacao &&
-            item.serial === otherItem.serial
+            index !== otherIndex && item.tag === otherItem.tag
         ) !== -1
     );
+  }
 
-    if (hasDuplicates) {
-      showToastError(
-        "O item não pode ser lido mais de uma vez no mesmo inventário!"
+  function findDivergences(list, backEnd) {
+    const divergences = [];
+
+    list.forEach((listItem) => {
+      const isMatch = backEnd.some(
+        (backendItem) =>
+          backEnd.length === list.length &&
+          backendItem.name === listItem.nome &&
+          backendItem.description === listItem.descricao &&
+          backendItem.location === listItem.localizacao &&
+          backendItem.serialNumber === listItem.serial &&
+          backendItem.tag === listItem.tag
       );
-    } else {
-      const divergences = [];
 
-      list.forEach((listItem) => {
-        const isMatch = backEnd.some(
-          (backendItem) =>
-            backendItem.name === listItem.nome &&
-            backendItem.description === listItem.descricao &&
-            backendItem.location === listItem.localizacao &&
-            backendItem.serialNumber === listItem.serial
-        );
-
-        if (!isMatch) {
-          divergences.push(listItem);
-        }
-      });
-
-      if (divergences.length === 0 && list.length === backEnd.length) {
-        const response = await axiosPrivate.post("api/inventory", {
-          list,
-          location: locationValue,
-        });
-        showToastSuccess(
-          response.data.msg || "Inventário realizado com sucesso!"
-        );
-      } else {
-        const response = await axiosPrivate.post("api/divergences", {
-          divergences,
-          location: locationValue,
-        });
-
-        showToastError(response.data.msg || "Inventário divergente!");
+      if (!isMatch) {
+        divergences.push(listItem);
       }
+    });
+
+    return divergences;
+  }
+
+  async function handleInventorySubmit(list, locationValue) {
+    const response = await axiosPrivate.post("api/inventory", {
+      list,
+      location: locationValue,
+    });
+    showToastSuccess(response.data.msg || "Inventário realizado com sucesso!");
+  }
+
+  async function handleDivergences(divergences, locationValue) {
+    const response = await axiosPrivate.post("api/divergences", {
+      divergences,
+      location: locationValue,
+    });
+
+    showToastError(response.data.msg || "Inventário divergente!");
+  }
+
+  function handleError(error) {
+    if (error.response.status === 401) {
+      showToastError("Acesso expirado. Faça o login novamente.");
+      navigate("/");
+    } else {
+      showToastError(
+        error.response?.data?.error ||
+          "Erro desconhecido. Entre em contato com o time de TI."
+      );
     }
   }
 
