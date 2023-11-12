@@ -576,8 +576,8 @@ const Items = () => {
                       onChange={handleCostCenter}
                     >
                       {costCenterData.map((data) => (
-                        <MenuItem key={data.name} value={data.name}>
-                          {data.name}
+                        <MenuItem key={data.description} value={data.description}>
+                          {data.description}
                         </MenuItem>
                       ))}
                     </Dropdown>
@@ -677,8 +677,6 @@ const Items = () => {
             columns={columns}
             pagination
             page={page}
-            showColumnVerticalBorder
-            showCellVerticalBorder
             pageSize={pageSize}
             paginationMode="client"
             onPageChange={(newPage) => setPage(newPage)}
