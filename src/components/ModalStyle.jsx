@@ -25,7 +25,7 @@ const ModalStyle = ({ children, maxHeight, open, onClose, width }) => {
     //   backgroundColor: theme.palette.background.default,
     // },
     bgcolor: theme.palette.background.default,
-    borderRadius: "35px",
+    borderRadius: "35px 5px 5px 35px",
     boxShadow: 24,
     padding: "2rem",
   };
