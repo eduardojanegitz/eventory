@@ -73,14 +73,15 @@ const navItems = [
     nav: "localizacao",
   },
   {
+    text: "Centro de Custos",
+    icon: <TableViewIcon />,
+    nav: "centro-de-custo"
+  },
+  {
     text: "Movimentação",
     icon: <TransferWithinAStationIcon />,
     nav: "movimentacao",
   },
-  // {
-  //   text: "CC",
-  //   icon: <TableViewIcon />,
-  // },
   {
     text: "Inventários",
     icon: <InventoryOutlinedIcon />,

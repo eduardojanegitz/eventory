@@ -15,7 +15,7 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import SendIcon from "@mui/icons-material/Send";
 import EditIcon from "@mui/icons-material/Edit";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
-import BookmarkRemoveOutlinedIcon from '@mui/icons-material/BookmarkRemoveOutlined';
+import BookmarkRemoveOutlinedIcon from "@mui/icons-material/BookmarkRemoveOutlined";
 import { toast } from "react-toastify";
 
 import Header from "components/Header";
@@ -39,6 +39,7 @@ const Items = () => {
   const [item, setItem] = useState([]);
   const [locationSelect, setLocationSelect] = useState([]);
   const [itemGroupData, setItemGroupData] = useState([]);
+  const [costCenterData, setCostCenterData] = useState([]);
 
   const [branch, setBranch] = useState("");
   const [name, setName] = useState("");
@@ -54,6 +55,7 @@ const Items = () => {
   const [depreciation, setDepreciation] = useState("");
   const [costCenter, setCostCenter] = useState("");
   const [itemGroup, setItemGroup] = useState("");
+  const [invoice, setInvoice] = useState("");
 
   const [editItem, setEditItem] = useState(null);
   const [deleteItem, setDeleteItem] = useState(null);
@@ -187,6 +189,9 @@ const Items = () => {
       .get("api/item-group")
       .then((response) => setItemGroupData(response.data));
   }, []);
+  useEffect(() => {
+    api2.get("api/cost").then((response) => setCostCenterData(response.data));
+  }, []);
 
   useEffect(() => {
     loadData();
@@ -222,6 +227,8 @@ const Items = () => {
         tag,
         acquisitionDate,
         depreciation,
+        itemGroup,
+        invoice,
       });
       showToastSuccess("Item cadastrado com sucesso!");
     }
@@ -249,11 +256,11 @@ const Items = () => {
     {
       field: "branch",
       headerName: "Filial",
-      flex: 0.2,
+      flex: 0.6,
     },
     {
       field: "name",
-      headerName: "Nome",
+      headerName: "Item",
       flex: 1,
     },
     {
@@ -264,17 +271,17 @@ const Items = () => {
     {
       field: "value",
       headerName: "Valor (R$)",
-      flex: 1,
+      flex: 0.7,
     },
     {
       field: "responsable",
       headerName: "Responsável",
-      flex: 1,
+      flex: 0.7,
     },
     {
       field: "location",
-      headerName: "Localidade",
-      flex: 0.3,
+      headerName: "Localização",
+      flex: 0.5,
     },
     {
       field: "supplier",
@@ -283,20 +290,20 @@ const Items = () => {
     },
     {
       field: "serialNumber",
-      headerName: "Série",
+      headerName: "Nº de série",
       flex: 0.5,
     },
     {
       field: "tag",
-      headerName: "Tag",
+      headerName: "Patrimônio",
       flex: 0.6,
     },
     {
       field: "acquisitionDate",
       headerName: "Data",
-      flex: 1,
+      flex: 0.7,
       valueGetter: (params) => {
-        const date = new Date(params.row.createdAt);
+        const date = new Date(params.row.acquisitionDate);
         return date.toLocaleDateString("pt-BR");
       },
     },
@@ -316,7 +323,6 @@ const Items = () => {
             <Button
               variant="text"
               color="error"
-              // onClick={() => handleDeleteClick(cellValues.row._id)}
               onClick={() => {
                 setConfirmationModalOpen(true);
                 setDeleteItem(cellValues.row);
@@ -373,7 +379,7 @@ const Items = () => {
               color: theme.palette.background.alt,
               fontSize: "14px",
               fontWeight: "bold",
-              padding: "10px 20px",
+              padding: "10px 50px",
               transition: "background-color 0.3s ease, color 0.3s ease",
               "&:hover": {
                 backgroundColor: theme.palette.secondary.main,
@@ -437,7 +443,7 @@ const Items = () => {
                   <Grid item xs={4}>
                     <Input
                       type="text"
-                      label="Nome do ativo"
+                      label="Item"
                       value={name}
                       onChange={handleName}
                       required
@@ -446,7 +452,7 @@ const Items = () => {
                   <Grid item xs={8}>
                     <Input
                       type="text"
-                      label="Descrição do ativo"
+                      label="Descrição do item"
                       value={description}
                       onChange={handleDescription}
                       required
@@ -461,17 +467,14 @@ const Items = () => {
                       required
                     />
                   </Grid>
-                  {(!editItem || (editItem && !editItem.acquisitionDate)) && (
-                    <Grid item xs={4}>
-                      <Input
-                        type="date"
-                        value={acquisitionDate}
-                        onChange={handleAcquisitionDate}
-                        required
-                      />
-                    </Grid>
-                  )}
-
+                  <Grid item xs={4}>
+                    <Input
+                      type="date"
+                      value={acquisitionDate}
+                      onChange={handleAcquisitionDate}
+                      required
+                    />
+                  </Grid>
                   <Grid item xs={4}>
                     <Input
                       type="text"
@@ -484,7 +487,7 @@ const Items = () => {
                   <Grid item xs={4}>
                     <Input
                       type="text"
-                      label="Responsável"
+                      label="Usuário responsável"
                       value={responsable}
                       onChange={handleResponsable}
                     />
@@ -517,13 +520,22 @@ const Items = () => {
                   <Grid item xs={4}>
                     <Input
                       type="text"
-                      label="Número da tag"
+                      label="Número de patrimônio"
                       value={tag}
                       onChange={handleTag}
                       required
                     />
                   </Grid>
-                  <Grid item xs={8}>
+                  <Grid item xs={4}>
+                    <Input
+                      type="text"
+                      label="Nota fiscal"
+                      value={invoice}
+                      onChange={(e) => setInvoice(e.target.value)}
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
                     <Input
                       type="text"
                       label="Filial"
@@ -556,14 +568,20 @@ const Items = () => {
                       disabled
                     />
                   </Grid>
-                  {/* <Grid item xs={8}>
-                      <Input
-                        type="text"
-                        label="Centro de custo"
-                        value={costCenter}
-                        onChange={handleCostCenter}
-                      />
-                    </Grid> */}
+                  <Grid item xs={4}>
+                    <Dropdown
+                      type="text"
+                      label="Centro de Custo"
+                      value={costCenter}
+                      onChange={handleCostCenter}
+                    >
+                      {costCenterData.map((data) => (
+                        <MenuItem key={data.description} value={data.description}>
+                          {data.description}
+                        </MenuItem>
+                      ))}
+                    </Dropdown>
+                  </Grid>
                 </Grid>
                 <Button
                   type="submit"

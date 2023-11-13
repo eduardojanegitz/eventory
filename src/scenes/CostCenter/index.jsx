@@ -1,96 +1,87 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Box, Button, CircularProgress, Typography, useTheme } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Button,
+  Typography,
+  useTheme,
+  Grid,
+  CircularProgress,
+} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import SendIcon from "@mui/icons-material/Send";
+import EditIcon from "@mui/icons-material/Edit";
 import { toast } from "react-toastify";
+
 import Header from "components/Header";
 import FlexBetween from "components/FlexBetween";
 import DataGridCustomToolbar from "components/DataGridCustomToolbar";
-import { api2 } from "state/api";
-import Input from "components/Input";
 import ModalStyle from "components/ModalStyle";
+import Input from "components/Input";
 import GridToolbar from "components/GridToolbar";
-import EditIcon from "@mui/icons-material/Edit";
-import AddLocationAltIcon from "@mui/icons-material/AddLocationAlt";
 
-const Location = () => {
+import { api2 } from "state/api";
+
+const CostCenter = () => {
   const theme = useTheme();
+
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(20);
   const [sort, setSort] = useState({});
   const [search, setSearch] = useState("");
-  const [open, setOpen] = useState(false);
-  const [searchInput, setSearchInput] = useState("");
-  const [name, setName] = useState("");
+  const [costCenter, setCostCenter] = useState([]);
+  const [code, setCode] = useState("");
   const [description, setDescription] = useState("");
-  const [location, setLocation] = useState([]);
-  const [editLocation, setEditLocation] = useState(null);
-  const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
-  const [deleteLocation, setDeleteLocation] = useState(null);
+  const [active, setActive] = useState(true);
+  const [editItem, setEditItem] = useState(null);
+  const [deleteItem, setDeleteItem] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
 
-  const handleOpen = (location = null) => {
-    setEditLocation(location);
-    setName(location ? location.name : "");
-    setDescription(location ? location.description : "");
+  const handleOpen = (item = null) => {
+    setEditItem(item);
     setOpen(true);
   };
 
   const handleClose = () => {
     setOpen(false);
   };
-
-  const handleName = (e) => {
-    setName(e.target.value);
-  };
+  const handleCode = (e) => {
+    setCode(e.target.value);
+  }
 
   const handleDescription = (e) => {
     setDescription(e.target.value);
-  };
-  const handleSearch = useCallback((searchInput) => {
+  }
+  const handleActive = (e) => {
+    setActive(e.target.value);
+  }
+
+  const handleSearch = (searchInput) => {
     setSearch(searchInput);
-  }, []);
+  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
 
-    try {
-      if (editLocation && editLocation._id) {
-        const response = await api2.put(`api/location/${editLocation._id}`, {
-          name,
-          description,
-        });
-        showToastSuccess(
-          response.data.msg || "Localização atualizada com sucesso!"
-        );
-      } else {
-        const response = await api2.post("api/location/", {
-          name,
-          description,
-        });
-        showToastSuccess(
-          response.data.msg || "Localização cadastrada com sucesso!"
-        );
-      }
+  const [searchInput, setSearchInput] = useState("");
 
-      setName("");
-      setDescription("");
-      setEditLocation(null);
-      setOpen(false);
-      loadData();
-    } catch (error) {
-      showToastError(
-        error.response?.data?.error ||
-          "Erro desconhecido. Entre em contato com o time de TI."
-      );
-    }
+  const showToastSuccess = (message) => {
+    toast.success(message, {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  };
+
+  const showToastDelete = (message) => {
+    toast.success(message, {
+      position: toast.POSITION.TOP_CENTER,
+    });
   };
 
   const loadData = async () => {
     try {
-      const response = await api2.get("api/location");
-      setLocation(response.data);
+      const response = await api2.get("api/cost");
+      setCostCenter(response.data);
       setLoading(false);
     } catch (error) {
       console.error("Erro ao carregar dados da tabela:", error);
@@ -102,42 +93,47 @@ const Location = () => {
     loadData();
   }, []);
 
-  const showToastSuccess = (message) => {
-    toast.success(message, {
-      position: toast.POSITION.TOP_CENTER,
-    });
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const showToastError = (message) => {
-    toast.error(message, {
-      position: toast.POSITION.TOP_CENTER,
-    });
+    if (editItem && editItem._id) {
+      await api2.put(`api/cost/${editItem._id}`, {
+        description,
+        active
+      });
+      showToastSuccess("Item atualizado com sucesso!");
+    } else {
+      await api2.post("api/cost/", {
+        code,
+        description,
+        active
+      });
+      showToastSuccess("Item cadastrado com sucesso!");
+    }
+
+    setEditItem(null);
+    setOpen(false);
+    loadData();
   };
 
   async function handleDeleteClick() {
     try {
-      const response = await api2.delete(`api/location/${deleteLocation._id}`);
+      const response = await api2.delete(`api/cost/${deleteItem._id}`);
       if (response.status === 200) {
         loadData();
-        showToastSuccess(
-          response.data.msg || "Localização deletada com sucesso!"
-        );
+        showToastDelete("Item deletado com sucesso");
       } else {
-        showToastError(response.data?.error || "Erro ao excluir o item.");
+        console.error("Erro ao excluir o custo.");
       }
     } catch (error) {
-      showToastError(
-        error.response?.data?.error ||
-          "Erro desconhecido. Entre em contato com o time de TI."
-      );
-      console.error("Erro ao excluir o item:", error);
+      console.error("Erro ao excluir o custo:", error);
     }
   }
 
   const columns = [
     {
-      field: "name",
-      headerName: "Localização",
+      field: "code",
+      headerName: "Código",
       flex: 1,
     },
     {
@@ -146,29 +142,38 @@ const Location = () => {
       flex: 1,
     },
     {
+      field: "active",
+      headerName: "Ativo",
+      flex: 1,
+    },
+
+    {
       field: "Ação",
-      flex: 0.3,
-      renderCell: (cellValues) => (
-        <>
-          <Button
-            variant="text"
-            color="secondary"
-            onClick={() => handleOpen(cellValues.row)}
-          >
-            <EditIcon />
-          </Button>
-          <Button
-            variant="text"
-            color="error"
-            onClick={() => {
-              setConfirmationModalOpen(true);
-              setDeleteLocation(cellValues.row);
-            }}
-          >
-            <DeleteIcon />
-          </Button>
-        </>
-      ),
+      flex: 0.5,
+      renderCell: (cellValues) => {
+        return (
+          <>
+            <Button
+              variant="text"
+              color="secondary"
+              onClick={() => handleOpen(cellValues.row)}
+            >
+              <EditIcon />
+            </Button>
+            <Button
+              variant="text"
+              color="error"
+              // onClick={() => handleDeleteClick(cellValues.row._id)}
+              onClick={() => {
+                setConfirmationModalOpen(true);
+                setDeleteItem(cellValues.row);
+              }}
+            >
+              <DeleteIcon />
+            </Button>
+          </>
+        );
+      },
     },
   ];
 
@@ -176,15 +181,15 @@ const Location = () => {
     <Box m="1.5rem 2.5rem">
       <FlexBetween>
         <Header
-          title="LOCALIZAÇÃO"
-          subtitle="Veja a lista das localização dos ativos."
+          title="CENTRO DE CUSTO"
+          subtitle="Veja a lista dos Centros de Custos."
         />
         <ModalStyle
           open={isConfirmationModalOpen}
           onClose={() => setConfirmationModalOpen(false)}
         >
           <Typography sx={{ mb: "30px" }}>
-            Tem certeza de que deseja excluir esta localização?
+            Tem certeza de que deseja excluir este custo?
           </Typography>
           <FlexBetween>
             <Button
@@ -209,13 +214,13 @@ const Location = () => {
         <Box>
           <Button
             onClick={handleOpen}
-            startIcon={<AddLocationAltIcon />}
+            startIcon={<AddCircleOutlineIcon />}
             sx={{
               backgroundColor: theme.palette.secondary.dark,
               color: theme.palette.background.alt,
               fontSize: "14px",
               fontWeight: "bold",
-              padding: "10px 17px",
+              padding: "10px 42px",
               transition: "background-color 0.3s ease, color 0.3s ease",
               "&:hover": {
                 backgroundColor: theme.palette.secondary.main,
@@ -223,35 +228,62 @@ const Location = () => {
               },
             }}
           >
-            Nova Localização
+            Novo Custo
           </Button>
-          <ModalStyle open={open} onClose={handleClose}>
+          <ModalStyle
+            maxHeight="90%"
+            width="90%"
+            open={open}
+            onClose={handleClose}
+          >
             <Typography id="modal-modal-title" variant="h5" component="h1">
-              {editLocation && editLocation._id
-                ? "Editar localização"
-                : "Nova localização"}
+              {editItem && editItem._id ? "Edição de custo" : "Cadastro de custo"}
             </Typography>
             <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-              <form onSubmit={handleSubmit} className="form">
-                <Input
-                  type="text"
-                  label="Nome da localização"
-                  value={name}
-                  onChange={handleName}
-                />
-                <Input
-                  type="text"
-                  label="Descrição"
-                  value={description}
-                  onChange={handleDescription}
-                />
+              <form component="form" onSubmit={handleSubmit}>
+                <Grid
+                  container
+                  rowSpacing={{ md: 5 }}
+                  columnSpacing={{ md: 2 }}
+                  columns={{ xs: 4, sm: 8, md: 12 }}
+                >
+
+                  <Grid item xs={4}>
+                    <Input
+                      type="text"
+                      label="Código"
+                      value={code}
+                      onChange={handleCode}
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={8}>
+                    <Input
+                      type="text"
+                      label="Descrição do ativo"
+                      value={description}
+                      onChange={handleDescription}
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Input
+                      type="text"
+                      label="Ativo"
+                      value={active}
+                      onChange={handleActive}
+                      required
+                    />
+                  </Grid> 
+                </Grid>
                 <Button
                   type="submit"
                   variant="contained"
                   color="secondary"
                   endIcon={<SendIcon />}
+                  sx={{ mr: 5 }}
                 >
-                  {editLocation && editLocation._id ? "Atualizar" : "Cadastrar"}
+                  {editItem && editItem._id ? "Atualizar" : "Cadastrar"}
                 </Button>
               </form>
             </Typography>
@@ -316,7 +348,16 @@ const Location = () => {
         >
           <DataGrid
             getRowId={(row) => row._id}
-            rows={location.filter((row) =>
+            rowsPerOptions={[20, 50, 100]}
+            columns={columns}
+            pagination
+            page={page}
+            pageSize={pageSize}
+            paginationMode="client"
+            onPageChange={(newPage) => setPage(newPage)}
+            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+            onSortModelChange={(newSortModel) => setSort(...newSortModel)}
+            rows={costCenter.filter((row) =>
               Object.values(row).some(
                 (value) =>
                   value &&
@@ -326,13 +367,6 @@ const Location = () => {
                     .includes(searchInput.toLowerCase())
               )
             )}
-            rowsPerPageOptions={[20, 50, 100]}
-            columns={columns}
-            pagination
-            paginationMode="client"
-            onPageChange={(newPage) => setPage(newPage)}
-            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-            onSortModelChange={(newSortModel) => setSort(...newSortModel)}
             components={{ Toolbar: GridToolbar }}
           />
         </Box>
@@ -341,4 +375,4 @@ const Location = () => {
   );
 };
 
-export default Location;
+export default CostCenter;
