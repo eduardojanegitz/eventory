@@ -1,232 +1,430 @@
 import React, { useState, useEffect } from "react";
-import { Box, useTheme } from "@mui/material";
-import { api2 } from "state/api";
+import {
+  Box,
+  Button,
+  Typography,
+  useTheme,
+  CircularProgress,
+} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import Header from "components/Header";
+
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
+import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
+import ThumbUpAltOutlinedIcon from "@mui/icons-material/ThumbUpAltOutlined";
+
+import ModalStyle from "components/ModalStyle";
 import FlexBetween from "components/FlexBetween";
-import IconButton from "@mui/material/IconButton";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { toast } from "react-toastify";
+import Header from "components/Header";
 import GridToolbar from "components/GridToolbar";
 import DataGridCustomToolbar from "components/DataGridCustomToolbar";
 
-
+import { toast } from "react-toastify";
+import { api2 } from "state/api";
+import useAxiosPrivate from "hooks/useAxiosPrivate";
+import { useNavigate } from "react-router-dom";
 
 const Divergences = () => {
+  const theme = useTheme();
+  const navigate = useNavigate();
+  const axiosPrivate = useAxiosPrivate();
 
   const [page, setPage] = useState(0);
-  const [search, setSearch] = useState("");
   const [pageSize, setPageSize] = useState(20);
-  const theme = useTheme();
-  const [sort, setSort] = useState({});
-  const [divergences, setDivergences] = useState([]);
 
-  const showToastMessage = () => {
-    toast.success("Divergência aprovada", {
+  const [isItemsModalOpen, setIsItemsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
+
+  const [searchInput, setSearchInput] = useState("");
+  const [divergencesId, setDivergencesId] = useState("");
+
+  const [sort, setSort] = useState({});
+
+  const [divergences, setDivergences] = useState([]);
+  const [itemsForDivergence, setItemsForDivergence] = useState([]);
+  const [approvedDivergence, setApprovedDivergence] = useState([]);
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const showToastSuccess = (message) => {
+    toast.success(message, {
       position: toast.POSITION.TOP_CENTER,
     });
+  };
+
+  const showToastError = (message) => {
+    toast.error(message, {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  };
+
+  const handleOpenItemsModal = (row) => {
+    const divergence = divergences.find((div) => div._id === row);
+    setItemsForDivergence(divergence?.item || []);
+    setIsItemsModalOpen(true);
+  };
+
+  const handleCloseItemsModal = () => {
+    setIsItemsModalOpen(false);
+  };
+
+  const handleSearch = (searchInput) => {
+    setSearchInput(searchInput);
+  };
+
+  const handleAssetMovement = () => {
+    navigate("/movimentacao");
+  };
+
+  const handleApproveDivergence = async (divergenceId) => {
+    try {
+      const response = await axiosPrivate.post(`api/approve/${divergenceId}`);
+      if (response.status === 200) {
+        showToastSuccess(response.data.msg || "Divergência aprovada!");
+        loadData();
+        handleCloseItemsModal();
+      }
+    } catch (error) {
+      console.error("Erro ao aprovar divergência:", error);
+    }
   };
 
   const loadData = async () => {
     try {
       const response = await api2.get("api/divergences");
       setDivergences(response.data);
+      setLoading(false);
     } catch (error) {
       console.error("Erro ao carregar dados da tabela:", error);
+      showToastError("Erro desconhecido. Entre em contato com o time de TI.");
+      setLoading(false);
     }
   };
 
   useEffect(() => {
- 
-    // Carregue os dados da tabela quando o componente for montado
+    api2
+      .get("api/approve")
+      .then((response) => setApprovedDivergence(response.data));
     loadData();
-  }, [])
-
-  async function handleDeleteClick(id) {
-    try {
-      const response = await api2.delete(`api/divergences/${id}`);
-      if (response.status === 200) {
-        // Atualize a lista de divergências após a exclusão bem-sucedida
-        // setDivergences((prevDivergences) =>
-        //   prevDivergences.filter((divergence) => divergence._id !== id)
-        // );
-        loadData();
-        showToastMessage();
-        // Exiba uma mensagem de sucesso ou faça qualquer outra ação necessária
-      } else {
-        // Exiba uma mensagem de erro ou trate qualquer erro que ocorra
-        console.error("Erro ao excluir o item.");
-      }
-    } catch (error) {
-      console.error("Erro ao excluir o item:", error);
-    }
-  }
-
-  const [searchInput, setSearchInput] = useState("");
-
-  const handleSearch = (searchInput) => {
-    setSearch(searchInput);
-  };
+  }, []);
 
   const columns = [
     {
       field: "location",
       headerName: "Localização",
-      flex: 1
-    },
-    {
-      field: "localizacao",
-      headerName: "Localização correta",
       flex: 1,
-      valueGetter: (params) => {
-        if (params.row.item && params.row.item.length > 0) {
-          const localizacao = params.row.item.map((obj) => obj.localizacao);
-          return localizacao.join(', ');
-        } else {
-          return '';
-        }
-      },
     },
-    {
-      field: "descricao",
-      headerName: "Descrição",
-      flex: 1,
-      valueGetter: (params) => {
-        if (params.row.item && params.row.item.length > 0) {
-          const descricao = params.row.item.map((obj) => obj.descricao);
-          return descricao.join(', ');
-        } else {
-          return '';
-        }
-      },
-    },
-    {
-      field: "nome",
-      headerName: "Nome",
-      flex: 1,
-      valueGetter: (params) => {
-        if (params.row.item && params.row.item.length > 0) {
-          const nome = params.row.item.map((obj) => obj.nome);
-          return nome.join(', ');
-        } else {
-          return '';
-        }
-      },
-    },
-    {
-      field: "serial",
-      headerName: "Número de série",
-      flex: 1,
-      valueGetter: (params) => {
-        if (params.row.item && params.row.item.length > 0) {
-          const serial = params.row.item.map((obj) => obj.serial);
-          return serial.join(', ');
-        } else {
-          return '';
-        }
-      },
-    },
+    // {
+    //   field: "localizacao",
+    //   headerName: "Localização correta",
+    //   flex: 1,
+    //   valueGetter: (params) => {
+    //     if (params.row.item && params.row.item.length > 0) {
+    //       const localizacao = params.row.item.map((obj) => obj.localizacao);
+    //       return localizacao.join(", ");
+    //     } else {
+    //       return "";
+    //     }
+    //   },
+    // },
     {
       field: "user",
       headerName: "Responsável",
-      flex: 1
+      flex: 1,
     },
     {
       field: "createdAt",
-      headerName: "Data",
+      headerName: "Data da divergência",
       flex: 1,
       valueGetter: (params) => {
-        // Formate a data para o formato brasileiro (dd/mm/yyyy)
         const date = new Date(params.row.createdAt);
-        return date.toLocaleString('pt-BR');
+        return date.toLocaleString("pt-BR");
       },
     },
     {
       field: "actions",
       headerName: "Ações",
       sortable: false,
-      flex: 1,
+      flex: 0.5,
       renderCell: (params) => (
-        <IconButton
-          edge="end"
-          aria-label="delete"
-          onClick={() => handleDeleteClick(params.row._id)}
-        >
-          <DeleteIcon />
-        </IconButton>
+        <>
+          <Button
+            variant="contained"
+            color="secondary"
+            sx={{ marginRight: "5px" }}
+            onClick={() => {
+              handleOpenItemsModal(params.row._id);
+              setDivergencesId(params.row._id);
+            }}
+          >
+            <VisibilityIcon />
+          </Button>
+        </>
       ),
     },
   ];
-  
-
   return (
     <Box m="1.5rem 2.5rem">
-    <FlexBetween>
-      <Header
-        title="DIVERGÊNCIA DE INVENTÁRIOS"
-        subtitle="Veja a lista das divergência dos ativos."
-      />
-    </FlexBetween>
+      <FlexBetween>
+        <Header
+          title="DIVERGÊNCIA DE INVENTÁRIOS"
+          subtitle="Veja a lista das divergência dos ativos."
+        />
+        <Button
+          onClick={handleOpen}
+          startIcon={<AssignmentTurnedInOutlinedIcon />}
+          sx={{
+            backgroundColor: theme.palette.secondary.dark,
+            color: theme.palette.background.default,
+            fontSize: "14px",
+            fontWeight: "bold",
+            padding: "10px 23px",
+            transition: "background-color 0.3s ease, color 0.3s ease",
+            "&:hover": {
+              backgroundColor: theme.palette.secondary.main,
+              color: theme.palette.primary.main,
+            },
+          }}
+        >
+          HISTÓRICO DE APROVAÇÕES
+        </Button>
+        <ModalStyle open={open} onClose={handleClose}>
+          <Typography
+            id="modal-modal-title"
+            variant="h6"
+            component="h2"
+            sx={{ mb: "1rem" }}
+          >
+            Histórico de Aprovações
+          </Typography>
+          <Box
+            height="50vh"
+            width="60vw"
+            sx={{
+              "& .MuiDataGrid-root": {
+                border: "none",
+              },
+              "& .MuiDataGrid-cell": {
+                borderBottom: "none",
+              },
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: theme.palette.background.alt,
+                color: theme.palette.secondary[100],
+                borderBottom: "none",
+              },
+              "& .MuiDataGrid-virtualScroller": {
+                backgroundColor: theme.palette.primary.light,
+                overflowY: "auto",
+                scrollbarWidth: "thin",
+                "&::-webkit-scrollbar": {
+                  width: "3px",
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  backgroundColor: "#b3b0b0",
+                  borderRadius: "20px",
+                },
+                "&::-webkit-scrollbar-track": {
+                  backgroundColor: "transparent",
+                },
+              },
+              "& .MuiDataGrid-FooterContainer": {
+                backgroundColor: theme.palette.background.alt,
+                color: theme.palette.secondary[100],
+                borderTop: "none",
+              },
+              "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+                color: `${theme.palette.secondary[200]} !important`,
+              },
+            }}
+          >
+            <DataGrid
+              rows={approvedDivergence.map((approve, index) => ({
+                ...approve,
+                id: index,
+              }))}
+              columns={[
+                { field: "location", headerName: "Localização", flex: 1 },
+                { field: "user", headerName: "Usuário aprovador", flex: 1 },
+                {
+                  field: "createdAt",
+                  headerName: "Data de aprovação",
+                  flex: 1,
+                  valueGetter: (params) => {
+                    const date = new Date(params.row.createdAt);
+                    return date.toLocaleString("pt-BR");
+                  },
+                },
+              ]}
+              pageSize={20}
+              pagination
+            />
+          </Box>
+        </ModalStyle>
+      </FlexBetween>
+      <ModalStyle
+        open={isItemsModalOpen}
+        onClose={handleCloseItemsModal}
+        width="90%"
+      >
+        <Typography variant="h6" component="h2" sx={{ mb: "1rem" }}>
+          Itens divergentes
+        </Typography>
+        <Box
+          height="50vh"
+          width="100%"
+          sx={{
+            "& .MuiDataGrid-root": {
+              border: "none",
+            },
+            "& .MuiDataGrid-cell": {
+              borderBottom: "none",
+            },
+            "& .MuiDataGrid-columnHeaders": {
+              backgroundColor: theme.palette.background.alt,
+              color: theme.palette.secondary[100],
+              borderBottom: "none",
+            },
+            "& .MuiDataGrid-virtualScroller": {
+              backgroundColor: theme.palette.primary.light,
+              overflowY: "auto",
+              scrollbarWidth: "thin",
+              "&::-webkit-scrollbar": {
+                width: "3px",
+              },
+              "&::-webkit-scrollbar-thumb": {
+                backgroundColor: "#b3b0b0",
+                borderRadius: "20px",
+              },
+              "&::-webkit-scrollbar-track": {
+                backgroundColor: "transparent",
+              },
+            },
+            "& .MuiDataGrid-FooterContainer": {
+              backgroundColor: theme.palette.background.alt,
+              color: theme.palette.secondary[100],
+              borderTop: "none",
+            },
+            "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+              color: `${theme.palette.secondary[200]} !important`,
+            },
+          }}
+        >
+          <DataGrid
+            rows={itemsForDivergence.map((item, index) => ({
+              ...item,
+              id: index,
+            }))}
+            columns={[
+              { field: "nome", headerName: "Item", flex: 1 },
+              { field: "descricao", headerName: "Descrição", flex: 1 },
+              {
+                field: "localizacao",
+                headerName: "Localização correta",
+                flex: 1,
+              },
+              { field: "serial", headerName: "Número de série", flex: 1 },
+              { field: "tag", headerName: "Patrimônio", flex: 1 },
+            ]}
+            pageSize={20}
+            pagination
+          />
+        </Box>
+        <Button
+          variant="contained"
+          color="secondary"
+          startIcon={<ThumbUpAltOutlinedIcon />}
+          sx={{ mr: "5px" }}
+          onClick={() => handleApproveDivergence(divergencesId)}
+        >
+          APROVAR A DIVERGÊNCIA
+        </Button>
+        <Button
+          variant="contained"
+          color="secondary"
+          startIcon={<CompareArrowsIcon />}
+          onClick={handleAssetMovement}
+        >
+          MOVIMENTAR O ATIVO
+        </Button>
+      </ModalStyle>
 
-    <DataGridCustomToolbar
+      <DataGridCustomToolbar
         value={searchInput}
         onChange={setSearchInput}
         onSearch={handleSearch}
       />
-    <Box
-      height="80vh"
-      sx={{
-        "& .MuiDataGrid-root": {
-          border: "none",
-        },
-        "& .MuiDataGrid-cell": {
-          borderBottom: "none",
-        },
-        "& .MuiDataGrid-columnHeaders": {
-          backgroundColor: theme.palette.background.alt,
-          color: theme.palette.secondary[100],
-          borderBottom: "none",
-        },
-        "& .MuiDataGrid-virtualScroller": {
-          backgroundColor: theme.palette.primary.light,
-        },
-        "& .MuiDataGrid-FooterContainer": {
-          backgroundColor: theme.palette.background.alt,
-          color: theme.palette.secondary[100],
-          borderTop: "none",
-        },
-        "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-          color: `${theme.palette.secondary[200]} !important`,
-        },
-      }}
-    >
-      <DataGrid
-        // loading={isLoading || !data}
-        getRowId={(row) => row._id}
-        rows={divergences.filter((row) =>
-          Object.values(row).some(
-            (value) =>
-              value &&
-              value
-                .toString()
-                .toLowerCase()
-                .includes(searchInput.toLowerCase())
-          )
-        )}
-        rowsPerPageOptions={[20, 50, 100]}
-        columns={columns}
-        pagination
-        page={page}
-        pageSize={pageSize}
-        paginationMode="client"
-        onPageChange={(newPage) => setPage(newPage)}
-        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-        onSortModelChange={(newSortModel) => setSort(...newSortModel)}
-        components={{ Toolbar: GridToolbar }}
-        
-      />
+      {loading ? (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "80vh",
+          }}
+        >
+          <CircularProgress color="secondary" />
+        </Box>
+      ) : (
+        <Box
+          height="80vh"
+          sx={{
+            "& .MuiDataGrid-root": {
+              border: "none",
+            },
+            "& .MuiDataGrid-cell": {
+              borderBottom: "none",
+            },
+            "& .MuiDataGrid-columnHeaders": {
+              backgroundColor: theme.palette.background.alt,
+              color: theme.palette.secondary[100],
+              borderBottom: "none",
+            },
+            "& .MuiDataGrid-virtualScroller": {
+              backgroundColor: theme.palette.primary.light,
+            },
+            "& .MuiDataGrid-FooterContainer": {
+              backgroundColor: theme.palette.background.alt,
+              color: theme.palette.secondary[100],
+              borderTop: "none",
+            },
+            "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+              color: `${theme.palette.secondary[200]} !important`,
+            },
+          }}
+        >
+          <DataGrid
+            getRowId={(row) => row._id}
+            rows={divergences.filter((row) =>
+              Object.values(row).some(
+                (value) =>
+                  value &&
+                  value
+                    .toString()
+                    .toLowerCase()
+                    .includes(searchInput.toLowerCase())
+              )
+            )}
+            rowsPerPageOptions={[20, 50, 100]}
+            columns={columns}
+            pagination
+            page={page}
+            pageSize={pageSize}
+            paginationMode="client"
+            onPageChange={(newPage) => setPage(newPage)}
+            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+            onSortModelChange={(newSortModel) => setSort(...newSortModel)}
+            components={{ Toolbar: GridToolbar }}
+          />
+        </Box>
+      )}
     </Box>
-  </Box>
   );
 };
 
