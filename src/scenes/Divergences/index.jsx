@@ -185,7 +185,7 @@ const Divergences = () => {
             color: theme.palette.background.default,
             fontSize: "14px",
             fontWeight: "bold",
-            padding: "10px 23px",
+            padding: "10px 15px",
             transition: "background-color 0.3s ease, color 0.3s ease",
             "&:hover": {
               backgroundColor: theme.palette.secondary.main,

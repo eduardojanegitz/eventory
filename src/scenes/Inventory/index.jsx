@@ -3,12 +3,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import { api2 } from "state/api";
 import Header from "components/Header";
 import { useTheme } from "@emotion/react";
-import {
-  Box,
-  Button,
-  CircularProgress,
-  MenuItem,
-} from "@mui/material";
+import { Box, Button, CircularProgress, MenuItem } from "@mui/material";
 import DataGridCustomToolbar from "components/DataGridCustomToolbar";
 import FlexBetween from "components/FlexBetween";
 import { useNavigate } from "react-router-dom";
@@ -28,18 +23,20 @@ const Inventory = () => {
 
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(20);
-  const [itemsForInventory, setItemsForInventory] = useState([]);
+
   const [isItemsModalOpen, setIsItemsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
 
+  const [itemsForInventory, setItemsForInventory] = useState([]);
   const [data, setData] = useState([]);
-
   const [locationSelect, setLocationSelect] = useState([]);
+  const [costCenterSelect, setCostCenterSelect] = useState([]);
 
   const [searchInput, setSearchInput] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [selectedCostCenter, setSelectedCostCenter] = useState("");
 
-  const [open, setOpen] = useState(false);
   const handleOpen = () => {
     setOpen(true);
   };
@@ -63,6 +60,12 @@ const Inventory = () => {
 
   useEffect(() => {
     api2
+      .get("api/location")
+      .then((response) => setLocationSelect(response.data));
+
+    api2.get("api/cost").then((response) => setCostCenterSelect(response.data));
+
+    api2
       .get("/api/inventory")
       .then((response) => {
         setData(response.data);
@@ -72,12 +75,6 @@ const Inventory = () => {
         console.error("Erro ao carregar dados da tabela", error);
         setLoading(false);
       });
-  }, []);
-
-  useEffect(() => {
-    api2
-      .get("api/location")
-      .then((response) => setLocationSelect(response.data));
   }, []);
 
   const columns = [
@@ -96,9 +93,9 @@ const Inventory = () => {
       },
     },
     {
-      field: "location", 
+      field: "location",
       headerName: "Localização",
-      flex: 1
+      flex: 1,
     },
     {
       field: "user",
@@ -192,14 +189,15 @@ const Inventory = () => {
                 id: index,
               }))}
               columns={[
-                { field: "nome", headerName: "Nome", flex: 1 },
+                { field: "nome", headerName: "Item", flex: 1 },
                 { field: "descricao", headerName: "Descrição", flex: 1 },
                 { field: "localizacao", headerName: "Localização", flex: 1 },
                 { field: "serial", headerName: "Número de série", flex: 1 },
-                { field: "tag", headerName: "Tag", flex: 1 },
+                { field: "tag", headerName: "Patrimônio", flex: 1 },
               ]}
               pageSize={20}
               pagination
+              components={{ Toolbar: GridToolbar }}
             />
           </Box>
         </ModalStyle>
@@ -231,24 +229,41 @@ const Inventory = () => {
             >
               Sala que está realizando o inventário
             </Typography>
-              <Dropdown
-                sx={{
-                  width: "25rem",
-                  mb: "1rem",
-                  borderRadius: "8px",
-                  padding: "8px",
-                }}
-                value={selectedLocation}
-                onChange={(e) => setSelectedLocation(e.target.value)}
-                label="Selecione a localização"
-                id="location-select"
-              >
-                {locationSelect.map((location) => (
-                  <MenuItem key={location._id} value={location.name}>
-                    {location.name}
-                  </MenuItem>
-                ))}
-              </Dropdown>
+            <Dropdown
+              sx={{
+                width: "25rem",
+                mb: "1rem",
+                borderRadius: "8px",
+                padding: "8px",
+              }}
+              value={selectedLocation}
+              onChange={(e) => setSelectedLocation(e.target.value)}
+              label="Selecione a localização"
+              id="location-select"
+            >
+              {locationSelect.map((location) => (
+                <MenuItem key={location._id} value={location.name}>
+                  {location.name}
+                </MenuItem>
+              ))}
+            </Dropdown>
+            <Dropdown
+              sx={{
+                width: "25rem",
+                mb: "1rem",
+                borderRadius: "8px",
+                padding: "8px",
+              }}
+              value={selectedCostCenter}
+              onChange={(e) => setSelectedCostCenter(e.target.value)}
+              label="Selecione o centro de custo"
+            >
+              {costCenterSelect.map((costCenter) => (
+                <MenuItem key={costCenter._id} value={costCenter.description}>
+                  {costCenter.description}
+                </MenuItem>
+              ))}
+            </Dropdown>
 
             <Button
               variant="contained"
