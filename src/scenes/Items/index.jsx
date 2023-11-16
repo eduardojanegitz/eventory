@@ -275,7 +275,7 @@ const Items = () => {
     },
     {
       field: "responsable",
-      headerName: "Responsável",
+      headerName: "Usuário",
       flex: 0.7,
     },
     {
