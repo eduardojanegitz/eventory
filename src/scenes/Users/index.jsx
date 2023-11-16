@@ -6,7 +6,6 @@ import { DataGrid } from "@mui/x-data-grid";
 import FlexBetween from "components/FlexBetween";
 import PersonAddOutlinedIcon from "@mui/icons-material/PersonAddOutlined";
 import Typography from "@mui/material/Typography";
-import Modal from "@mui/material/Modal";
 import EditIcon from "@mui/icons-material/Edit";
 import SendIcon from "@mui/icons-material/Send";
 
@@ -269,7 +268,7 @@ const Users = () => {
               color: theme.palette.background.alt,
               fontSize: "14px",
               fontWeight: "bold",
-              padding: "10px 35px",
+              padding: "10px 20px",
               transition: "background-color 0.3s ease, color 0.3s ease",
               "&:hover": {
                 backgroundColor: theme.palette.secondary.main,

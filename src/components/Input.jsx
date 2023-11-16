@@ -10,7 +10,8 @@ const Input = ({
   disabled,
   label,
   refInput,
-  required
+  required,
+  onKeyDown
 }) => {
   const theme = useTheme();
   return (
@@ -24,6 +25,7 @@ const Input = ({
       disabled={disabled}
       ref={refInput}
       required={required} 
+      onKeyDown={onKeyDown}
       color="info"
       sx={{
         width: "100%",

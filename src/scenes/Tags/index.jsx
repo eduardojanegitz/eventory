@@ -206,16 +206,22 @@ const Tags = () => {
             value={item}
             refInput={itemName}
             onChange={(e) => setItem(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                addItem();
+              }
+            }}
             label="Faça aqui a leitura do patrimônio..."
           />
           <Box sx={{ mb: "15px" }}>
-            <Button
-              sx={{ mr: "5px" }}
-              variant="contained"
-              color="secondary"
-              endIcon={<PlaylistAddIcon />}
-              onClick={addItem}
-            >
+          <Button
+            sx={{ mr: "5px" }}
+            variant="contained"
+            color="secondary"
+            endIcon={<PlaylistAddIcon />}
+            onClick={addItem}
+          >
               ADICIONAR
             </Button>
             <Button

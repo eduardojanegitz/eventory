@@ -153,7 +153,7 @@ const ItemGroup = () => {
   const columns = [
     {
       field: "name",
-      headerName: "Localização",
+      headerName: "Grupo de itens",
       flex: 1,
     },
     {

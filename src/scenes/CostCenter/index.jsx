@@ -6,6 +6,7 @@ import {
   useTheme,
   Grid,
   CircularProgress,
+  MenuItem,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -22,8 +23,11 @@ import Input from "components/Input";
 import GridToolbar from "components/GridToolbar";
 
 import { api2 } from "state/api";
+import Dropdown from "components/Dropdown";
 
 const CostCenter = () => {
+  const ACTIVE = ["Ativo", "Inativo"];
+
   const theme = useTheme();
 
   const [page, setPage] = useState(0);
@@ -50,19 +54,18 @@ const CostCenter = () => {
   };
   const handleCode = (e) => {
     setCode(e.target.value);
-  }
+  };
 
   const handleDescription = (e) => {
     setDescription(e.target.value);
-  }
+  };
   const handleActive = (e) => {
     setActive(e.target.value);
-  }
+  };
 
   const handleSearch = (searchInput) => {
     setSearch(searchInput);
   };
-
 
   const [searchInput, setSearchInput] = useState("");
 
@@ -97,19 +100,27 @@ const CostCenter = () => {
     e.preventDefault();
 
     if (editItem && editItem._id) {
-      await api2.put(`api/cost/${editItem._id}`, {
+      const response = await api2.put(`api/cost/${editItem._id}`, {
         description,
-        active
+        active,
       });
-      showToastSuccess("Item atualizado com sucesso!");
+      showToastSuccess(
+        response.data.msg || "Centro de custo atualizado com sucesso! "
+      );
     } else {
-      await api2.post("api/cost/", {
+      const response = await api2.post("api/cost/", {
         code,
         description,
-        active
+        active,
       });
-      showToastSuccess("Item cadastrado com sucesso!");
+      showToastSuccess(
+        response.data.msg || "Centro de custo criado com sucesso!"
+      );
     }
+
+    setCode("");
+    setDescription("");
+    setActive("");
 
     setEditItem(null);
     setOpen(false);
@@ -121,12 +132,17 @@ const CostCenter = () => {
       const response = await api2.delete(`api/cost/${deleteItem._id}`);
       if (response.status === 200) {
         loadData();
-        showToastDelete("Item deletado com sucesso");
+        showToastDelete(
+          response.data.msg || "Centro de custo deletado com sucesso! "
+        );
       } else {
-        console.error("Erro ao excluir o custo.");
+        console.error("Erro ao excluir o centro de custo.");
       }
     } catch (error) {
-      console.error("Erro ao excluir o custo:", error);
+      console.error("Erro ao excluir o centro custo:", error);
+      showToastDelete(
+        "Erro desconhecido. Entre em contato com a equipe de TI."
+      );
     }
   }
 
@@ -220,7 +236,7 @@ const CostCenter = () => {
               color: theme.palette.background.alt,
               fontSize: "14px",
               fontWeight: "bold",
-              padding: "10px 42px",
+              padding: "10px",
               transition: "background-color 0.3s ease, color 0.3s ease",
               "&:hover": {
                 backgroundColor: theme.palette.secondary.main,
@@ -228,16 +244,17 @@ const CostCenter = () => {
               },
             }}
           >
-            Novo Custo
+            NOVO CENTRO DE CUSTO
           </Button>
           <ModalStyle
             maxHeight="90%"
-            width="90%"
             open={open}
             onClose={handleClose}
           >
             <Typography id="modal-modal-title" variant="h5" component="h1">
-              {editItem && editItem._id ? "Edição de custo" : "Cadastro de custo"}
+              {editItem && editItem._id
+                ? "Edição de centro de custo"
+                : "Cadastro de centro de custo"}
             </Typography>
             <Typography id="modal-modal-description" sx={{ mt: 2 }}>
               <form component="form" onSubmit={handleSubmit}>
@@ -247,7 +264,6 @@ const CostCenter = () => {
                   columnSpacing={{ md: 2 }}
                   columns={{ xs: 4, sm: 8, md: 12 }}
                 >
-
                   <Grid item xs={4}>
                     <Input
                       type="text"
@@ -260,21 +276,25 @@ const CostCenter = () => {
                   <Grid item xs={8}>
                     <Input
                       type="text"
-                      label="Descrição do ativo"
+                      label="Descrição do centro de custo"
                       value={description}
                       onChange={handleDescription}
                       required
                     />
                   </Grid>
                   <Grid item xs={4}>
-                    <Input
-                      type="text"
-                      label="Ativo"
+                    <Dropdown
+                      label="Status"
                       value={active}
                       onChange={handleActive}
-                      required
-                    />
-                  </Grid> 
+                    >
+                      {ACTIVE.map((active) => (
+                        <MenuItem key={active} value={active}>
+                          {active}
+                        </MenuItem>
+                      ))}
+                    </Dropdown>
+                  </Grid>
                 </Grid>
                 <Button
                   type="submit"
