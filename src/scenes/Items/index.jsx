@@ -33,8 +33,8 @@ const Items = () => {
 
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(20);
+
   const [sort, setSort] = useState({});
-  const [search, setSearch] = useState("");
 
   const [item, setItem] = useState([]);
   const [locationSelect, setLocationSelect] = useState([]);
@@ -56,14 +56,16 @@ const Items = () => {
   const [costCenter, setCostCenter] = useState("");
   const [itemGroup, setItemGroup] = useState("");
   const [invoice, setInvoice] = useState("");
+  const [searchInput, setSearchInput] = useState("");
 
   const [editItem, setEditItem] = useState(null);
   const [deleteItem, setDeleteItem] = useState(null);
+  const [itemImage, setItemImage] = useState(null);
+
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [openWritteOff, setOpenWritteOff] = useState(false);
   const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
-  const [itemImage, setItemImage] = useState(null);
 
   const handleOpen = (item = null) => {
     setEditItem(item);
@@ -75,6 +77,11 @@ const Items = () => {
     setTag(item ? item.tag : "");
     setBranch(item ? item.branch : "");
     setDepreciation(item ? item.depreciation : "");
+    setResponsable(item ? item.responsable : "");
+    setInvoice(item ? item.invoice : "");
+    setItemGroup(item ? item.itemGroup : "");
+    setCostCenter(item ? item.costCenter : "");
+    setAcquisitionDate(item ? item.acquisitionDate : "");
     setOpen(true);
   };
 
@@ -140,7 +147,7 @@ const Items = () => {
     updateDepreciation(selectedItemGroup);
   };
   const handleSearch = (searchInput) => {
-    setSearch(searchInput);
+    setSearchInput(searchInput);
   };
 
   const updateDepreciation = (selectedItemGroup) => {
@@ -153,8 +160,6 @@ const Items = () => {
       setDepreciation("");
     }
   };
-
-  const [searchInput, setSearchInput] = useState("");
 
   const showToastSuccess = (message) => {
     toast.success(message, {
@@ -183,17 +188,10 @@ const Items = () => {
     api2
       .get("api/location")
       .then((response) => setLocationSelect(response.data));
-  }, []);
-  useEffect(() => {
     api2
       .get("api/item-group")
       .then((response) => setItemGroupData(response.data));
-  }, []);
-  useEffect(() => {
     api2.get("api/cost").then((response) => setCostCenterData(response.data));
-  }, []);
-
-  useEffect(() => {
     loadData();
   }, []);
 
@@ -212,6 +210,7 @@ const Items = () => {
         acquisitionDate,
         writeOffDate,
         depreciation,
+        costCenter,
       });
       showToastSuccess("Item atualizado com sucesso!");
     } else {
@@ -229,6 +228,7 @@ const Items = () => {
         depreciation,
         itemGroup,
         invoice,
+        costCenter,
       });
       showToastSuccess("Item cadastrado com sucesso!");
     }
@@ -467,7 +467,17 @@ const Items = () => {
                       required
                     />
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid
+                    item
+                    xs={4}
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                      marginTop: "-20px",
+                    }}
+                  >
+                    <Typography>Data de Aquisição</Typography>
                     <Input
                       type="date"
                       value={acquisitionDate}
@@ -576,7 +586,10 @@ const Items = () => {
                       onChange={handleCostCenter}
                     >
                       {costCenterData.map((data) => (
-                        <MenuItem key={data.description} value={data.description}>
+                        <MenuItem
+                          key={data.description}
+                          value={data.description}
+                        >
                           {data.description}
                         </MenuItem>
                       ))}
