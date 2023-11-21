@@ -1,15 +1,22 @@
-import { Link } from "react-router-dom"
+import notFound from "../assets/404-status-code.jpg";
+import { Box } from "@mui/material";
 
 const Missing = () => {
-    return (
-        <article style={{ padding: "100px" }}>
-            <h1>Oops!</h1>
-            <p>Page Not Found</p>
-            <div className="flexGrow">
-                <Link to="/">Visit Our Homepage</Link>
-            </div>
-        </article>
-    )
-}
+  return (
+    <article>
+      {/* <p>Página não encontrada!</p> */}
+      <Box>
+        <img
+          style={{
+            width: "100%",
+            height: "100%",
+          }}
+          src={notFound}
+          alt="Página não encontrada!"
+        />
+      </Box>
+    </article>
+  );
+};
 
-export default Missing
+export default Missing;
