@@ -102,9 +102,14 @@ const navItems = [
     nav: "depreciacao",
   },
   {
-    text: "Categorias",
+    text: "Itens x Centro de Custo",
     icon: <PieChartOutlined />,
-    nav: "categorias",
+    nav: "itens-centro-de-custo",
+  },
+  {
+    text: "Itens x Grupo de Itens",
+    icon: <PieChartOutlined />,
+    nav: "itens-por-grupo",
   },
   // {
   //   text: "Leitura de etiquetas",

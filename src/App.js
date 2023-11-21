@@ -54,14 +54,12 @@ const App = () => {
                   <RequireAuth allowedRoles={[...Object.values(ROLES)]} />
                 }
               >
-                <Route path="/home" element={<Home />} />
                 <Route path="/inventarios" element={<Inventory />} />
                 <Route path="/tags" element={<Tags />} />
               </Route>
               <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
                 <Route path="/usuarios" element={<Users />} />
                 <Route path="/novo-usuario" element={<NewUser />} />
-                <Route path="/cc" element={<Cost />} />
               </Route>
               <Route
                 element={
@@ -77,7 +75,8 @@ const App = () => {
                 <Route path="/new-movement" element={<NewMovement />} />
                 <Route path="/depreciacao" element={<Depreciation />} />
                 <Route path="/grupo-de-itens" element={<ItemGroup />} />
-                <Route path="/categorias" element={<Breakdown />} />
+                <Route path="/itens-centro-de-custo" element={<Breakdown />} />
+                <Route path="/itens-por-grupo" element={<Overview />} />
                 <Route path="/divergencias" element={<Divergences />} />
               </Route>
               <Route path="*" element={<Missing />} />

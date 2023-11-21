@@ -1,29 +1,20 @@
-import React, { useState } from "react";
-import { FormControl, MenuItem, InputLabel, Box, Select } from "@mui/material";
+import React from "react";
+import { Box } from "@mui/material";
 import Header from "components/Header";
-import OverviewChart from "components/OverviewChart";
+import PieChart from "components/PieChart";
 
-const Overview = () => {
-  const [view, setView] = useState("units");
+const Breakdown = () => {
   return (
     <Box m="1.5rem 2.5rem">
-      <Header title="VALOR POR CENTRO DE CUSTO" subtitle="Veja a depreciação dos itens" />
-      <Box height="75vh">
-        <FormControl sx={{ mt: "1rem" }}>
-          <InputLabel>View</InputLabel>
-          <Select
-            value={view}
-            label="View"
-            onChange={(e) => setView(e.target.value)}
-          >
-            <MenuItem value="items">Itens</MenuItem>
-            <MenuItem value="units">Unidades</MenuItem>
-          </Select>
-        </FormControl>
-        <OverviewChart view={view} /> 
+      <Header
+        title="ITENS POR GRUPO DE ITENS"
+        subtitle="Veja o gráfico dos itens por grupo de itens."
+      />
+      <Box mt="40px" height="75vh">
+        <PieChart />
       </Box>
     </Box>
   );
 };
 
-export default Overview;
+export default Breakdown;
