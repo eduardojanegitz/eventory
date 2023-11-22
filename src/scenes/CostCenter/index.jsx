@@ -205,7 +205,7 @@ const CostCenter = () => {
           onClose={() => setConfirmationModalOpen(false)}
         >
           <Typography sx={{ mb: "30px" }}>
-            Tem certeza de que deseja excluir este custo?
+            Tem certeza de que deseja excluir este centro de custo?
           </Typography>
           <FlexBetween>
             <Button
