@@ -1,5 +1,12 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Box, Button, CircularProgress, MenuItem, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  MenuItem,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SendIcon from "@mui/icons-material/Send";
@@ -12,7 +19,7 @@ import Input from "components/Input";
 import ModalStyle from "components/ModalStyle";
 import GridToolbar from "components/GridToolbar";
 import EditIcon from "@mui/icons-material/Edit";
-import LayersIcon from '@mui/icons-material/Layers';
+import LayersIcon from "@mui/icons-material/Layers";
 import Dropdown from "components/Dropdown";
 
 const ItemGroup = () => {
@@ -27,7 +34,7 @@ const ItemGroup = () => {
   const [description, setDescription] = useState("");
   const [active, setActive] = useState("");
   const [itemGroup, setItemGroup] = useState([]);
-  const [depreciation, setDepreciation] = useState([])
+  const [depreciation, setDepreciation] = useState([]);
   const [editItemGroup, setEditItemGroup] = useState(null);
   const [deleteItemGroup, setDeleteItemGroup] = useState(null);
   const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
@@ -37,6 +44,7 @@ const ItemGroup = () => {
     setEditItemGroup(itemGroup);
     setName(itemGroup ? itemGroup.name : "");
     setDescription(itemGroup ? itemGroup.description : "");
+    setDepreciation(itemGroup ? itemGroup.depreciation : "");
     setActive(itemGroup ? itemGroup.active : "");
     setOpen(true);
   };
@@ -56,8 +64,8 @@ const ItemGroup = () => {
     setActive(e.target.value);
   };
   const handleDepreciation = (e) => {
-    setDepreciation(e.target.value)
-  }
+    setDepreciation(e.target.value);
+  };
   const handleSearch = useCallback((searchInput) => {
     setSearch(searchInput);
   }, []);
@@ -71,7 +79,7 @@ const ItemGroup = () => {
           name,
           description,
           active,
-          depreciation
+          depreciation,
         });
         showToastSuccess(
           response.data.msg || "Grupo de itens atualizada com sucesso!"
@@ -81,7 +89,7 @@ const ItemGroup = () => {
           name,
           description,
           active,
-          depreciation
+          depreciation,
         });
         showToastSuccess(
           response.data.msg || "Grupo de itens cadastrada com sucesso!"
@@ -90,8 +98,8 @@ const ItemGroup = () => {
 
       setName("");
       setDescription("");
-      setActive("")
-      setDepreciation("")
+      setActive("");
+      setDepreciation("");
       setEditItemGroup(null);
       setOpen(false);
       loadData();
@@ -132,14 +140,18 @@ const ItemGroup = () => {
 
   async function handleDeleteClick() {
     try {
-      const response = await api2.delete(`api/item-group/${deleteItemGroup._id}`);
+      const response = await api2.delete(
+        `api/item-group/${deleteItemGroup._id}`
+      );
       if (response.status === 200) {
         loadData();
         showToastSuccess(
           response.data.msg || "Grupo de itens deletado com sucesso!"
         );
       } else {
-        showToastError(response.data?.error || "Erro ao excluir o grupo de itens.");
+        showToastError(
+          response.data?.error || "Erro ao excluir o grupo de itens."
+        );
       }
     } catch (error) {
       showToastError(
@@ -262,11 +274,13 @@ const ItemGroup = () => {
                 <Input
                   type="text"
                   label="Nome do Grupo"
+                  required
                   value={name}
                   onChange={handleName}
                 />
                 <Input
                   type="text"
+                  required
                   label="Descrição do Grupo"
                   value={description}
                   onChange={handleDescription}
@@ -274,6 +288,7 @@ const ItemGroup = () => {
                 <Input
                   type="text"
                   label="Taxa de depreciação"
+                  required
                   value={depreciation}
                   onChange={handleDepreciation}
                 />
@@ -293,7 +308,9 @@ const ItemGroup = () => {
                   color="secondary"
                   endIcon={<SendIcon />}
                 >
-                  {editItemGroup && editItemGroup._id ? "Atualizar" : "Cadastrar"}
+                  {editItemGroup && editItemGroup._id
+                    ? "Atualizar"
+                    : "Cadastrar"}
                 </Button>
               </form>
             </Typography>
