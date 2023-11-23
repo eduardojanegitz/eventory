@@ -1,7 +1,7 @@
 import Typography from "@mui/joy/Typography";
 import image from "../../assets/imagem-fundo-login.png";
 import Input from "components/Input";
-import { Button, Box } from "@mui/material";
+import { Button, Box, CircularProgress } from "@mui/material";
 import { useRef, useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { api2 } from "state/api";
@@ -15,6 +15,7 @@ const LoginPage = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const [isLoading, setIsLoading] = useState(false);
   // const from = location.state?.from?.pathname || "/home";
 
   const [username, setUsername] = useState("");
@@ -34,6 +35,8 @@ const LoginPage = () => {
     e.preventDefault();
 
     try {
+      setIsLoading(true);
+
       const response = await api2.post(
         "api/auth/login",
         JSON.stringify({
@@ -60,19 +63,23 @@ const LoginPage = () => {
         navigate("/inventarios");
       }
     } catch (error) {
-      if (error.response.status === 400) {
-        {
+      if (error.response) {
+        if (error.response.status === 400) {
           showToastError(
             error.response.data.message || "Usuário e senha são obrigatórios!"
           );
+        } else if (error.response.status === 401) {
+          showToastError(
+            error.response.data.message || "Usuário ou senha incorretos!"
+          );
+        } else {
+          showToastError("Erro interno no servidor");
         }
-      } else if (error.response.status === 401) {
-        showToastError(
-          error.response.data.message || "Usuário ou senha incorretos!"
-        );
       } else {
-        showToastError("Erro interno no servidor");
+        showToastError("Erro de conexão ou servidor indisponível");
       }
+    } finally {
+      setIsLoading(false);
     }
   };
   const handleUserInput = (e) => setUsername(e.target.value);
@@ -87,9 +94,9 @@ const LoginPage = () => {
           src={image}
           sx={{
             height: "65vh",
-            "@media (max-width: 768px)" : {
-              display: "none"
-            }
+            "@media (max-width: 768px)": {
+              display: "none",
+            },
           }}
         />
         <Box
@@ -101,9 +108,9 @@ const LoginPage = () => {
             alignItems: "center",
             justifyContent: "center",
             gap: "40px",
-            "@media (max-width: 768px)" : {
-              p: "16px"
-            }
+            "@media (max-width: 768px)": {
+              p: "16px",
+            },
           }}
         >
           <Typography>
@@ -131,8 +138,23 @@ const LoginPage = () => {
               label="Senha"
             />
 
-            <Button variant="contained" color="secondary" type="submit">
-              Acessar
+            <Button
+              variant="contained"
+              color="secondary"
+              disabled={isLoading}
+              type="submit"
+            >
+              {isLoading && (
+                <CircularProgress
+                  size={24}
+                  sx={{
+                    color: "secondary",
+                    transform: "translate(-50%, -50%)",
+                    marginRight: "2px",
+                  }}
+                />
+              )}
+              {!isLoading ? "Acessar" : "Aguarde..."}
             </Button>
           </form>
         </Box>

@@ -184,8 +184,8 @@ const Depreciation = () => {
             {selectedTimePeriod === 1
               ? "Valor residual por mês durante 1 ano"
               : selectedTimePeriod === 2
-              ? "Valor depreciado por mês durante 2 anos"
-              : "Valor depreciado por mês durante 3 anos"}
+              ? "Valor residual por mês durante 2 anos"
+              : "Valor residual por mês durante 3 anos"}
           </Typography>
 
           <Typography variant="h6" sx={{ textAlign: "center" }}>

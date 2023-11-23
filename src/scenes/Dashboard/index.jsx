@@ -1,90 +1,77 @@
 import React, { useEffect, useState } from "react";
 import FlexBetween from "components/FlexBetween";
 import Header from "components/Header";
-import {
-  DownloadOutlined,
-  Email,
-  PointOfSale,
-  PersonAdd,
-  Traffic,
-} from "@mui/icons-material";
-import {
-  Box,
-  Button,
-  Typography,
-  useTheme,
-  useMediaQuery,
-} from "@mui/material";
+import { Box, Typography, useTheme, useMediaQuery } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import BreakdownChart from "components/BreakdownChart";
-import OverviewChart from "components/OverviewChart";
-import { api2, useGetDashboardQuery, useGetProductsQuery } from "state/api";
+import { api2 } from "state/api";
 import StatBox from "components/StatBox";
 import TotalAssets from "components/TotalAssets";
 import PieChart from "components/PieChart";
-import SummarizeIcon from '@mui/icons-material/Summarize';
-import ErrorIcon from '@mui/icons-material/Error';
-import DateRangeIcon from '@mui/icons-material/DateRange';
-
-const Product = ({
-  _id,
-  name,
-  description,
-  price,
-  rating,
-  category,
-  supply,
-  stat,
-}) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-};
+import DateRangeIcon from "@mui/icons-material/DateRange";
+import MonetizationOnOutlinedIcon from "@mui/icons-material/MonetizationOnOutlined";
+import AssessmentOutlinedIcon from "@mui/icons-material/AssessmentOutlined";
+import HourglassEmptyOutlinedIcon from "@mui/icons-material/HourglassEmptyOutlined";
 
 const Dashboard = () => {
-
   const date = new Date();
-  const today = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium', timeStyle: 'short' }).format(date);
+  const today = new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
 
   const theme = useTheme();
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
-  const [inventory, setInventory] = useState([])
-  const [item, setItem] = useState([])
-  const [data, setData] = useState([])
-  const [total, setTotal] = useState([])
-
-  const itensAnterior = 100;
-  const itensAtuais = 120;
-
-  const crescimento = ((itensAtuais - itensAnterior) / itensAnterior) * 100;
+  const [inventory, setInventory] = useState([]);
+  const [item, setItem] = useState([]);
+  const [data, setData] = useState([]);
+  const [total, setTotal] = useState([]);
+  const [totalByYear, setTotalByYear] = useState([]);
+  const [averageAge, setAverageAge] = useState([]);
 
   useEffect(() => {
-    api2.get("/api/inventory").then((response) => setInventory(response.data))
-  }, [])
+    api2.get("/api/inventory").then((response) => setInventory(response.data));
 
-  useEffect(() => {
-    api2.get("/api/item").then((response) => setItem(response.data))
-  }, [])
+    api2.get("/api/item").then((response) => setItem(response.data));
+    api2
+      .get("/api/dashboard/item/lastmonth")
+      .then((response) => setData(response.data));
 
-  useEffect(() => {
-    api2.get("/api/dashboard/item/lastmonth").then((response) => setData(response.data))
-  }, [])
-
-  useEffect(() => {
     api2.get("/api/dashboard/item/total").then((response) => {
+      console.log(response);
       if (response.data && response.data[0] && response.data[0].total) {
         setTotal(response.data[0].total);
       } else {
-        setTotal(0); 
+        setTotal(0);
       }
+      api2.get("/api/dashboard/item/avaregeAssets").then((response) => {
+        console.log(response.data.averageAge);
+        if (response.data && response.data.averageAge) {
+          setAverageAge(response.data.averageAge.toFixed(2));
+        }
+      });
     });
-  }, [])
 
-  const growth = ((item.length - data.length) / data.length) * 100; 
+    api2
+      .get("/api/dashboard/item/totalByYear")
+      .then((response) => {
+        const totalByYear =
+          response.data && response.data[0] && response.data[0].total
+            ? response.data[0].total
+            : 0;
+        setTotalByYear(totalByYear);
+      })
+      .catch((error) => {
+        console.error("Erro na requisição:", error);
+      });
+  }, []);
+  const growth = ((item.length - data.length) / data.length) * 100;
   const formattedGrowth = `${growth.toFixed(1)}%`;
 
   const formatNumber = (value) => {
     return value.toLocaleString("pt-BR", { minimumFractionDigits: 2 });
   };
-  
+
   const columns = [
     {
       field: "inventoryCode",
@@ -98,67 +85,24 @@ const Dashboard = () => {
       flex: 1,
       valueGetter: (params) => {
         const date = new Date(params.row.createdAt);
-        return date.toLocaleString('pt-BR');
+        return date.toLocaleString("pt-BR");
       },
     },
     {
       field: "user",
       headerName: "Responsável",
       flex: 0.5,
-      // sortable: false,
-      // renderCell: (params) => params.value.length,
     },
-    // {
-    //   field: "cost",
-    //   headerName: "Custo",
-    //   flex: 1,
-    //   renderCell: (params) => `${Number(params.value).toFixed(2)}`,
-    // },
   ];
 
   return (
     <Box m="1.5rem 2.5rem">
-      {/* {data.map(
-            ({
-              _id,
-              name,
-              description,
-              price,
-              rating,
-              category,
-              supply,
-              stat,
-            }) => (
-              <Product
-                key={_id}
-                _id={_id}
-                name={name}
-                description={description}
-                price={price}
-                rating={rating}
-                category={category}
-                supply={supply}
-                stat={stat}
-              />
-            ))
-} */}
       <FlexBetween>
-        <Header title="DASHBOARD" subtitle="Bem vindo ao EVENTORY." date={today}/>
-
-        {/* <Box>
-          <Button
-            sx={{
-              backgroundColor: theme.palette.secondary.light,
-              color: theme.palette.background.alt,
-              fontSize: "14px",
-              fontWeight: "bold",
-              padding: "10px 20px",
-            }}
-          >
-            <DownloadOutlined sx={{ mr: "10px" }} />
-            Download Reports
-          </Button>
-        </Box> */}
+        <Header
+          title="DASHBOARD"
+          subtitle="Bem vindo ao EVENTORY."
+          date={today}
+        />
       </FlexBetween>
 
       <Box
@@ -177,7 +121,7 @@ const Dashboard = () => {
           increase={`+${formattedGrowth}`}
           description="Desde o mês passado"
           icon={
-            <SummarizeIcon
+            <AssessmentOutlinedIcon
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
             />
           }
@@ -185,10 +129,9 @@ const Dashboard = () => {
         <TotalAssets
           title="Valor total"
           value={`R$ ${formatNumber(total)}`}
-          increase="+21%"
-          description="Desde o mês passado"
+          description="Total em R$ dos ativos"
           icon={
-            <PointOfSale
+            <MonetizationOnOutlinedIcon
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
             />
           }
@@ -200,15 +143,12 @@ const Dashboard = () => {
           p="1rem"
           borderRadius="0.55rem"
         >
-          {/* <OverviewChart view="sales" isDashboard={true} /> */}
           <BreakdownChart isDashboard={true} />
         </Box>
         <StatBox
-          title="Idade média do ativo"
-          // value={data }
-          value="4"
-          increase="+5%"
-          description="Desde o mês passado"
+          title="Valor total no ano"
+          value={`R$ ${formatNumber(totalByYear)}`}
+          description="Valor total de aquisições no ano"
           icon={
             <DateRangeIcon
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
@@ -216,19 +156,16 @@ const Dashboard = () => {
           }
         />
         <StatBox
-          title="Alertas"
-          // value={data && data.yearlySalesTotal}
-          value="Veículos"
-          increase="Manutenção"
-          // description=""
+          title="Idade média do ativo"
+          value={averageAge}
+          description="Idade média do ativo imobilizado"
           icon={
-            <ErrorIcon
+            <HourglassEmptyOutlinedIcon
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
             />
           }
         />
 
-        {/* ROW 2 */}
         <Box
           gridColumn="span 8"
           gridRow="span 3"
@@ -246,6 +183,18 @@ const Dashboard = () => {
             },
             "& .MuiDataGrid-virtualScroller": {
               backgroundColor: theme.palette.primary.light,
+              overflowY: "auto",
+              scrollbarWidth: "thin",
+              "&::-webkit-scrollbar": {
+                width: "3px",
+              },
+              "&::-webkit-scrollbar-thumb": {
+                backgroundColor: "#b3b0b0",
+                borderRadius: "20px",
+              },
+              "&::-webkit-scrollbar-track": {
+                backgroundColor: "transparent",
+              },
             },
             "& .MuiDataGrid-FooterContainer": {
               backgroundColor: theme.palette.background.alt,
@@ -258,7 +207,6 @@ const Dashboard = () => {
           }}
         >
           <DataGrid
-            // loading={isLoading || !data}
             getRowId={(row) => row._id}
             rows={inventory || []}
             columns={columns}
@@ -274,17 +222,7 @@ const Dashboard = () => {
           <Typography variant="h6" sx={{ color: theme.palette.secondary[100] }}>
             Itens por grupos
           </Typography>
-          {/* <BreakdownChart isDashboard={true} /> */}
-          <PieChart isDashboard={true}/>
-
-          {/* <Typography
-            p="0 0.6rem"
-            fontSize="0.8rem"
-            sx={{ color: theme.palette.secondary[200] }}
-          >
-            Breakdown of real states and information via category for revenue
-            made for this year and total sales.
-          </Typography> */}
+          <PieChart isDashboard={true} />
         </Box>
       </Box>
     </Box>

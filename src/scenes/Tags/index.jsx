@@ -47,9 +47,6 @@ const Tags = () => {
 
   useEffect(() => {
     itemName.current.focus();
-  }, []);
-
-  useEffect(() => {
     api2
       .get(`api/inventory/location/${locationValue}`)
       .then((response) => setBackEnd(response.data));
@@ -215,13 +212,13 @@ const Tags = () => {
             label="Faça aqui a leitura do patrimônio..."
           />
           <Box sx={{ mb: "15px" }}>
-          <Button
-            sx={{ mr: "5px" }}
-            variant="contained"
-            color="secondary"
-            endIcon={<PlaylistAddIcon />}
-            onClick={addItem}
-          >
+            <Button
+              sx={{ mr: "5px" }}
+              variant="contained"
+              color="secondary"
+              endIcon={<PlaylistAddIcon />}
+              onClick={addItem}
+            >
               ADICIONAR
             </Button>
             <Button

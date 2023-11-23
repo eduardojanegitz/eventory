@@ -38,11 +38,13 @@ const Divergences = () => {
 
   const [searchInput, setSearchInput] = useState("");
   const [divergencesId, setDivergencesId] = useState("");
+  const [divergencesLocation, setDivergencesLocation] = useState("");
 
   const [sort, setSort] = useState({});
 
   const [divergences, setDivergences] = useState([]);
   const [itemsForDivergence, setItemsForDivergence] = useState([]);
+  const [correctItems, setCorrectItems] = useState([]);
   const [approvedDivergence, setApprovedDivergence] = useState([]);
 
   const handleOpen = () => {
@@ -81,6 +83,16 @@ const Divergences = () => {
 
   const handleAssetMovement = () => {
     navigate("/movimentacao");
+  };
+
+  const handleButtonClick = async (location) => {
+    try {
+      const response = await api2.get(`api/inventory/location/${location}`);
+      setCorrectItems(response.data);
+    } catch (error) {
+      console.error("Erro ao obter dados do backend:", error);
+      showToastError("Erro desconhecido. Entre em contato com o time de TI.");
+    }
   };
 
   const handleApproveDivergence = async (divergenceId) => {
@@ -162,6 +174,7 @@ const Divergences = () => {
             onClick={() => {
               handleOpenItemsModal(params.row._id);
               setDivergencesId(params.row._id);
+              handleButtonClick(params.row.location);
             }}
           >
             <VisibilityIcon />
@@ -276,66 +289,133 @@ const Divergences = () => {
         <Typography variant="h6" component="h2" sx={{ mb: "1rem" }}>
           Itens divergentes
         </Typography>
-        <Box
-          height="50vh"
-          width="100%"
-          sx={{
-            "& .MuiDataGrid-root": {
-              border: "none",
-            },
-            "& .MuiDataGrid-cell": {
-              borderBottom: "none",
-            },
-            "& .MuiDataGrid-columnHeaders": {
-              backgroundColor: theme.palette.background.alt,
-              color: theme.palette.secondary[100],
-              borderBottom: "none",
-            },
-            "& .MuiDataGrid-virtualScroller": {
-              backgroundColor: theme.palette.primary.light,
-              overflowY: "auto",
-              scrollbarWidth: "thin",
-              "&::-webkit-scrollbar": {
-                width: "3px",
+        <FlexBetween>
+          <Box
+            height="50vh"
+            width="100%"
+            sx={{
+              mr: "7px",
+              "& .MuiDataGrid-root": {
+                border: "none",
               },
-              "&::-webkit-scrollbar-thumb": {
-                backgroundColor: "#b3b0b0",
-                borderRadius: "20px",
+              "& .MuiDataGrid-cell": {
+                borderBottom: "none",
               },
-              "&::-webkit-scrollbar-track": {
-                backgroundColor: "transparent",
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: theme.palette.background.alt,
+                color: theme.palette.secondary[100],
+                borderBottom: "none",
               },
-            },
-            "& .MuiDataGrid-FooterContainer": {
-              backgroundColor: theme.palette.background.alt,
-              color: theme.palette.secondary[100],
-              borderTop: "none",
-            },
-            "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-              color: `${theme.palette.secondary[200]} !important`,
-            },
-          }}
-        >
-          <DataGrid
-            rows={itemsForDivergence.map((item, index) => ({
-              ...item,
-              id: index,
-            }))}
-            columns={[
-              { field: "nome", headerName: "Item", flex: 1 },
-              { field: "descricao", headerName: "Descrição", flex: 1 },
-              {
-                field: "localizacao",
-                headerName: "Localização correta",
-                flex: 1,
+              "& .MuiDataGrid-virtualScroller": {
+                backgroundColor: theme.palette.primary.light,
+                overflowY: "auto",
+                scrollbarWidth: "thin",
+                "&::-webkit-scrollbar": {
+                  width: "3px",
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  backgroundColor: "#b3b0b0",
+                  borderRadius: "20px",
+                },
+                "&::-webkit-scrollbar-track": {
+                  backgroundColor: "transparent",
+                },
               },
-              { field: "serial", headerName: "Número de série", flex: 1 },
-              { field: "tag", headerName: "Patrimônio", flex: 1 },
-            ]}
-            pageSize={20}
-            pagination
-          />
-        </Box>
+              "& .MuiDataGrid-FooterContainer": {
+                backgroundColor: theme.palette.background.alt,
+                color: theme.palette.secondary[100],
+                borderTop: "none",
+              },
+              "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+                color: `${theme.palette.secondary[200]} !important`,
+              },
+            }}
+          >
+            <DataGrid
+              rows={itemsForDivergence.map((item, index) => ({
+                ...item,
+                id: index,
+              }))}
+              columns={[
+                { field: "nome", headerName: "Item", flex: 1 },
+                {
+                  field: "localizacao",
+                  headerName: "Localização correta",
+                  flex: 1,
+                },
+                { field: "tag", headerName: "Patrimônio", flex: 0.4 },
+              ]}
+              pageSize={20}
+              pagination
+              components={{ Toolbar: GridToolbar }}
+            />
+          </Box>
+          <Box
+            height="50vh"
+            width="100%"
+            sx={{
+              "& .divergence": {
+                backgroundColor: "#e10b0b91",
+              },
+              "& .MuiDataGrid-root": {
+                border: "none",
+              },
+              "& .MuiDataGrid-cell": {
+                borderBottom: "none",
+              },
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: theme.palette.background.alt,
+                color: theme.palette.secondary[100],
+                borderBottom: "none",
+              },
+              "& .MuiDataGrid-virtualScroller": {
+                backgroundColor: theme.palette.primary.light,
+                overflowY: "auto",
+                scrollbarWidth: "thin",
+                "&::-webkit-scrollbar": {
+                  width: "3px",
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  backgroundColor: "#b3b0b0",
+                  borderRadius: "20px",
+                },
+                "&::-webkit-scrollbar-track": {
+                  backgroundColor: "transparent",
+                },
+              },
+              "& .MuiDataGrid-FooterContainer": {
+                backgroundColor: theme.palette.background.alt,
+                color: theme.palette.secondary[100],
+                borderTop: "none",
+              },
+              "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+                color: `${theme.palette.secondary[200]} !important`,
+              },
+            }}
+          >
+            <DataGrid
+              rows={correctItems.map((item, index) => ({ ...item, id: index }))}
+              columns={[
+                { field: "name", headerName: "Item", flex: 1 },
+                { field: "tag", headerName: "Patrimônio", flex: 0.3 },
+              ]}
+              pageSize={20}
+              pagination
+              getRowClassName={(params) => {
+                const correspondingItem = itemsForDivergence.find(
+                  (divergentItem) =>
+                    divergentItem.nome === params.row.name &&
+                    divergentItem.tag === params.row.tag
+                );
+
+                const isDifferent = correspondingItem ? true : false;
+
+                return isDifferent ? "" : "divergence";
+              }}
+              components={{ Toolbar: GridToolbar }}
+            />
+          </Box>
+        </FlexBetween>
         <Button
           variant="contained"
           color="secondary"
